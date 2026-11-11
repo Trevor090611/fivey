@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Original AP study guides and reflections on studying for a 5 across six AP courses.">
 <title>AP Course Library | Fivey</title>
+<link rel="stylesheet" href="./brand.css">
 <style>
 :root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--green:#d9f783;--white:#fffef8}
 *{box-sizing:border-box}
@@ -14,8 +15,6 @@ a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5p
 .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
 header{border-bottom:1px solid var(--line)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-.brand{font-size:29px;font-weight:900;letter-spacing:-.09em;text-decoration:none}
-.brand span{color:#457032}
 nav a{font-size:14px;font-weight:700}
 main{flex:1;padding-bottom:72px}
 .directory{padding-top:48px}
@@ -43,7 +42,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </style>
 </head>
 <body>
-<header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="./">← Home</a></nav></div></header>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./">← Home</a></nav></div></header>
 <main class="wrap">
 <section class="directory" id="courses" aria-labelledby="directory-title"><h1 id="directory-title">AP Course Library</h1><nav class="grid" id="directory" aria-label="AP courses"></nav></section>
 <noscript>Enable JavaScript to browse the course library.</noscript>

@@ -1,0 +1,10 @@
+.brand{display:grid;place-items:center;position:relative;isolation:isolate;width:59px;height:54px;color:#d9f783;text-decoration:none}
+.brand::before{content:"";position:absolute;inset:5px 8px;border-radius:50%;background:repeating-radial-gradient(circle,#19271f 0 7px,#455c3f 8px 9px)}
+.brand-number{position:relative;font:900 33px/1 system-ui,sans-serif}
+.brand-bill{position:absolute;display:grid;place-items:center;width:15px;height:9px;background:#acd77a;color:#254923;border:1px solid #2e552a;border-radius:2px;font:900 6px/1 system-ui,sans-serif;transform:rotate(var(--tilt))}
+.brand-bill:nth-of-type(2){top:5px;left:2px;--tilt:-27deg}
+.brand-bill:nth-of-type(3){top:1px;right:5px;--tilt:24deg}
+.brand-bill:nth-of-type(4){top:20px;right:0;--tilt:-20deg}
+.brand-bill:nth-of-type(5){bottom:4px;right:3px;--tilt:29deg}
+.brand-bill:nth-of-type(6){bottom:3px;left:5px;--tilt:-16deg}
+.brand-bill:nth-of-type(7){top:26px;left:0;--tilt:15deg}

@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Course | Fivey</title>
+<link rel="stylesheet" href="./brand.css">
 <style>
 :root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
 *{box-sizing:border-box}
@@ -13,8 +14,6 @@ a:focus-visible,summary:focus-visible{outline:3px solid #467335;outline-offset:5
 .wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
 header{border-bottom:1px solid var(--line)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-.brand{font-size:29px;font-weight:900;letter-spacing:-.09em;text-decoration:none}
-.brand span{color:#457032}
 nav a{font-size:14px;font-weight:700}
 .hero{padding:clamp(40px,8vw,92px) 0;background:var(--ink);color:var(--white)}
 h1,h2,p{margin:0}
@@ -44,7 +43,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </style>
 </head>
 <body>
-<header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="./courses.html">← All courses</a></nav></div></header>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html">← All courses</a></nav></div></header>
 <main>
 <section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
