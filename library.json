@@ -1,0 +1,8 @@
+{
+  "biology": { "guides": [], "articles": [] },
+  "chemistry": { "guides": [], "articles": [] },
+  "physics-1": { "guides": [], "articles": [] },
+  "psychology": { "guides": [], "articles": [] },
+  "calculus-ab": { "guides": [], "articles": [] },
+  "macroeconomics": { "guides": [], "articles": [] }
+}

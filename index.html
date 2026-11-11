@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Original AP study guides and reflections on studying for a 5 across six AP courses.">
+<title>Fivey | AP Study Guides</title>
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--green:#d9f783;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{font-size:29px;font-weight:900;letter-spacing:-.09em;text-decoration:none}
+.brand span{color:#457032}
+nav a{font-size:14px;font-weight:700}
+.hero{padding:clamp(52px,9vw,120px) 0;background:var(--ink);color:var(--white)}
+.hero .wrap{display:grid;grid-template-columns:1fr auto;align-items:center;gap:32px}
+h1,h2,h3,p{margin:0}
+h1,h2{line-height:1.04;letter-spacing:-.055em}
+h1{font-size:clamp(58px,11vw,142px)}
+.hero p{max-width:510px;margin-top:20px;color:#e0e9da;font-size:clamp(17px,2vw,22px)}
+.hero a{display:inline-block;margin-top:28px;background:var(--green);color:var(--ink);padding:11px 20px;border-radius:6px;font-weight:800;text-decoration:none}
+.mark{display:grid;place-items:center;width:clamp(120px,23vw,300px);aspect-ratio:1;border:1px solid #8eaa69;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 21px,#3f503b 22px 23px);font-size:clamp(80px,16vw,205px);font-weight:900;line-height:1;color:var(--green);user-select:none}
+main{padding-bottom:72px}
+.directory{padding-top:48px}
+.directory h2,.course h2{font-size:clamp(34px,5vw,58px);margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{display:block;min-height:140px;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:18px;text-decoration:none}
+.card:hover{border-color:var(--ink);background:#f1f7dc}
+.tag{display:inline-block;border-radius:4px;background:var(--tint);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
+.card strong{display:block;margin-top:13px;font-size:20px;line-height:1.25}
+.card small{color:var(--muted)}
+.course{margin-top:58px;padding-top:34px;border-top:1px solid var(--line);scroll-margin-top:24px}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
+.panel h3{font-size:21px;margin-bottom:8px}
+.panel p,.panel li{color:var(--muted)}
+.panel ul{margin:0;padding-left:20px}
+.panel li+li{margin-top:10px}
+details{padding:12px 0;border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:750}
+details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
+#error{margin-top:20px}
+@media(max-width:740px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero .wrap{grid-template-columns:1fr}.mark{display:none}}
+@media(max-width:450px){.columns{grid-template-columns:1fr}.card{padding:12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="#courses">Browse courses</a></nav></div></header>
+<section class="hero" aria-labelledby="title"><div class="wrap"><div>
+<h1 id="title">Fivey.</h1>
+<p>Original AP study guides and reflections on how I studied for a 5.</p>
+<a href="#courses">Explore AP courses ↓</a>
+</div><div class="mark" aria-hidden="true">5</div></div></section>
+<main class="wrap">
+<section class="directory" id="courses" aria-labelledby="directory-title"><h2 id="directory-title">Choose a course</h2><nav class="grid" id="directory" aria-label="AP courses"></nav></section>
+<p id="error" role="status" hidden>Resources are temporarily unavailable. Try refreshing the page.</p>
+<div id="course-pages"></div>
+<noscript>Enable JavaScript to browse the course library.</noscript>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script>
+const courses = [
+  ['biology', 'AP Biology', 'BIO', '#dceebc'],
+  ['chemistry', 'AP Chemistry', 'CHEM', '#f7e5a8'],
+  ['physics-1', 'AP Physics 1', 'PHYS', '#dedcfa'],
+  ['psychology', 'AP Psychology', 'PSYCH', '#f7dce8'],
+  ['calculus-ab', 'AP Calculus AB', 'CALC', '#d4ebfa'],
+  ['macroeconomics', 'AP Macroeconomics', 'MACRO', '#f5dfcc']
+];
+
+function element(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+function panel(title) {
+  const node = element('div', '', 'panel');
+  node.append(element('h3', title));
+  return node;
+}
+
+const shelves = new Map();
+for (const [id, name, code, tint] of courses) {
+  const card = element('a', '', 'card');
+  card.href = '#' + id;
+  const tag = element('span', code, 'tag');
+  tag.style.setProperty('--tint', tint);
+  tag.setAttribute('aria-hidden', 'true');
+  card.append(tag, element('strong', name), element('small', 'Guides & articles →'));
+  document.querySelector('#directory').append(card);
+
+  const course = element('section', '', 'course');
+  course.id = id;
+  const title = element('h2', name);
+  title.id = id + '-title';
+  course.setAttribute('aria-labelledby', title.id);
+  const columns = element('div', '', 'columns');
+  const guides = panel('Study Guides');
+  const articles = panel('How I Studied for a 5');
+  columns.append(guides, articles);
+  course.append(title, columns);
+  document.querySelector('#course-pages').append(course);
+  shelves.set(id, { guides, articles });
+}
+
+function guideLink(entry) {
+  if (typeof entry?.title !== 'string' || typeof entry.url !== 'string') return null;
+  try {
+    const url = new URL(entry.url, document.baseURI);
+    if (!['https:', 'http:'].includes(url.protocol)) return null;
+    const link = element('a', entry.title);
+    link.href = url.href;
+    return link;
+  } catch {
+    return null;
+  }
+}
+
+async function loadResources() {
+  const response = await fetch('./library.json');
+  if (!response.ok) throw new Error('Could not load the resource library');
+  const library = await response.json();
+  for (const [id, { guides, articles }] of shelves) {
+    const course = library[id] ?? {};
+    const links = (course.guides ?? []).map(guideLink).filter(Boolean);
+    if (links.length) {
+      const list = element('ul');
+      for (const link of links) {
+        const item = element('li');
+        item.append(link);
+        list.append(item);
+      }
+      guides.append(list);
+    } else {
+      guides.append(element('p', 'No study guides posted yet.'));
+    }
+    const posts = course.articles ?? [];
+    if (!posts.length) articles.append(element('p', 'No articles posted yet.'));
+    for (const post of posts) {
+      const details = element('details');
+      details.append(element('summary', post.title));
+      for (const paragraph of post.paragraphs) {
+        details.append(element('p', paragraph));
+      }
+      articles.append(details);
+    }
+  }
+}
+
+loadResources().catch(() => { document.querySelector('#error').hidden = false; });
+</script>
+</body>
+</html>
