@@ -46,7 +46,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <body>
 <header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="./#courses">← All courses</a></nav></div></header>
 <main>
-<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" aria-hidden="true" hidden></span><h1 id="title">Course</h1></div></section>
+<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
 <section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div id="guides"></div></section>
@@ -57,12 +57,12 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
 <script>
 const courses = [
-  ['biology', 'AP Biology', 'BIO', '#dceebc'],
-  ['chemistry', 'AP Chemistry', 'CHEM', '#f7e5a8'],
-  ['physics-1', 'AP Physics 1', 'PHYS', '#dedcfa'],
-  ['psychology', 'AP Psychology', 'PSYCH', '#f7dce8'],
-  ['calculus-ab', 'AP Calculus AB', 'CALC', '#d4ebfa'],
-  ['macroeconomics', 'AP Macroeconomics', 'MACRO', '#f5dfcc']
+  ['biology', 'AP Biology', 'STEM', '#d9f783'],
+  ['chemistry', 'AP Chemistry', 'STEM', '#d9f783'],
+  ['physics-1', 'AP Physics 1', 'STEM', '#d9f783'],
+  ['psychology', 'AP Psychology', 'Humanities', '#fff1b8'],
+  ['calculus-ab', 'AP Calculus AB', 'STEM', '#d9f783'],
+  ['macroeconomics', 'AP Macroeconomics', 'Humanities', '#fff1b8']
 ];
 
 function element(tag, text) {
@@ -125,11 +125,11 @@ async function loadResources(id) {
 const id = new URLSearchParams(location.search).get('course');
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
-  const [, name, code, tint] = selected;
+  const [, name, category, tint] = selected;
   document.title = name + ' | Fivey';
   document.querySelector('#title').textContent = name;
   const tag = document.querySelector('#tag');
-  tag.textContent = code;
+  tag.textContent = category;
   tag.style.setProperty('--tint', tint);
   tag.hidden = false;
   loadResources(id).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));

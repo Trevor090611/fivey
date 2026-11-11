@@ -98,12 +98,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
 <script>
 const courses = [
-  ['biology', 'AP Biology', 'BIO', '#dceebc'],
-  ['chemistry', 'AP Chemistry', 'CHEM', '#f7e5a8'],
-  ['physics-1', 'AP Physics 1', 'PHYS', '#dedcfa'],
-  ['psychology', 'AP Psychology', 'PSYCH', '#f7dce8'],
-  ['calculus-ab', 'AP Calculus AB', 'CALC', '#d4ebfa'],
-  ['macroeconomics', 'AP Macroeconomics', 'MACRO', '#f5dfcc']
+  ['biology', 'AP Biology', 'STEM', '#d9f783'],
+  ['chemistry', 'AP Chemistry', 'STEM', '#d9f783'],
+  ['physics-1', 'AP Physics 1', 'STEM', '#d9f783'],
+  ['psychology', 'AP Psychology', 'Humanities', '#fff1b8'],
+  ['calculus-ab', 'AP Calculus AB', 'STEM', '#d9f783'],
+  ['macroeconomics', 'AP Macroeconomics', 'Humanities', '#fff1b8']
 ];
 
 function element(tag, text, className) {
@@ -113,13 +113,12 @@ function element(tag, text, className) {
   return node;
 }
 
-for (const [id, name, code, tint] of courses) {
+for (const [id, name, category, tint] of courses) {
   const card = element('a', '', 'card');
   card.href = './course.html?course=' + encodeURIComponent(id);
-  card.setAttribute('aria-label', name + ' guides and articles');
-  const tag = element('span', code, 'tag');
+  card.setAttribute('aria-label', name + ' guides and articles, ' + category);
+  const tag = element('span', category, 'tag');
   tag.style.setProperty('--tint', tint);
-  tag.setAttribute('aria-hidden', 'true');
   card.append(tag, element('strong', name), element('small', 'Guides & articles →'));
   document.querySelector('#directory').append(card);
 }
