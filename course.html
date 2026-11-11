@@ -34,6 +34,13 @@ details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
 [hidden]{display:none}
 @media(max-width:620px){.columns{grid-template-columns:1fr}}
+@view-transition{navigation:auto}
+::view-transition-group(root){background:#f8f7ef}
+::view-transition-old(root){animation:150ms ease-in both fivey-fade-out;mix-blend-mode:normal}
+::view-transition-new(root){animation:200ms ease-out 150ms both fivey-fade-in;mix-blend-mode:normal}
+@keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 </style>
 </head>
 <body>
