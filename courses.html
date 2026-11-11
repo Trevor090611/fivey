@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Original AP study guides and reflections on studying for a 5 across six AP courses.">
+<title>AP Course Library | Fivey</title>
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--green:#d9f783;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{font-size:29px;font-weight:900;letter-spacing:-.09em;text-decoration:none}
+.brand span{color:#457032}
+nav a{font-size:14px;font-weight:700}
+main{flex:1;padding-bottom:72px}
+.directory{padding-top:48px}
+.directory h1{font-size:clamp(40px,7vw,74px);line-height:1.04;letter-spacing:-.055em;margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{display:block;min-height:140px;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:18px;text-decoration:none}
+.card[data-category="stem"]{background:#204b34;border-color:#204b34;color:#fffef8}
+.card[data-category="humanities"]{background:#936b00;border-color:#936b00;color:#fffef8}
+.card[data-category="stem"]:hover{background:#2b573d}
+.card[data-category="humanities"]:hover{background:#976e00}
+.card .tag{color:var(--ink)}
+.tag{display:inline-block;border-radius:4px;background:var(--tint);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
+.card strong{display:block;margin-top:13px;font-size:20px;line-height:1.25}
+.card small{color:#fffef8}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
+@media(max-width:740px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:450px){.card{padding:12px}}
+@view-transition{navigation:auto}
+::view-transition-group(root){background:#f8f7ef}
+::view-transition-old(root){animation:300ms ease-in both fivey-fade-out;mix-blend-mode:normal}
+::view-transition-new(root){animation:400ms ease-out 300ms both fivey-fade-in;mix-blend-mode:normal}
+@keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="./">← Home</a></nav></div></header>
+<main class="wrap">
+<section class="directory" id="courses" aria-labelledby="directory-title"><h1 id="directory-title">AP Course Library</h1><nav class="grid" id="directory" aria-label="AP courses"></nav></section>
+<noscript>Enable JavaScript to browse the course library.</noscript>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script>
+const courses = [
+  ['biology', 'AP Biology', 'STEM', '#d9f783'],
+  ['chemistry', 'AP Chemistry', 'STEM', '#d9f783'],
+  ['physics-1', 'AP Physics 1', 'STEM', '#d9f783'],
+  ['psychology', 'AP Psychology', 'Humanities', '#fff1b8'],
+  ['calculus-ab', 'AP Calculus AB', 'STEM', '#d9f783'],
+  ['macroeconomics', 'AP Macroeconomics', 'Humanities', '#fff1b8']
+];
+
+function element(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text) node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+
+for (const [id, name, category, tint] of courses) {
+  const card = element('a', '', 'card');
+  card.dataset.category = category.toLowerCase();
+  card.href = './course.html?course=' + encodeURIComponent(id);
+  card.setAttribute('aria-label', name + ' guides and articles, ' + category);
+  const tag = element('span', category, 'tag');
+  tag.style.setProperty('--tint', tint);
+  card.append(tag, element('strong', name), element('small', 'Guides & articles →'));
+  document.querySelector('#directory').append(card);
+}
+</script>
+</body>
+</html>
