@@ -51,27 +51,16 @@ h1{font-size:clamp(58px,11vw,142px)}
 @media(prefers-reduced-motion:reduce){.bill{animation:none}}
 main{padding-bottom:72px}
 .directory{padding-top:48px}
-.directory h2,.course h2{font-size:clamp(34px,5vw,58px);margin-bottom:22px}
+.directory h2{font-size:clamp(34px,5vw,58px);margin-bottom:22px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .card{display:block;min-height:140px;border:1px solid var(--line);border-radius:10px;background:var(--white);padding:18px;text-decoration:none}
 .card:hover{border-color:var(--ink);background:#f1f7dc}
 .tag{display:inline-block;border-radius:4px;background:var(--tint);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
 .card strong{display:block;margin-top:13px;font-size:20px;line-height:1.25}
 .card small{color:var(--muted)}
-.course{margin-top:58px;padding-top:34px;border-top:1px solid var(--line);scroll-margin-top:24px}
-.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.panel{background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
-.panel h3{font-size:21px;margin-bottom:8px}
-.panel p,.panel li{color:var(--muted)}
-.panel ul{margin:0;padding-left:20px}
-.panel li+li{margin-top:10px}
-details{padding:12px 0;border-bottom:1px solid var(--line)}
-summary{cursor:pointer;font-weight:750}
-details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
-#error{margin-top:20px}
 @media(max-width:740px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero .wrap{grid-template-columns:1fr}.mark{justify-self:center;width:clamp(130px,32vw,210px);font-size:clamp(92px,22vw,145px)}}
-@media(max-width:450px){.columns{grid-template-columns:1fr}.card{padding:12px}}
+@media(max-width:450px){.card{padding:12px}}
 </style>
 </head>
 <body>
@@ -97,8 +86,6 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </div></div></section>
 <main class="wrap">
 <section class="directory" id="courses" aria-labelledby="directory-title"><h2 id="directory-title">Choose a course</h2><nav class="grid" id="directory" aria-label="AP courses"></nav></section>
-<p id="error" role="status" hidden>Resources are temporarily unavailable. Try refreshing the page.</p>
-<div id="course-pages"></div>
 <noscript>Enable JavaScript to browse the course library.</noscript>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
@@ -119,81 +106,18 @@ function element(tag, text, className) {
   return node;
 }
 
-function panel(title) {
-  const node = element('div', '', 'panel');
-  node.append(element('h3', title));
-  return node;
-}
-
-const shelves = new Map();
 for (const [id, name, code, tint] of courses) {
   const card = element('a', '', 'card');
-  card.href = '#' + id;
+  card.href = './course.html?course=' + encodeURIComponent(id);
+  card.target = '_blank';
+  card.rel = 'noopener';
+  card.setAttribute('aria-label', name + ' guides and articles (opens in a new tab)');
   const tag = element('span', code, 'tag');
   tag.style.setProperty('--tint', tint);
   tag.setAttribute('aria-hidden', 'true');
   card.append(tag, element('strong', name), element('small', 'Guides & articles →'));
   document.querySelector('#directory').append(card);
-
-  const course = element('section', '', 'course');
-  course.id = id;
-  const title = element('h2', name);
-  title.id = id + '-title';
-  course.setAttribute('aria-labelledby', title.id);
-  const columns = element('div', '', 'columns');
-  const guides = panel('Study Guides');
-  const articles = panel('How I Studied for a 5');
-  columns.append(guides, articles);
-  course.append(title, columns);
-  document.querySelector('#course-pages').append(course);
-  shelves.set(id, { guides, articles });
 }
-
-function guideLink(entry) {
-  if (typeof entry?.title !== 'string' || typeof entry.url !== 'string') return null;
-  try {
-    const url = new URL(entry.url, document.baseURI);
-    if (!['https:', 'http:'].includes(url.protocol)) return null;
-    const link = element('a', entry.title);
-    link.href = url.href;
-    return link;
-  } catch {
-    return null;
-  }
-}
-
-async function loadResources() {
-  const response = await fetch('./library.json');
-  if (!response.ok) throw new Error('Could not load the resource library');
-  const library = await response.json();
-  for (const [id, { guides, articles }] of shelves) {
-    const course = library[id] ?? {};
-    const links = (course.guides ?? []).map(guideLink).filter(Boolean);
-    if (links.length) {
-      const list = element('ul');
-      for (const link of links) {
-        const item = element('li');
-        item.append(link);
-        list.append(item);
-      }
-      guides.append(list);
-    } else {
-      guides.append(element('p', 'No study guides posted yet.'));
-    }
-    const posts = course.articles ?? [];
-    if (!posts.length) articles.append(element('p', 'No articles posted yet.'));
-    for (const post of posts) {
-      const details = element('details');
-      details.append(element('summary', post.title));
-      for (const paragraph of post.paragraphs) {
-        details.append(element('p', paragraph));
-      }
-      articles.append(details);
-    }
-  }
-}
-
-loadResources().catch(() => { document.querySelector('#error').hidden = false; });
 </script>
 </body>
 </html>

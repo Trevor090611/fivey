@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Course | Fivey</title>
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,summary:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.brand{font-size:29px;font-weight:900;letter-spacing:-.09em;text-decoration:none}
+.brand span{color:#457032}
+nav a{font-size:14px;font-weight:700}
+.hero{padding:clamp(40px,8vw,92px) 0;background:var(--ink);color:var(--white)}
+h1,h2,p{margin:0}
+h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em}
+.tag{display:inline-block;margin-bottom:14px;border-radius:4px;background:var(--tint,#d9f783);color:var(--ink);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
+main{flex:1}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-block:34px 72px}
+.panel{min-width:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
+.panel h2{font-size:23px;margin-bottom:8px;letter-spacing:-.025em}
+.panel p,.panel li{color:var(--muted)}
+.panel ul{margin:0;padding-left:20px}
+.panel li+li{margin-top:10px}
+details{padding:12px 0;border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:750}
+details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+#status{padding-top:24px}
+footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
+[hidden]{display:none}
+@media(max-width:620px){.columns{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="./">fivey<span>.</span></a><nav aria-label="Main navigation"><a href="./#courses">← All courses</a></nav></div></header>
+<main>
+<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" aria-hidden="true" hidden></span><h1 id="title">Course</h1></div></section>
+<p class="wrap" id="status" role="status" hidden></p>
+<div class="wrap columns" id="resources" hidden>
+<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div id="guides"></div></section>
+<section class="panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
+</div>
+<noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script>
+const courses = [
+  ['biology', 'AP Biology', 'BIO', '#dceebc'],
+  ['chemistry', 'AP Chemistry', 'CHEM', '#f7e5a8'],
+  ['physics-1', 'AP Physics 1', 'PHYS', '#dedcfa'],
+  ['psychology', 'AP Psychology', 'PSYCH', '#f7dce8'],
+  ['calculus-ab', 'AP Calculus AB', 'CALC', '#d4ebfa'],
+  ['macroeconomics', 'AP Macroeconomics', 'MACRO', '#f5dfcc']
+];
+
+function element(tag, text) {
+  const node = document.createElement(tag);
+  node.textContent = text;
+  return node;
+}
+
+function showStatus(message) {
+  const status = document.querySelector('#status');
+  status.textContent = message;
+  status.hidden = false;
+}
+
+function guideLink(entry) {
+  if (typeof entry?.title !== 'string' || typeof entry.url !== 'string') return null;
+  try {
+    const url = new URL(entry.url, document.baseURI);
+    if (!['https:', 'http:'].includes(url.protocol)) return null;
+    const link = element('a', entry.title);
+    link.href = url.href;
+    return link;
+  } catch {
+    return null;
+  }
+}
+
+async function loadResources(id) {
+  const response = await fetch('./library.json');
+  if (!response.ok) throw new Error('Could not load the resource library');
+  const library = await response.json();
+  const course = library[id] ?? {};
+  const guides = document.querySelector('#guides');
+  const articles = document.querySelector('#articles');
+  const links = (course.guides ?? []).map(guideLink).filter(Boolean);
+  if (links.length) {
+    const list = document.createElement('ul');
+    for (const link of links) {
+      const item = document.createElement('li');
+      item.append(link);
+      list.append(item);
+    }
+    guides.append(list);
+  } else {
+    guides.append(element('p', 'No study guides posted yet.'));
+  }
+  const posts = course.articles ?? [];
+  if (!posts.length) articles.append(element('p', 'No articles posted yet.'));
+  for (const post of posts) {
+    const details = document.createElement('details');
+    details.append(element('summary', post.title));
+    for (const paragraph of post.paragraphs) {
+      details.append(element('p', paragraph));
+    }
+    articles.append(details);
+  }
+  document.querySelector('#resources').hidden = false;
+}
+
+const id = new URLSearchParams(location.search).get('course');
+const selected = courses.find(([courseId]) => courseId === id);
+if (selected) {
+  const [, name, code, tint] = selected;
+  document.title = name + ' | Fivey';
+  document.querySelector('#title').textContent = name;
+  const tag = document.querySelector('#tag');
+  tag.textContent = code;
+  tag.style.setProperty('--tint', tint);
+  tag.hidden = false;
+  loadResources(id).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
+} else {
+  document.querySelector('#title').textContent = 'Course not found';
+  showStatus('Use All courses to choose a subject.');
+}
+</script>
+</body>
+</html>
