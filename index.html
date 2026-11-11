@@ -27,15 +27,21 @@ h1{font-size:clamp(58px,11vw,142px)}
 .mark{display:grid;place-items:center;width:clamp(120px,23vw,300px);aspect-ratio:1;border:1px solid #8eaa69;border-radius:50%;background:repeating-radial-gradient(circle,transparent 0 21px,#3f503b 22px 23px);font-size:clamp(80px,16vw,205px);font-weight:900;line-height:1;color:var(--green);user-select:none}
 .mark{position:relative;isolation:isolate}
 .mark-number{position:relative;z-index:1;text-shadow:0 3px 0 #18271f}
-.bill{position:absolute;left:var(--x);top:var(--y);z-index:2;display:grid;place-items:center;width:24%;aspect-ratio:2.15;border:1px solid #2e552a;border-radius:4px;background:#acd77a;color:#254923;box-shadow:0 3px 0 #101a13;font:900 clamp(9px,1.4vw,17px)/1 system-ui,sans-serif;transform:rotate(var(--tilt));animation:bill-fall 3.2s var(--delay) both}
+.bill{position:absolute;left:var(--x);top:var(--y);z-index:2;display:grid;place-items:center;width:20%;aspect-ratio:2.15;border:1px solid #2e552a;border-radius:4px;background:#acd77a;color:#254923;box-shadow:0 3px 0 #101a13;font:900 clamp(9px,1.4vw,17px)/1 system-ui,sans-serif;transform:rotate(var(--tilt));animation:bill-fall 3.2s var(--delay) both}
 .bill::before{content:"";position:absolute;inset:13%;border:1px solid currentColor;border-radius:3px;opacity:.75}
 .bill::after{content:"";position:absolute;inset:43% 17%;border-inline:2px solid currentColor;opacity:.75}
-.bill:nth-of-type(2){--x:-3%;--y:13%;--tilt:-29deg;--delay:0s}
-.bill:nth-of-type(3){--x:76%;--y:5%;--tilt:24deg;--delay:.35s}
-.bill:nth-of-type(4){--x:-6%;--y:54%;--tilt:17deg;--delay:.65s}
-.bill:nth-of-type(5){--x:84%;--y:41%;--tilt:-23deg;--delay:.2s}
-.bill:nth-of-type(6){--x:12%;--y:81%;--tilt:-18deg;--delay:.9s}
-.bill:nth-of-type(7){--x:71%;--y:79%;--tilt:32deg;--delay:1.15s}
+.bill:nth-of-type(2){--x:40%;--y:-3%;--tilt:-12deg;--delay:0.16s}
+.bill:nth-of-type(3){--x:65%;--y:3%;--tilt:22deg;--delay:0.4s}
+.bill:nth-of-type(4){--x:81%;--y:19%;--tilt:-18deg;--delay:0.12s}
+.bill:nth-of-type(5){--x:85%;--y:42%;--tilt:16deg;--delay:0.65s}
+.bill:nth-of-type(6){--x:79%;--y:63%;--tilt:-24deg;--delay:0.32s}
+.bill:nth-of-type(7){--x:64%;--y:81%;--tilt:28deg;--delay:0.93s}
+.bill:nth-of-type(8){--x:40%;--y:88%;--tilt:-9deg;--delay:0.58s}
+.bill:nth-of-type(9){--x:17%;--y:82%;--tilt:-23deg;--delay:0.8s}
+.bill:nth-of-type(10){--x:0%;--y:65%;--tilt:20deg;--delay:1.06s}
+.bill:nth-of-type(11){--x:-5%;--y:43%;--tilt:-15deg;--delay:0.48s}
+.bill:nth-of-type(12){--x:1%;--y:20%;--tilt:25deg;--delay:0.22s}
+.bill:nth-of-type(13){--x:17%;--y:3%;--tilt:-26deg;--delay:1.15s}
 @keyframes bill-fall{
   0%{opacity:0;transform:translate(16px,-88px) rotate(calc(var(--tilt) - 50deg))}
   23%{opacity:1}
@@ -76,6 +82,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <a href="#courses">Explore AP courses ↓</a>
 </div><div class="mark" aria-hidden="true">
   <span class="mark-number">5</span>
+  <span class="bill">$</span>
+  <span class="bill">$</span>
+  <span class="bill">$</span>
+  <span class="bill">$</span>
+  <span class="bill">$</span>
+  <span class="bill">$</span>
   <span class="bill">$</span>
   <span class="bill">$</span>
   <span class="bill">$</span>
