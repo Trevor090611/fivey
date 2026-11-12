@@ -100,8 +100,8 @@ function getWorker() {
     } else if (data.type === 'generating') {
       status.textContent = 'Fivey is writing a reply…';
     } else if (data.type === 'answer') {
-      if (pending.review && introducesNumbers(data.answer, pending.question.content)) {
-        addMessage('Fivey', 'I couldn’t verify the numbers in my expanded explanation. The answer key above has the checked solution.');
+      if (pending.review && (data.answer.length > 950 || introducesNumbers(data.answer, pending.question.content))) {
+        addMessage('Fivey', 'I couldn’t verify my expanded explanation. The answer key above has the checked solution.');
         finish('Review the answer key or ask Fivey a more specific follow-up.');
         return;
       }
@@ -135,8 +135,11 @@ function fail(message) {
 }
 
 function introducesNumbers(answer, source) {
-  const numbers = text => (text.replace(/^\s*\d+[.)]\s+/gm, '').match(/\d+(?:[.,]\d+)*/g) ?? [])
-    .map(value => Number(value.replaceAll(',', '')));
+  const numbers = text => (text.replace(/^\s*\d+[.)]\s+/gm, '').match(/\d+(?:[.,]\d+)*\s*%?/g) ?? [])
+    .map(value => {
+      const isPercent = value.endsWith('%');
+      return String(Number(value.replace(/[,%]/g, '').trim())) + (isPercent ? '%' : '');
+    });
   const provided = new Set(numbers(source));
   return numbers(answer).some(value => !provided.has(value));
 }
@@ -174,7 +177,8 @@ function ask(isPractice = false, review) {
       'My choice: ' + review.selected,
       'Correct answer: ' + review.correct,
       'Answer key explanation: ' + review.explanation,
-      'Use the checked explanation as your only source of facts and arithmetic. Do not invent intermediate values, definitions, or a different answer. In plain text, explain how the checked reasoning leads to the correct option, then contrast my selected option with that reasoning. If the checked explanation lacks a step, describe the method in words instead of guessing numbers.'
+      review.whyWrong ? 'Checked reasoning about my choice: ' + review.whyWrong : '',
+      'Use the checked explanation as your only source of facts and arithmetic. Do not invent intermediate values, definitions, or a different answer. In two or three sentences of plain text, explain how the checked reasoning leads to the correct option, then contrast my selected option with that reasoning. If the checked explanation lacks a step, describe the method in words instead of guessing numbers.'
     ].join('\n');
   } else if (isPractice) {
     content = 'Write one original AP-style practice question for ' + name + '. ' +
@@ -232,6 +236,7 @@ document.addEventListener('fivey:explain-answer', ({ detail }) => {
   }
   select.value = detail.course;
   addMessage('Answer key', detail.prompt + '\n\nYour choice: ' + detail.selected +
-    '\nCorrect answer: ' + detail.correct + '\n\n' + detail.explanation);
+    '\nCorrect answer: ' + detail.correct + '\n\n' + detail.explanation +
+    (detail.whyWrong ? '\n\nWhy your choice was wrong: ' + detail.whyWrong : ''));
   ask(false, detail);
 });

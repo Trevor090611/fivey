@@ -124,11 +124,23 @@ const templates = {
       percent(b), [percent(b / 10), percent(100 - b), percent(2 * b)],
       'Divide the number of unemployed workers by the labor force, then multiply by 100.'
     ),
-    (a, b) => question(
-      `The GDP deflator increases from ${a * 100} to ${a * (100 + b)}. By what percentage did the overall price level rise?`,
-      percent(b), [percent(b / 10), percent(100 + b), percent(2 * b)],
-      `The index rose by ${a * b}, since ${a * (100 + b)} − ${a * 100} = ${a * b}. Divide the rise by the starting index: ${a * b} ÷ ${a * 100} = ${b / 100}. Express that fraction as a percentage: ${percent(b)}.`
-    )
+    (a, b) => {
+      const start = a * 100;
+      const change = a * b;
+      const end = start + change;
+      const item = question(
+        `The GDP deflator increases from ${start} to ${end}. By what percentage did the overall price level rise?`,
+        percent(b), [percent(b / 10), percent(100 + b), percent(2 * b)],
+        `The index rose by ${change}, since ${end} − ${start} = ${change}. Divide the rise by the starting index: ${change} ÷ ${start} = ${b / 100}. Express that fraction as a percentage: ${percent(b)}.`
+      );
+      item.choiceExplanations = [
+        null,
+        `${percent(b / 10)} of ${start} is only ${change / 10} index points. The actual rise was ${change} index points.`,
+        `${percent(100 + b)} compares the entire ending index to the starting index. The question asks for just the increase, so subtract the starting index first.`,
+        `${percent(2 * b)} of ${start} would be an increase of ${2 * change} index points, twice the actual change.`
+      ];
+      return item;
+    }
   ]
 };
 
