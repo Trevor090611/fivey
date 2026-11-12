@@ -1,0 +1,60 @@
+.fivey-chat {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 20;
+  color: #19271f;
+  font: 15px/1.45 system-ui, sans-serif;
+}
+.fivey-chat * { box-sizing: border-box; }
+.fivey-chat button, .fivey-chat select, .fivey-chat textarea { font: inherit; }
+.fivey-chat button { cursor: pointer; }
+.fivey-chat button:disabled { cursor: wait; opacity: .65; }
+.fivey-chat button:focus-visible, .fivey-chat select:focus-visible, .fivey-chat textarea:focus-visible {
+  outline: 2px solid #467335;
+  outline-offset: 2px;
+}
+.fivey-chat .chat-open, .fivey-chat .chat-send {
+  color: #19271f;
+  background: #d9f783;
+  border: 1px solid #52673b;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-weight: 750;
+}
+.fivey-chat .chat-open { box-shadow: 0 4px 18px #19271f30; }
+.fivey-chat .chat-panel {
+  width: min(380px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background: #fffef8;
+  border: 1px solid #8b9c8a;
+  border-radius: 14px;
+  box-shadow: 0 12px 35px #19271f35;
+}
+.fivey-chat [hidden] { display: none; }
+.fivey-chat .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #204b34; color: #fffef8; }
+.fivey-chat .chat-close { background: transparent; color: inherit; border: 0; min-width: 32px; min-height: 32px; font-size: 22px; }
+.fivey-chat .chat-close:focus-visible { outline-color: #d9f783; }
+.fivey-chat .chat-tools, .fivey-chat .chat-form { display: grid; gap: 8px; padding: 10px 14px; }
+.fivey-chat select, .fivey-chat textarea, .fivey-chat .chat-practice {
+  width: 100%;
+  border: 1px solid #8b9c8a;
+  border-radius: 6px;
+  padding: 7px;
+  color: #19271f;
+  background: #fffef8;
+}
+.fivey-chat .chat-log {
+  min-height: 64px;
+  max-height: min(230px, 34dvh);
+  overflow: auto;
+  padding: 8px 14px;
+  border-block: 1px solid #d4d9cd;
+}
+.fivey-chat .chat-message { margin: 0 0 8px; padding: 8px; border-radius: 7px; white-space: pre-wrap; overflow-wrap: anywhere; background: #edf1e9; }
+.fivey-chat .chat-message[data-speaker="You"] { background: #eaf4d2; }
+.fivey-chat .chat-status { margin: 0; padding: 0 14px 10px; font-size: 13px; color: #4e5d52; }
+.fivey-chat .chat-form textarea { resize: vertical; max-height: 100px; }

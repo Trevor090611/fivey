@@ -1,0 +1,165 @@
+const subjects = {
+  biology: ['AP Biology', 'biochemistry, cells, energetics, cell signaling, heredity, gene expression, evolution, ecology'],
+  chemistry: ['AP Chemistry', 'atomic structure, bonding, intermolecular forces, reactions, kinetics, thermodynamics, equilibria, acids and bases, electrochemistry'],
+  'physics-1': ['AP Physics 1', 'kinematics, forces, energy, momentum, rotation, oscillations, fluids; use algebra rather than calculus'],
+  psychology: ['AP Psychology', 'research methods, biological bases, cognition, development and learning, social psychology, personality, mental and physical health'],
+  'calculus-ab': ['AP Calculus AB', 'limits, continuity, differentiation, applications of derivatives, integration, differential equations, applications of integration'],
+  macroeconomics: ['AP Macroeconomics', 'economic indicators, business cycles, aggregate demand and supply, fiscal and monetary policy, growth, open economy and exchange rates']
+};
+
+const widget = document.createElement('aside');
+widget.className = 'fivey-chat';
+widget.setAttribute('aria-label', 'Fivey AP tutor');
+widget.innerHTML = `
+  <button class="chat-open" type="button" aria-expanded="false" aria-controls="fivey-panel">Ask Fivey</button>
+  <section class="chat-panel" id="fivey-panel" aria-labelledby="fivey-chat-title" hidden>
+    <div class="chat-header"><strong id="fivey-chat-title">Fivey · AP tutor</strong><button class="chat-close" type="button" aria-label="Close Fivey">×</button></div>
+    <div class="chat-tools">
+      <label for="fivey-subject">AP subject</label>
+      <select id="fivey-subject">
+        <option value="">Choose a course</option>
+      </select>
+      <button class="chat-practice" type="button">Generate a practice question</button>
+    </div>
+    <div class="chat-log" role="log" aria-label="Conversation" tabindex="0"></div>
+    <form class="chat-form">
+      <label for="fivey-question">Your question</label>
+      <textarea id="fivey-question" maxlength="1000" rows="2" placeholder="Ask about a topic or request a quiz"></textarea>
+      <button class="chat-send" type="submit">Send</button>
+    </form>
+    <p class="chat-status" role="status">Runs on your device. First use downloads a model. AI answers can be wrong.</p>
+  </section>`;
+document.body.append(widget);
+
+const open = widget.querySelector('.chat-open');
+const panel = widget.querySelector('.chat-panel');
+const close = widget.querySelector('.chat-close');
+const select = widget.querySelector('select');
+const input = widget.querySelector('textarea');
+const form = widget.querySelector('form');
+const practice = widget.querySelector('.chat-practice');
+const send = widget.querySelector('.chat-send');
+const log = widget.querySelector('.chat-log');
+const status = widget.querySelector('.chat-status');
+
+for (const [key, [name]] of Object.entries(subjects)) {
+  select.add(new Option(name, key));
+}
+select.value = new URLSearchParams(location.search).get('course') ?? '';
+if (select.selectedIndex < 0) select.selectedIndex = 0;
+
+let worker;
+let pending;
+const history = new Map();
+
+function toggle(isOpen) {
+  panel.hidden = !isOpen;
+  open.hidden = isOpen;
+  open.setAttribute('aria-expanded', String(isOpen));
+  (isOpen ? (select.value ? input : select) : open).focus();
+}
+open.addEventListener('click', () => toggle(true));
+close.addEventListener('click', () => toggle(false));
+panel.addEventListener('keydown', event => {
+  if (event.key === 'Escape') toggle(false);
+});
+
+function addMessage(speaker, text) {
+  const message = document.createElement('p');
+  message.className = 'chat-message';
+  message.dataset.speaker = speaker;
+  message.textContent = speaker + ': ' + text;
+  log.append(message);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setBusy(busy) {
+  send.disabled = practice.disabled = select.disabled = input.disabled = busy;
+}
+
+function getWorker() {
+  if (worker) return worker;
+  worker = new Worker(new URL('./fivey-worker.js', import.meta.url), { type: 'module' });
+  worker.addEventListener('message', ({ data }) => {
+    if (data.type === 'loading') {
+      status.textContent = 'Preparing the local model… ' + data.percent + '%';
+    } else if (data.type === 'generating') {
+      status.textContent = 'Fivey is writing a reply…';
+    } else if (data.type === 'answer') {
+      const answer = { role: 'assistant', content: data.answer };
+      history.set(pending.key, [...pending.previous, pending.question, answer].slice(-4));
+      addMessage('Fivey', data.answer);
+      finish('AI answers can be wrong. Check important details against your course materials.');
+    } else if (data.type === 'unsupported') {
+      fail('This browser could not access WebGPU. Open Fivey in a WebGPU-enabled browser to use the tutor.');
+    } else if (data.type === 'error') {
+      fail('Fivey could not complete the request. Check your connection and device memory, then try again.');
+    }
+  });
+  worker.addEventListener('error', () => fail('Fivey could not start. Reload the page and try again.'));
+  return worker;
+}
+
+function finish(message) {
+  pending = undefined;
+  setBusy(false);
+  status.textContent = message;
+  if (!panel.hidden) input.focus();
+}
+
+function fail(message) {
+  if (pending) input.value = pending.draft;
+  worker?.terminate();
+  worker = undefined;
+  finish(message);
+}
+
+function ask(isPractice = false) {
+  if (pending) return;
+  const key = select.value;
+  if (!Object.hasOwn(subjects, key)) {
+    status.textContent = 'Choose an AP subject first.';
+    select.focus();
+    return;
+  }
+
+  const draft = input.value.trim();
+  if (!isPractice && !draft) {
+    input.focus();
+    return;
+  }
+
+  if (!navigator.gpu) {
+    status.textContent = 'This browser does not support WebGPU. Open Fivey in a WebGPU-enabled browser to use the tutor.';
+    return;
+  }
+
+  const [name, topics] = subjects[key];
+  const system = {
+    role: 'system',
+    content: `You are Fivey, a tutor for ${name}. Course scope includes ${topics}. Give clear, accurate AP-level explanations. Show reasoning and units where relevant. Ask for clarification when needed and say when unsure. Keep answers concise. For practice, write original AP-style questions, never claim they are official exam items. For multiple choice, provide four plausible choices and explain the correct answer after the student responds unless they ask for the answer now. If the request belongs to another AP course, ask the student to change the subject. Use plain text, clear numbering, and short paragraphs.`
+  };
+  const content = isPractice
+    ? 'Write one original AP-style practice question for ' + name + '. ' +
+      (draft ? 'Focus on this request: ' + draft : 'Pick a topic within the course.') +
+      ' Wait for my answer before explaining the solution.'
+    : draft;
+  const question = { role: 'user', content };
+  const previous = history.get(key) ?? [];
+  pending = { key, draft, previous, question };
+  addMessage('You', isPractice && !draft ? 'Generate a practice question for ' + name + '.' : content);
+  input.value = '';
+  setBusy(true);
+  status.textContent = 'Starting Fivey…';
+  try {
+    getWorker().postMessage([system, ...previous, question]);
+  } catch {
+    fail('Fivey could not start. Reload the page and try again.');
+  }
+}
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  ask();
+});
+practice.addEventListener('click', () => ask(true));
