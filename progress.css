@@ -13,3 +13,30 @@
 .progress-quiz input { flex: 0 0 auto; accent-color: #204b34; }
 .progress-quiz .answer-review { margin-top: 9px; border-top: 1px solid #d4d9cd; padding-top: 7px; }
 .progress-summary { margin-top: 16px; }
+
+.progress-quiz fieldset:disabled input {
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  border: 1.5px solid #7d857a;
+  border-radius: 50%;
+  display: inline-grid;
+  place-content: center;
+  align-self: flex-start;
+  margin-top: .3em;
+}
+.progress-quiz fieldset:disabled input:checked::before,
+.progress-quiz [data-result="correct"] input::before {
+  content: "";
+  width: .48em;
+  height: .48em;
+  border-radius: 50%;
+  background: currentColor;
+}
+.progress-quiz label[data-result] { flex-wrap: wrap; font-weight: 650; }
+.progress-quiz label[data-result="incorrect"] { color: #a51d29; }
+.progress-quiz label[data-result="correct"] { color: #176436; }
+.progress-quiz label[data-result] input { border-color: currentColor; color: inherit; }
+.progress-quiz .choice-result { font-size: .88em; }
+.progress-quiz .progress-explain { display: block; margin: -7px 0 20px; }

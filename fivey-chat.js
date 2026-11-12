@@ -129,7 +129,7 @@ function fail(message) {
   finish(message);
 }
 
-function ask(isPractice = false) {
+function ask(isPractice = false, review) {
   if (pending) return;
   const key = select.value;
   if (!Object.hasOwn(subjects, key)) {
@@ -139,7 +139,7 @@ function ask(isPractice = false) {
   }
 
   const draft = input.value.trim();
-  if (!isPractice && !draft) {
+  if (!isPractice && !draft && !review) {
     input.focus();
     return;
   }
@@ -154,15 +154,27 @@ function ask(isPractice = false) {
     role: 'system',
     content: `You are Fivey, a tutor for ${name}. Course scope includes ${topics}. Give clear, accurate AP-level explanations. Show reasoning and units where relevant. Ask for clarification when needed and say when unsure. Keep answers concise. For practice, write original AP-style questions, never claim they are official exam items. For multiple choice, provide four plausible choices and explain the correct answer after the student responds unless they ask for the answer now. If the request belongs to another AP course, ask the student to change the subject. Use plain text, clear numbering, and short paragraphs.`
   };
-  const content = isPractice
-    ? 'Write one original AP-style practice question for ' + name + '. ' +
+  let content = draft;
+  if (review) {
+    content = [
+      'Explain the answer to this Progress Checking question using the supplied answer key.',
+      'Question: ' + review.prompt,
+      'My choice: ' + review.selected,
+      'Correct answer: ' + review.correct,
+      'Answer key explanation: ' + review.explanation,
+      'Walk through how to solve it in plain language. Explicitly explain why my chosen option is wrong for this question, and how to avoid that mistake. Keep the two parts clearly labeled.'
+    ].join('\n');
+  } else if (isPractice) {
+    content = 'Write one original AP-style practice question for ' + name + '. ' +
       (draft ? 'Focus on this request: ' + draft : 'Pick a topic within the course.') +
-      ' Wait for my answer before explaining the solution.'
-    : draft;
+      ' Wait for my answer before explaining the solution.';
+  }
   const question = { role: 'user', content };
   const previous = history.get(key) ?? [];
   pending = { key, draft, previous, question };
-  addMessage('You', isPractice && !draft ? 'Generate a practice question for ' + name + '.' : content);
+  const request = review ? 'Explain why my answer was wrong and walk me through the correct answer.'
+    : isPractice && !draft ? 'Generate a practice question for ' + name + '.' : content;
+  addMessage('You', request);
   input.value = '';
   setBusy(true);
   status.textContent = 'Starting Fivey…';
@@ -197,4 +209,17 @@ widget.querySelector('.chat-sample').addEventListener('click', () => {
   details.append(summary, solution);
   log.append(details);
   log.scrollTop = log.scrollHeight;
+});
+
+document.addEventListener('fivey:explain-answer', ({ detail }) => {
+  if (!detail || !Object.hasOwn(subjects, detail.course)) return;
+  toggle(true);
+  if (pending) {
+    addMessage('Fivey', 'I’m still working on the current reply. Click Explain with Fivey again when it finishes.');
+    return;
+  }
+  select.value = detail.course;
+  addMessage('Answer key', detail.prompt + '\n\nYour choice: ' + detail.selected +
+    '\nCorrect answer: ' + detail.correct + '\n\n' + detail.explanation);
+  ask(false, detail);
 });

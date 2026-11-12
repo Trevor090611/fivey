@@ -35,6 +35,15 @@ function reserveUnseen(questions, count) {
   return shuffle(set);
 }
 
+function markChoice(field, index, result, text) {
+  const label = field.querySelector('input[value="' + index + '"]').closest('label');
+  label.dataset.result = result;
+  const badge = document.createElement('span');
+  badge.className = 'choice-result';
+  badge.textContent = text;
+  label.append(badge);
+}
+
 function setupPractice() {
   section.hidden = false;
   const setup = section.querySelector('.progress-setup');
@@ -128,13 +137,30 @@ function setupPractice() {
       }
 
       let score = 0;
-      for (const { field, review, item } of reviews) {
+      for (const [index, { field, review, item }] of reviews.entries()) {
         const selected = Number(field.querySelector(':checked').value);
         const correct = selected === item.answer;
         if (correct) score++;
-        review.textContent = (correct ? 'Correct. ' : 'Correct answer: ' + item.choices[item.answer] + '. ') + item.explanation;
+        markChoice(field, item.answer, 'correct', '✓ Correct answer');
+        if (!correct) markChoice(field, selected, 'incorrect', '✕ Your answer was incorrect');
+
+        review.textContent = item.explanation;
         review.hidden = false;
         field.disabled = true;
+        if (!correct) {
+          const explain = document.createElement('button');
+          explain.type = 'button';
+          explain.className = 'progress-explain';
+          explain.textContent = 'Explain with Fivey';
+          explain.setAttribute('aria-label', 'Explain question ' + (index + 1) + ' with Fivey');
+          explain.addEventListener('click', () => {
+            document.dispatchEvent(new CustomEvent('fivey:explain-answer', {
+              detail: { course, prompt: item.prompt, selected: item.choices[selected], correct: item.choices[item.answer], explanation: item.explanation }
+            }));
+          });
+          // Keep this button outside the disabled fieldset so it stays interactive.
+          field.after(explain);
+        }
       }
       active = false;
       submit.hidden = true;
