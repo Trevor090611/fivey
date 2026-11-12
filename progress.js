@@ -1,3 +1,5 @@
+import { variantAt } from './progress-variants.js';
+
 const course = new URLSearchParams(location.search).get('course');
 const section = document.querySelector('#progress-check');
 const supported = new Set(['biology', 'chemistry', 'physics-1', 'psychology', 'calculus-ab', 'macroeconomics']);
@@ -11,6 +13,26 @@ function shuffle(values) {
     [result[index], result[other]] = [result[other], result[index]];
   }
   return result;
+}
+
+function reserveUnseen(questions, count) {
+  const key = 'fivey-progress-seen-v1:' + course;
+  const saved = JSON.parse(localStorage.getItem(key) ?? '{"seen":[],"offset":0}');
+  const seen = new Set(saved.seen);
+  const set = shuffle(questions.filter(item => !seen.has(item.prompt))).slice(0, count);
+  for (const item of set) seen.add(item.prompt);
+
+  let offset = saved.offset;
+  while (set.length < count) {
+    const item = variantAt(course, offset);
+    if (!item) return null;
+    offset++;
+    set.push(item);
+  }
+
+  // Save before showing the set so abandoned questions also stay reserved.
+  localStorage.setItem(key, JSON.stringify({ seen: [...seen], offset }));
+  return shuffle(set);
 }
 
 function setupPractice() {
@@ -36,12 +58,19 @@ function setupPractice() {
         questions = (await response.json())[course];
       }
       const count = Number(size.value);
-      if (questions.length < count) throw new Error('Set size unavailable');
-      render(shuffle(questions).slice(0, count));
+      const reserve = () => reserveUnseen(questions, count);
+      const set = navigator.locks
+        ? await navigator.locks.request('fivey-progress:' + course, reserve)
+        : reserve();
+      if (!set) {
+        status.textContent = 'There are fewer unseen questions than this set size. Try a smaller set.';
+        return;
+      }
+      render(set);
       status.textContent = count + ' questions ready.';
       quiz.querySelector('input').focus();
     } catch {
-      status.textContent = 'Could not load the questions. Try again.';
+      status.textContent = 'Could not start a fresh set. Check your connection and allow site storage, then try again.';
     } finally {
       start.disabled = false;
     }
