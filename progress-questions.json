@@ -1,0 +1,1994 @@
+{
+  "biology": [
+    {
+      "prompt": "Cells placed in a concentrated sucrose solution shrink. Which process directly explains the change?",
+      "choices": [
+        "Water leaves by osmosis.",
+        "Sucrose exits by active transport.",
+        "Water enters by facilitated diffusion.",
+        "The membrane pumps water outward."
+      ],
+      "answer": 0,
+      "explanation": "Water moves toward the solution with lower water potential."
+    },
+    {
+      "prompt": "An enzyme works more slowly after a mutation changes a charged residue in its active site. Which effect is most likely?",
+      "choices": [
+        "Substrate binding or catalysis has changed.",
+        "The reaction equilibrium constant has increased.",
+        "The reaction became thermodynamically unfavorable.",
+        "The substrate now contains less chemical energy."
+      ],
+      "answer": 0,
+      "explanation": "Active-site changes can affect binding and the activation-energy barrier."
+    },
+    {
+      "prompt": "A membrane becomes less fluid when chilled. Which change would best counteract this effect?",
+      "choices": [
+        "Increase the proportion of unsaturated fatty acids.",
+        "Increase the proportion of saturated fatty acids.",
+        "Replace phospholipids with cellulose.",
+        "Lengthen all fatty acid tails."
+      ],
+      "answer": 0,
+      "explanation": "Double bonds hinder tight packing and help maintain fluidity."
+    },
+    {
+      "prompt": "A toxin dissipates the proton gradient across the inner mitochondrial membrane. What is the immediate effect on ATP synthase?",
+      "choices": [
+        "ATP production falls.",
+        "ATP production rises because oxygen increases.",
+        "ATP synthase transfers electrons to oxygen.",
+        "ATP synthase directly oxidizes glucose."
+      ],
+      "answer": 0,
+      "explanation": "The proton gradient supplies the energy that drives ATP synthesis."
+    },
+    {
+      "prompt": "A plant closes its stomata during a hot afternoon. Which change most directly limits carbon fixation?",
+      "choices": [
+        "Less carbon dioxide enters the leaf.",
+        "More oxygen leaves the leaf.",
+        "The chloroplast envelope becomes impermeable to water.",
+        "Chlorophyll immediately stops absorbing light."
+      ],
+      "answer": 0,
+      "explanation": "Stomatal closure reduces carbon dioxide uptake."
+    },
+    {
+      "prompt": "In a receptor pathway, one activated enzyme phosphorylates many downstream molecules. This illustrates which feature?",
+      "choices": [
+        "Signal amplification",
+        "Negative feedback",
+        "Competitive inhibition",
+        "Receptor downregulation"
+      ],
+      "answer": 0,
+      "explanation": "One upstream event triggers many downstream events."
+    },
+    {
+      "prompt": "A receptor mutation prevents a hormone from binding. Which treatment would most directly bypass this defect?",
+      "choices": [
+        "Activate a downstream signaling protein.",
+        "Increase transcription of the same defective receptor.",
+        "Inhibit the downstream signaling pathway.",
+        "Remove all second messengers."
+      ],
+      "answer": 0,
+      "explanation": "Activating a downstream component bypasses the need for receptor activation."
+    },
+    {
+      "prompt": "A cell with damaged DNA fails to arrest before S phase. What is the main consequence?",
+      "choices": [
+        "Damaged DNA can be copied.",
+        "Homologous chromosomes immediately separate.",
+        "Ribosomes stop translating all mRNA.",
+        "DNA replication shifts to the cytoplasm."
+      ],
+      "answer": 0,
+      "explanation": "The G1/S checkpoint normally helps prevent replication of damaged DNA."
+    },
+    {
+      "prompt": "Two genes on the same chromosome show 8% recombination. What does this indicate?",
+      "choices": [
+        "The genes are linked and relatively close together.",
+        "The genes are 80 map units apart.",
+        "The genes assort independently in every cross.",
+        "The genes are alternate alleles of a single locus."
+      ],
+      "answer": 0,
+      "explanation": "Low recombination frequency indicates a small map distance."
+    },
+    {
+      "prompt": "A diploid cell has 2n = 12. How many chromosomes are in each normal gamete?",
+      "choices": [
+        "6",
+        "12",
+        "24",
+        "3"
+      ],
+      "answer": 0,
+      "explanation": "Meiosis halves chromosome number from diploid to haploid."
+    },
+    {
+      "prompt": "Which observation most directly supports a recessive allele in a simple autosomal pedigree?",
+      "choices": [
+        "Two unaffected parents have an affected child.",
+        "Every affected individual has an affected parent.",
+        "Only heterozygotes show the trait.",
+        "The trait appears in every individual."
+      ],
+      "answer": 0,
+      "explanation": "Unaffected carrier parents can each pass a recessive allele."
+    },
+    {
+      "prompt": "A nonsense mutation occurs near the beginning of a coding sequence. What is the likely direct effect?",
+      "choices": [
+        "A truncated polypeptide",
+        "An extra chromosome",
+        "Failure to unwind all cellular DNA",
+        "An expanded intron in every transcript"
+      ],
+      "answer": 0,
+      "explanation": "A premature stop codon can terminate translation early."
+    },
+    {
+      "prompt": "A mutation removes the promoter of a bacterial gene. Which step is most directly impaired?",
+      "choices": [
+        "Initiation of transcription",
+        "Termination of translation",
+        "DNA ligation during replication",
+        "Binding of tRNA to a codon"
+      ],
+      "answer": 0,
+      "explanation": "RNA polymerase recruitment and transcription initiation depend on promoter sequences."
+    },
+    {
+      "prompt": "A eukaryotic gene produces two mature mRNAs with different combinations of exons. Which mechanism explains this?",
+      "choices": [
+        "Alternative splicing",
+        "Semiconservative replication",
+        "Crossing over",
+        "Random segregation"
+      ],
+      "answer": 0,
+      "explanation": "Alternative splicing joins different subsets of exons."
+    },
+    {
+      "prompt": "After antibiotic exposure, a bacterial population is mostly resistant. Which explanation best fits natural selection?",
+      "choices": [
+        "Preexisting resistant variants left more descendants.",
+        "All bacteria acquired the same directed mutation.",
+        "The antibiotic caused each bacterium to adapt identically.",
+        "Resistance spread because selection removed variation from all genes."
+      ],
+      "answer": 0,
+      "explanation": "The antibiotic favors survival and reproduction of resistant variants."
+    },
+    {
+      "prompt": "A flood leaves a small random subset of a beetle population alive. Which process can change allele frequencies immediately?",
+      "choices": [
+        "Genetic drift",
+        "Sexual selection",
+        "Convergent evolution",
+        "Adaptive radiation"
+      ],
+      "answer": 0,
+      "explanation": "A random population bottleneck changes allele frequencies by chance."
+    },
+    {
+      "prompt": "Two island bird populations develop different mating songs and stop recognizing one another as mates. This is which barrier?",
+      "choices": [
+        "Behavioral isolation",
+        "Hybrid sterility",
+        "Gametic isolation",
+        "Reduced hybrid viability"
+      ],
+      "answer": 0,
+      "explanation": "Different courtship signals can prevent mating before fertilization."
+    },
+    {
+      "prompt": "Which evidence most directly supports recent common ancestry for two species?",
+      "choices": [
+        "Many shared derived DNA substitutions",
+        "Similar habitats on separate continents",
+        "Identical body size",
+        "Feeding on the same prey"
+      ],
+      "answer": 0,
+      "explanation": "Shared derived sequence changes support inheritance from a common ancestor."
+    },
+    {
+      "prompt": "A population grows rapidly when small but levels off as resources become limited. Which model fits best?",
+      "choices": [
+        "Logistic growth",
+        "Unrestricted exponential growth",
+        "Constant linear growth",
+        "Growth independent of density"
+      ],
+      "answer": 0,
+      "explanation": "Logistic growth slows as population size approaches carrying capacity."
+    },
+    {
+      "prompt": "Removing a top predator causes herbivores to increase and aquatic plants to decline. Which process is illustrated?",
+      "choices": [
+        "A trophic cascade",
+        "Primary succession",
+        "Nitrogen fixation",
+        "Resource partitioning"
+      ],
+      "answer": 0,
+      "explanation": "An indirect effect propagates through trophic levels."
+    },
+    {
+      "prompt": "Which change would most directly lower dissolved oxygen after fertilizer runoff into a lake?",
+      "choices": [
+        "Microbial decomposition of algal biomass increases.",
+        "Nitrogen fixation permanently stops.",
+        "Fish lose the ability to use glucose.",
+        "Plant transpiration increases in the watershed."
+      ],
+      "answer": 0,
+      "explanation": "Decomposers consume oxygen while breaking down accumulated organic matter."
+    },
+    {
+      "prompt": "Two species consume the same limited seed type. Each has higher survival when raised alone. Which interaction best explains the result?",
+      "choices": [
+        "Interspecific competition",
+        "Mutualism",
+        "Commensalism",
+        "Facilitation"
+      ],
+      "answer": 0,
+      "explanation": "Both species benefit from removal of a competitor for a limiting resource."
+    },
+    {
+      "prompt": "A scientist measures oxygen production at four light levels with temperature held constant. Which variable is manipulated?",
+      "choices": [
+        "Light level",
+        "Oxygen production",
+        "Temperature",
+        "The rate of respiration"
+      ],
+      "answer": 0,
+      "explanation": "The independent variable is the one deliberately changed."
+    },
+    {
+      "prompt": "Why include an untreated group in a trial of a plant hormone?",
+      "choices": [
+        "To estimate what occurs without the treatment.",
+        "To ensure all plants respond the same way.",
+        "To eliminate the need for replication.",
+        "To make the outcome variable constant."
+      ],
+      "answer": 0,
+      "explanation": "The control provides a baseline for comparison."
+    },
+    {
+      "prompt": "A drought reduces seeds with thin coats. Birds with deeper beaks then have higher reproductive success. What is expected if beak depth is heritable?",
+      "choices": [
+        "Average beak depth increases over generations.",
+        "Every adult bird immediately grows a deeper beak.",
+        "The deep-beak alleles disappear by mutation.",
+        "Average depth stays fixed regardless of selection."
+      ],
+      "answer": 0,
+      "explanation": "Differential reproduction can shift heritable trait distributions."
+    },
+    {
+      "prompt": "Equal volumes of two glucose solutions are separated by a membrane permeable only to water. Which side gains water?",
+      "choices": [
+        "The side with higher glucose concentration.",
+        "The side with lower glucose concentration.",
+        "Both sides equally regardless of concentration.",
+        "Neither side because glucose cannot cross."
+      ],
+      "answer": 0,
+      "explanation": "Water moves toward the higher solute concentration under equal pressure."
+    },
+    {
+      "prompt": "Which observation best supports the hypothesis that a protein is secreted through the endomembrane system?",
+      "choices": [
+        "It appears first in the rough ER, then in the Golgi, then outside the cell.",
+        "It first appears in the nucleus, then in chromosomes.",
+        "It remains in cytosolic ribosomes throughout.",
+        "It accumulates only in the mitochondrial matrix."
+      ],
+      "answer": 0,
+      "explanation": "This sequence follows the route of many secreted proteins."
+    },
+    {
+      "prompt": "A researcher adds an inhibitor of photosystem II to isolated chloroplasts. Which output of water splitting should decline directly?",
+      "choices": [
+        "Oxygen",
+        "Carbon dioxide",
+        "Glucose",
+        "Nitrogen gas"
+      ],
+      "answer": 0,
+      "explanation": "Photosystem II oxidizes water and releases molecular oxygen."
+    },
+    {
+      "prompt": "A population has allele frequencies p = 0.7 and q = 0.3. Under Hardy–Weinberg equilibrium, what fraction is heterozygous?",
+      "choices": [
+        "0.42",
+        "0.09",
+        "0.49",
+        "0.21"
+      ],
+      "answer": 0,
+      "explanation": "The heterozygous genotype frequency is 2pq = 2 × 0.7 × 0.3."
+    },
+    {
+      "prompt": "If a predator detects an increase in prey density and its birth rate rises afterward, what is the initial directional effect on prey abundance from that predator response?",
+      "choices": [
+        "Greater predation tends to decrease prey abundance.",
+        "Greater predation tends to increase prey abundance.",
+        "The predator response cannot affect prey abundance.",
+        "The prey necessarily become extinct immediately."
+      ],
+      "answer": 0,
+      "explanation": "An increased predator population can increase prey mortality."
+    }
+  ],
+  "psychology": [
+    {
+      "prompt": "Students are randomly assigned to practice retrieval or reread notes. Researchers later compare recall scores. What is the dependent variable?",
+      "choices": [
+        "Recall score",
+        "Study method",
+        "Random assignment",
+        "Time spent before enrollment"
+      ],
+      "answer": 0,
+      "explanation": "The dependent variable is the measured outcome."
+    },
+    {
+      "prompt": "A survey of volunteers finds a correlation between sleep and test scores. Why is a causal conclusion unwarranted?",
+      "choices": [
+        "Other variables could explain the association.",
+        "Correlations always have negative values.",
+        "Volunteers cannot provide numerical data.",
+        "Sleep cannot be measured."
+      ],
+      "answer": 0,
+      "explanation": "An observational correlation cannot rule out confounds or reverse causation."
+    },
+    {
+      "prompt": "A researcher defines attention as the number of targets detected in a five-minute task. What is this definition?",
+      "choices": [
+        "An operational definition",
+        "A placebo",
+        "A random sample",
+        "A confounding variable"
+      ],
+      "answer": 0,
+      "explanation": "An operational definition specifies how a construct is measured."
+    },
+    {
+      "prompt": "Neither participants nor the staff measuring outcomes know who received a treatment. What is the main purpose?",
+      "choices": [
+        "Reduce participant and researcher expectancy effects.",
+        "Increase the sample's representativeness automatically.",
+        "Ensure no participant withdraws.",
+        "Guarantee that the treatment works."
+      ],
+      "answer": 0,
+      "explanation": "A double-blind design reduces bias from knowledge of condition."
+    },
+    {
+      "prompt": "A neuron receives several excitatory inputs together and crosses threshold. What does this illustrate?",
+      "choices": [
+        "Summation",
+        "Reuptake",
+        "Habituation",
+        "Absolute refractory period"
+      ],
+      "answer": 0,
+      "explanation": "Multiple excitatory inputs can combine to trigger an action potential."
+    },
+    {
+      "prompt": "A medication blocks reuptake of a neurotransmitter. What is the most immediate likely effect?",
+      "choices": [
+        "The neurotransmitter remains in the synaptic cleft longer.",
+        "The postsynaptic neuron stops making proteins.",
+        "The presynaptic axon disappears.",
+        "The neurotransmitter crosses directly into DNA."
+      ],
+      "answer": 0,
+      "explanation": "Reuptake normally clears neurotransmitter from the synapse."
+    },
+    {
+      "prompt": "After injury, a person remembers childhood but has difficulty forming new explicit memories. Which structure is most directly implicated?",
+      "choices": [
+        "Hippocampus",
+        "Medulla",
+        "Retina",
+        "Cerebellar vermis"
+      ],
+      "answer": 0,
+      "explanation": "The hippocampus supports formation of new explicit memories."
+    },
+    {
+      "prompt": "A person detects a faint tone on half the trials when it is presented. Which concept fits the tone intensity?",
+      "choices": [
+        "Absolute threshold",
+        "Difference threshold",
+        "Sensory adaptation",
+        "Perceptual constancy"
+      ],
+      "answer": 0,
+      "explanation": "An absolute threshold is conventionally the stimulus intensity detected 50% of the time."
+    },
+    {
+      "prompt": "After several minutes in a bakery, a customer barely notices the constant smell. Which process fits?",
+      "choices": [
+        "Sensory adaptation",
+        "Perceptual set",
+        "Signal amplification",
+        "Subliminal priming"
+      ],
+      "answer": 0,
+      "explanation": "Sensitivity can decline with continuous unchanging stimulation."
+    },
+    {
+      "prompt": "A student sees a familiar word faster after seeing a related word moments earlier. What is this effect?",
+      "choices": [
+        "Priming",
+        "Retroactive interference",
+        "Source amnesia",
+        "Sensory adaptation"
+      ],
+      "answer": 0,
+      "explanation": "Recent exposure can facilitate processing of related information."
+    },
+    {
+      "prompt": "Which study method most directly uses the testing effect?",
+      "choices": [
+        "Answer practice questions from memory.",
+        "Copy the chapter word for word.",
+        "Reread highlighted sentences repeatedly.",
+        "Listen to an unrelated lecture."
+      ],
+      "answer": 0,
+      "explanation": "Retrieval practice strengthens later recall."
+    },
+    {
+      "prompt": "Learning a new locker combination makes the old one harder to recall. What is this?",
+      "choices": [
+        "Retroactive interference",
+        "Proactive interference",
+        "State-dependent memory",
+        "Encoding specificity without interference"
+      ],
+      "answer": 0,
+      "explanation": "New learning interferes with recall of older information."
+    },
+    {
+      "prompt": "A witness recalls a red backpack only after hearing another witness say it was red. Which effect is most relevant?",
+      "choices": [
+        "Misinformation effect",
+        "Spacing effect",
+        "Serial position effect",
+        "Overjustification effect"
+      ],
+      "answer": 0,
+      "explanation": "Post-event information can alter later recollection."
+    },
+    {
+      "prompt": "A student estimates that a rare event is common after seeing several vivid news reports. Which heuristic is illustrated?",
+      "choices": [
+        "Availability heuristic",
+        "Representativeness heuristic",
+        "Algorithmic reasoning",
+        "Belief perseverance after disconfirmation"
+      ],
+      "answer": 0,
+      "explanation": "The judgment relies on examples that come easily to mind."
+    },
+    {
+      "prompt": "A person searches only for evidence that supports an existing theory. What is this tendency?",
+      "choices": [
+        "Confirmation bias",
+        "Hindsight bias",
+        "Random sampling",
+        "Divergent thinking"
+      ],
+      "answer": 0,
+      "explanation": "Confirmation bias favors information consistent with prior beliefs."
+    },
+    {
+      "prompt": "An infant searches for a toy hidden under a blanket. What ability is demonstrated?",
+      "choices": [
+        "Object permanence",
+        "Conservation of volume",
+        "Abstract reasoning",
+        "Hypothetical deduction"
+      ],
+      "answer": 0,
+      "explanation": "The infant treats the toy as existing even when it is hidden."
+    },
+    {
+      "prompt": "A child says two equal rows contain the same number of coins even after one row is spread out. Which concept is shown?",
+      "choices": [
+        "Conservation",
+        "Egocentrism",
+        "Centration",
+        "Assimilation without conservation"
+      ],
+      "answer": 0,
+      "explanation": "The child recognizes that quantity can stay constant despite a change in appearance."
+    },
+    {
+      "prompt": "A child imitates an older sibling's way of solving a puzzle after watching them succeed. Which process is illustrated?",
+      "choices": [
+        "Observational learning",
+        "Latent inhibition",
+        "Classical extinction",
+        "Negative punishment"
+      ],
+      "answer": 0,
+      "explanation": "The child learns by observing a model."
+    },
+    {
+      "prompt": "A tone is repeatedly paired with a puff of air to the eye. Eventually the tone alone produces blinking. What is the tone after learning?",
+      "choices": [
+        "Conditioned stimulus",
+        "Unconditioned stimulus",
+        "Unconditioned response",
+        "Conditioned response"
+      ],
+      "answer": 0,
+      "explanation": "The originally neutral tone now elicits a learned response."
+    },
+    {
+      "prompt": "A driver buckles a seat belt more often because doing so stops a warning sound. What consequence explains the increase?",
+      "choices": [
+        "Negative reinforcement",
+        "Positive punishment",
+        "Negative punishment",
+        "Extinction"
+      ],
+      "answer": 0,
+      "explanation": "Removing an aversive sound increases the behavior that removed it."
+    },
+    {
+      "prompt": "A student earns a reward after an unpredictable number of completed problems. What schedule is this?",
+      "choices": [
+        "Variable ratio",
+        "Fixed ratio",
+        "Variable interval",
+        "Fixed interval"
+      ],
+      "answer": 0,
+      "explanation": "Rewards depend on a varying number of responses."
+    },
+    {
+      "prompt": "A student assumes a classmate was late because they are careless, ignoring a reported bus delay. Which bias fits?",
+      "choices": [
+        "Fundamental attribution error",
+        "Self-serving bias",
+        "False consensus effect",
+        "Ingroup favoritism"
+      ],
+      "answer": 0,
+      "explanation": "The student overweights disposition and underweights the situation."
+    },
+    {
+      "prompt": "People in a crowd are less likely to call for help when they assume someone else will call. Which process fits?",
+      "choices": [
+        "Diffusion of responsibility",
+        "Group polarization",
+        "Social facilitation",
+        "Reciprocity"
+      ],
+      "answer": 0,
+      "explanation": "Responsibility feels distributed among multiple bystanders."
+    },
+    {
+      "prompt": "A group of mildly cautious members becomes much more cautious after discussing a decision. Which phenomenon is this?",
+      "choices": [
+        "Group polarization",
+        "Social loafing",
+        "Deindividuation",
+        "Diffusion of responsibility"
+      ],
+      "answer": 0,
+      "explanation": "Discussion can strengthen a group's initial tendency."
+    },
+    {
+      "prompt": "A person volunteers more on a group task when individual contributions are identifiable. Which tendency is reduced?",
+      "choices": [
+        "Social loafing",
+        "Cognitive dissonance",
+        "Obedience",
+        "Group polarization"
+      ],
+      "answer": 0,
+      "explanation": "Identifiable effort reduces the tendency to exert less effort in a group."
+    },
+    {
+      "prompt": "A person who values conservation feels uncomfortable after buying a highly inefficient car. Which concept explains the discomfort?",
+      "choices": [
+        "Cognitive dissonance",
+        "Stereotype threat",
+        "Habituation",
+        "External locus of control"
+      ],
+      "answer": 0,
+      "explanation": "The behavior conflicts with a belief, producing psychological discomfort."
+    },
+    {
+      "prompt": "A student keeps revising a story because the work is satisfying even without a reward. Which motivation fits?",
+      "choices": [
+        "Intrinsic motivation",
+        "Extrinsic motivation",
+        "Avoidance conditioning",
+        "Primary drive reduction"
+      ],
+      "answer": 0,
+      "explanation": "The activity itself is the source of satisfaction."
+    },
+    {
+      "prompt": "In a Big Five assessment, which trait is most closely associated with being organized and dependable?",
+      "choices": [
+        "Conscientiousness",
+        "Extraversion",
+        "Openness",
+        "Agreeableness"
+      ],
+      "answer": 0,
+      "explanation": "Conscientiousness includes organization, reliability, and self-discipline."
+    },
+    {
+      "prompt": "A client gradually practices entering feared situations with a therapist and learns that the predicted harm does not occur. Which approach is illustrated?",
+      "choices": [
+        "Exposure therapy",
+        "Free association",
+        "Aversive conditioning",
+        "Dream interpretation"
+      ],
+      "answer": 0,
+      "explanation": "Repeated safe contact with feared cues can reduce avoidance and fear."
+    },
+    {
+      "prompt": "A student responds to a stressful schedule by negotiating deadlines and making a study plan. Which strategy is most evident?",
+      "choices": [
+        "Problem-focused coping",
+        "Emotion-focused avoidance",
+        "Learned helplessness",
+        "Displacement"
+      ],
+      "answer": 0,
+      "explanation": "The student acts on the source of the stress."
+    }
+  ],
+  "chemistry": [
+    {
+      "prompt": "Two samples contain the same mass of gas at the same temperature. Which sample has the greater average translational kinetic energy per molecule?",
+      "choices": [
+        "The samples have the same average kinetic energy.",
+        "The sample with greater molar mass.",
+        "The sample with smaller molar mass.",
+        "The sample with more molecules."
+      ],
+      "answer": 0,
+      "explanation": "Average translational kinetic energy per molecule depends on absolute temperature."
+    },
+    {
+      "prompt": "An element has a sharp jump between its second and third ionization energies. Which inference is best supported?",
+      "choices": [
+        "It has two valence electrons.",
+        "It has three valence electrons.",
+        "Its first two electrons are core electrons.",
+        "Its third electron is easier to remove than its second."
+      ],
+      "answer": 0,
+      "explanation": "The third electron is removed from a much more tightly held inner shell."
+    },
+    {
+      "prompt": "Which compound has a net dipole moment in its usual molecular geometry?",
+      "choices": [
+        "NH₃",
+        "CO₂",
+        "BF₃",
+        "CCl₄"
+      ],
+      "answer": 0,
+      "explanation": "Ammonia is trigonal pyramidal, so its bond dipoles do not cancel."
+    },
+    {
+      "prompt": "Why does ethanol boil at a higher temperature than dimethyl ether, which has the same molecular formula?",
+      "choices": [
+        "Ethanol molecules form hydrogen bonds with one another.",
+        "Dimethyl ether contains ionic bonds.",
+        "Ethanol has a greater molar mass.",
+        "Dimethyl ether has no London dispersion forces."
+      ],
+      "answer": 0,
+      "explanation": "Ethanol's O–H group allows intermolecular hydrogen bonding."
+    },
+    {
+      "prompt": "Adding a catalyst to a reaction at equilibrium does what?",
+      "choices": [
+        "Increases the forward and reverse reaction rates without changing equilibrium composition.",
+        "Increases only the forward rate.",
+        "Increases the equilibrium constant.",
+        "Makes the reaction enthalpy more negative."
+      ],
+      "answer": 0,
+      "explanation": "A catalyst changes the reaction pathway, while equilibrium thermodynamics stay the same."
+    },
+    {
+      "prompt": "At equilibrium for N₂O₄(g) ⇌ 2 NO₂(g), volume is decreased at constant temperature. What is the net response?",
+      "choices": [
+        "More N₂O₄ forms.",
+        "More NO₂ forms.",
+        "The equilibrium constant increases.",
+        "No net reaction occurs because temperature stays fixed."
+      ],
+      "answer": 0,
+      "explanation": "Compression favors the side with fewer gas particles."
+    },
+    {
+      "prompt": "A weak acid is titrated with a strong base. What equals pH at the half-equivalence point?",
+      "choices": [
+        "The pKₐ of the weak acid.",
+        "The pKᵦ of the strong base.",
+        "7 at every temperature.",
+        "The initial pH of the acid solution."
+      ],
+      "answer": 0,
+      "explanation": "Conjugate base and acid concentrations are equal at this point."
+    },
+    {
+      "prompt": "Which process increases entropy for the stated system?",
+      "choices": [
+        "A pure liquid evaporates.",
+        "A gas condenses.",
+        "A dissolved solute crystallizes.",
+        "A pure liquid freezes."
+      ],
+      "answer": 0,
+      "explanation": "Gas particles can occupy more arrangements than liquid particles."
+    },
+    {
+      "prompt": "A galvanic cell runs spontaneously. In which direction do electrons move through its wire?",
+      "choices": [
+        "From anode to cathode.",
+        "From cathode to anode.",
+        "From salt bridge to anode.",
+        "From both electrodes into the salt bridge."
+      ],
+      "answer": 0,
+      "explanation": "Oxidation at the anode supplies electrons for reduction at the cathode."
+    },
+    {
+      "prompt": "The color of a solution darkens as solute concentration increases. What should happen to absorbance at the same wavelength and path length, within the Beer–Lambert range?",
+      "choices": [
+        "It increases in proportion to concentration.",
+        "It decreases in proportion to concentration.",
+        "It stays fixed.",
+        "It becomes independent of the solute."
+      ],
+      "answer": 0,
+      "explanation": "A = εbc, with ε and b held constant."
+    },
+    {
+      "prompt": "A sample contains 2 mol of CO₂. What mass of oxygen atoms does the sample contain? Use O = 16 g/mol.",
+      "choices": [
+        "64 g",
+        "32 g",
+        "88 g",
+        "24 g"
+      ],
+      "answer": 0,
+      "explanation": "Each mole of CO₂ contains 2 mol of O atoms, so the oxygen mass is 2 × 2 × 16 = 64 g."
+    },
+    {
+      "prompt": "A solution contains 2 mmol of NaCl in 200 mL. What is its molarity?",
+      "choices": [
+        "0.010 M",
+        "0.100 M",
+        "0.0010 M",
+        "1.000 M"
+      ],
+      "answer": 0,
+      "explanation": "Divide 0.002 mol by 0.200 L."
+    },
+    {
+      "prompt": "A reaction is second order in X and zero order in Y. If [X] is multiplied by 2 and [Y] is doubled, by what factor does the initial rate change?",
+      "choices": [
+        "4",
+        "2",
+        "8",
+        "3"
+      ],
+      "answer": 0,
+      "explanation": "The rate is proportional to [X]² and independent of [Y]."
+    },
+    {
+      "prompt": "A process absorbs 40 J of heat while the surroundings do 10 J of work on the system. What is ΔU for the system?",
+      "choices": [
+        "+50 J",
+        "+30 J",
+        "−50 J",
+        "−30 J"
+      ],
+      "answer": 0,
+      "explanation": "Both q and w are positive for energy entering the system, so ΔU = q + w."
+    },
+    {
+      "prompt": "For A(g) ⇌ B(g), [A] = 0.20 M and [B] = 0.40 M at equilibrium. What is Kc?",
+      "choices": [
+        "2",
+        "0.5",
+        "3",
+        "4"
+      ],
+      "answer": 0,
+      "explanation": "Kc is [B] divided by [A] for the given stoichiometry."
+    },
+    {
+      "prompt": "A sample contains 3 mol of CO₂. What mass of oxygen atoms does the sample contain? Use O = 16 g/mol.",
+      "choices": [
+        "96 g",
+        "48 g",
+        "132 g",
+        "36 g"
+      ],
+      "answer": 0,
+      "explanation": "Each mole of CO₂ contains 2 mol of O atoms, so the oxygen mass is 2 × 3 × 16 = 96 g."
+    },
+    {
+      "prompt": "A solution contains 3 mmol of NaCl in 200 mL. What is its molarity?",
+      "choices": [
+        "0.015 M",
+        "0.150 M",
+        "0.0015 M",
+        "1.500 M"
+      ],
+      "answer": 0,
+      "explanation": "Divide 0.003 mol by 0.200 L."
+    },
+    {
+      "prompt": "A reaction is second order in X and zero order in Y. If [X] is multiplied by 3 and [Y] is doubled, by what factor does the initial rate change?",
+      "choices": [
+        "9",
+        "3",
+        "18",
+        "4"
+      ],
+      "answer": 0,
+      "explanation": "The rate is proportional to [X]² and independent of [Y]."
+    },
+    {
+      "prompt": "A process absorbs 60 J of heat while the surroundings do 15 J of work on the system. What is ΔU for the system?",
+      "choices": [
+        "+75 J",
+        "+45 J",
+        "−75 J",
+        "−45 J"
+      ],
+      "answer": 0,
+      "explanation": "Both q and w are positive for energy entering the system, so ΔU = q + w."
+    },
+    {
+      "prompt": "For A(g) ⇌ B(g), [A] = 0.20 M and [B] = 0.60 M at equilibrium. What is Kc?",
+      "choices": [
+        "3",
+        "0.3333333333333333",
+        "4",
+        "9"
+      ],
+      "answer": 0,
+      "explanation": "Kc is [B] divided by [A] for the given stoichiometry."
+    },
+    {
+      "prompt": "A sample contains 4 mol of CO₂. What mass of oxygen atoms does the sample contain? Use O = 16 g/mol.",
+      "choices": [
+        "128 g",
+        "64 g",
+        "176 g",
+        "48 g"
+      ],
+      "answer": 0,
+      "explanation": "Each mole of CO₂ contains 2 mol of O atoms, so the oxygen mass is 2 × 4 × 16 = 128 g."
+    },
+    {
+      "prompt": "A solution contains 4 mmol of NaCl in 200 mL. What is its molarity?",
+      "choices": [
+        "0.020 M",
+        "0.200 M",
+        "0.0020 M",
+        "2.000 M"
+      ],
+      "answer": 0,
+      "explanation": "Divide 0.004 mol by 0.200 L."
+    },
+    {
+      "prompt": "A reaction is second order in X and zero order in Y. If [X] is multiplied by 4 and [Y] is doubled, by what factor does the initial rate change?",
+      "choices": [
+        "16",
+        "4",
+        "32",
+        "5"
+      ],
+      "answer": 0,
+      "explanation": "The rate is proportional to [X]² and independent of [Y]."
+    },
+    {
+      "prompt": "A process absorbs 80 J of heat while the surroundings do 20 J of work on the system. What is ΔU for the system?",
+      "choices": [
+        "+100 J",
+        "+60 J",
+        "−100 J",
+        "−60 J"
+      ],
+      "answer": 0,
+      "explanation": "Both q and w are positive for energy entering the system, so ΔU = q + w."
+    },
+    {
+      "prompt": "For A(g) ⇌ B(g), [A] = 0.20 M and [B] = 0.80 M at equilibrium. What is Kc?",
+      "choices": [
+        "4",
+        "0.25",
+        "5",
+        "16"
+      ],
+      "answer": 0,
+      "explanation": "Kc is [B] divided by [A] for the given stoichiometry."
+    },
+    {
+      "prompt": "A sample contains 5 mol of CO₂. What mass of oxygen atoms does the sample contain? Use O = 16 g/mol.",
+      "choices": [
+        "160 g",
+        "80 g",
+        "220 g",
+        "60 g"
+      ],
+      "answer": 0,
+      "explanation": "Each mole of CO₂ contains 2 mol of O atoms, so the oxygen mass is 2 × 5 × 16 = 160 g."
+    },
+    {
+      "prompt": "A solution contains 5 mmol of NaCl in 200 mL. What is its molarity?",
+      "choices": [
+        "0.025 M",
+        "0.250 M",
+        "0.0025 M",
+        "2.500 M"
+      ],
+      "answer": 0,
+      "explanation": "Divide 0.005 mol by 0.200 L."
+    },
+    {
+      "prompt": "A reaction is second order in X and zero order in Y. If [X] is multiplied by 5 and [Y] is doubled, by what factor does the initial rate change?",
+      "choices": [
+        "25",
+        "5",
+        "50",
+        "6"
+      ],
+      "answer": 0,
+      "explanation": "The rate is proportional to [X]² and independent of [Y]."
+    },
+    {
+      "prompt": "A process absorbs 100 J of heat while the surroundings do 25 J of work on the system. What is ΔU for the system?",
+      "choices": [
+        "+125 J",
+        "+75 J",
+        "−125 J",
+        "−75 J"
+      ],
+      "answer": 0,
+      "explanation": "Both q and w are positive for energy entering the system, so ΔU = q + w."
+    },
+    {
+      "prompt": "For A(g) ⇌ B(g), [A] = 0.20 M and [B] = 1.00 M at equilibrium. What is Kc?",
+      "choices": [
+        "5",
+        "0.2",
+        "6",
+        "25"
+      ],
+      "answer": 0,
+      "explanation": "Kc is [B] divided by [A] for the given stoichiometry."
+    }
+  ],
+  "physics-1": [
+    {
+      "prompt": "A ball moves upward after leaving a thrower's hand. Ignoring air resistance, what are its velocity and acceleration at the highest point?",
+      "choices": [
+        "Velocity is zero and acceleration is downward.",
+        "Both are zero.",
+        "Velocity is upward and acceleration is zero.",
+        "Both point downward."
+      ],
+      "answer": 0,
+      "explanation": "Gravity acts throughout the flight even at the instant the velocity is zero."
+    },
+    {
+      "prompt": "A car rounds a level curve at constant speed. What provides its horizontal centripetal force if the tires roll without slipping?",
+      "choices": [
+        "Static friction",
+        "Kinetic friction",
+        "Gravity",
+        "The normal force"
+      ],
+      "answer": 0,
+      "explanation": "Static friction can act horizontally toward the center of the curve."
+    },
+    {
+      "prompt": "A box slides at constant speed across a rough horizontal floor under a steady pull. What is the net work on the box?",
+      "choices": [
+        "Zero",
+        "Positive because the pull is forward",
+        "Negative because friction acts backward",
+        "Equal to the box's weight times distance"
+      ],
+      "answer": 0,
+      "explanation": "Net work equals the change in kinetic energy."
+    },
+    {
+      "prompt": "A person standing on a rotating platform pulls their arms inward. External torque is negligible. What happens?",
+      "choices": [
+        "Angular speed increases and angular momentum stays constant.",
+        "Both increase.",
+        "Angular speed stays constant and angular momentum decreases.",
+        "Both decrease."
+      ],
+      "answer": 0,
+      "explanation": "Reducing rotational inertia increases angular speed at fixed angular momentum."
+    },
+    {
+      "prompt": "Two points on a rigid disk rotate about its center. Point P is farther from the axis than Q. Which statement is correct?",
+      "choices": [
+        "P has greater tangential speed and the same angular speed.",
+        "P has greater angular speed and the same tangential speed.",
+        "P has smaller tangential speed.",
+        "Both speeds are the same."
+      ],
+      "answer": 0,
+      "explanation": "Tangential speed is rω; angular speed is shared."
+    },
+    {
+      "prompt": "A small mass oscillates on an ideal horizontal spring. What is greatest in magnitude at the endpoints?",
+      "choices": [
+        "Acceleration",
+        "Speed",
+        "Kinetic energy",
+        "Power delivered by the spring"
+      ],
+      "answer": 0,
+      "explanation": "The restoring force and acceleration are greatest at maximum displacement."
+    },
+    {
+      "prompt": "Two objects of equal external volume are fully submerged in the same water, one at twice the depth. Which experiences more buoyant force?",
+      "choices": [
+        "Neither, because they displace equal volumes of water.",
+        "The deeper object because pressure is greater.",
+        "The shallower object because it is closer to air.",
+        "The heavier object regardless of displaced volume."
+      ],
+      "answer": 0,
+      "explanation": "Buoyancy depends on fluid density and displaced volume."
+    },
+    {
+      "prompt": "An ideal fluid passes through a horizontal pipe that narrows. What happens in the narrow section?",
+      "choices": [
+        "Speed increases and static pressure decreases.",
+        "Speed decreases and static pressure increases.",
+        "Both speed and static pressure increase.",
+        "Both remain constant."
+      ],
+      "answer": 0,
+      "explanation": "Continuity raises speed in the narrow part, and Bernoulli's equation then gives lower pressure."
+    },
+    {
+      "prompt": "A student wants to reduce the force needed to hold a gate stationary against a torque. Where should they push perpendicularly?",
+      "choices": [
+        "Farthest from the hinge.",
+        "As close to the hinge as possible.",
+        "Directly on the hinge.",
+        "Anywhere, because torque is independent of radius."
+      ],
+      "answer": 0,
+      "explanation": "A greater lever arm gives more torque for the same force."
+    },
+    {
+      "prompt": "Two students push opposite ends of a freely suspended rod with equal forces in opposite directions, perpendicular to the rod. What can result?",
+      "choices": [
+        "Zero net force and nonzero net torque.",
+        "Nonzero net force and zero net torque.",
+        "Zero net force and zero net torque in all cases.",
+        "Nonzero net force and nonzero net torque."
+      ],
+      "answer": 0,
+      "explanation": "The forces cancel, but their torques about the center have the same rotational sense."
+    },
+    {
+      "prompt": "A cart starts from rest and accelerates uniformly at 2 m/s² for 4 s. How far does it move?",
+      "choices": [
+        "16 m",
+        "8 m",
+        "32 m",
+        "4 m"
+      ],
+      "answer": 0,
+      "explanation": "Use displacement = ½at² for motion starting from rest."
+    },
+    {
+      "prompt": "A 2 kg object moving at 6 m/s stops over 0.50 s. What is the magnitude of the average net force?",
+      "choices": [
+        "24 N",
+        "12 N",
+        "6 N",
+        "48 N"
+      ],
+      "answer": 0,
+      "explanation": "Average force magnitude is the momentum change divided by elapsed time."
+    },
+    {
+      "prompt": "A 2 kg cart traveling at 6 m/s sticks to an identical stationary cart. What is the total kinetic energy after the collision?",
+      "choices": [
+        "18 J",
+        "36 J",
+        "72 J",
+        "6 J"
+      ],
+      "answer": 0,
+      "explanation": "Momentum conservation gives a final speed of 3 m/s. Use ½(2m)(3²)."
+    },
+    {
+      "prompt": "A wheel with rotational inertia 2 kg·m² experiences a constant net torque of 4 N·m for 3 s. Starting from rest, what is its angular speed?",
+      "choices": [
+        "6 rad/s",
+        "2 rad/s",
+        "0.67 rad/s",
+        "12 rad/s"
+      ],
+      "answer": 0,
+      "explanation": "The angular acceleration is torque divided by inertia. Multiply by 3 s."
+    },
+    {
+      "prompt": "A vertical spring stretches 2 cm when a 0.40 kg mass hangs at rest. Use g = 10 m/s². What is the spring constant?",
+      "choices": [
+        "200.0 N/m",
+        "2.0 N/m",
+        "400.0 N/m",
+        "100.0 N/m"
+      ],
+      "answer": 0,
+      "explanation": "At equilibrium kx = mg. Convert the stretch from centimeters to meters."
+    },
+    {
+      "prompt": "A cart starts from rest and accelerates uniformly at 3 m/s² for 4 s. How far does it move?",
+      "choices": [
+        "24 m",
+        "12 m",
+        "48 m",
+        "6 m"
+      ],
+      "answer": 0,
+      "explanation": "Use displacement = ½at² for motion starting from rest."
+    },
+    {
+      "prompt": "A 3 kg object moving at 6 m/s stops over 0.50 s. What is the magnitude of the average net force?",
+      "choices": [
+        "36 N",
+        "18 N",
+        "9 N",
+        "72 N"
+      ],
+      "answer": 0,
+      "explanation": "Average force magnitude is the momentum change divided by elapsed time."
+    },
+    {
+      "prompt": "A 3 kg cart traveling at 6 m/s sticks to an identical stationary cart. What is the total kinetic energy after the collision?",
+      "choices": [
+        "27 J",
+        "54 J",
+        "108 J",
+        "9 J"
+      ],
+      "answer": 0,
+      "explanation": "Momentum conservation gives a final speed of 3 m/s. Use ½(2m)(3²)."
+    },
+    {
+      "prompt": "A wheel with rotational inertia 3 kg·m² experiences a constant net torque of 9 N·m for 3 s. Starting from rest, what is its angular speed?",
+      "choices": [
+        "9 rad/s",
+        "3 rad/s",
+        "1.00 rad/s",
+        "18 rad/s"
+      ],
+      "answer": 0,
+      "explanation": "The angular acceleration is torque divided by inertia. Multiply by 3 s."
+    },
+    {
+      "prompt": "A vertical spring stretches 3 cm when a 0.40 kg mass hangs at rest. Use g = 10 m/s². What is the spring constant?",
+      "choices": [
+        "133.3 N/m",
+        "1.3 N/m",
+        "266.7 N/m",
+        "66.7 N/m"
+      ],
+      "answer": 0,
+      "explanation": "At equilibrium kx = mg. Convert the stretch from centimeters to meters."
+    },
+    {
+      "prompt": "A cart starts from rest and accelerates uniformly at 4 m/s² for 4 s. How far does it move?",
+      "choices": [
+        "32 m",
+        "16 m",
+        "64 m",
+        "8 m"
+      ],
+      "answer": 0,
+      "explanation": "Use displacement = ½at² for motion starting from rest."
+    },
+    {
+      "prompt": "A 4 kg object moving at 6 m/s stops over 0.50 s. What is the magnitude of the average net force?",
+      "choices": [
+        "48 N",
+        "24 N",
+        "12 N",
+        "96 N"
+      ],
+      "answer": 0,
+      "explanation": "Average force magnitude is the momentum change divided by elapsed time."
+    },
+    {
+      "prompt": "A 4 kg cart traveling at 6 m/s sticks to an identical stationary cart. What is the total kinetic energy after the collision?",
+      "choices": [
+        "36 J",
+        "72 J",
+        "144 J",
+        "12 J"
+      ],
+      "answer": 0,
+      "explanation": "Momentum conservation gives a final speed of 3 m/s. Use ½(2m)(3²)."
+    },
+    {
+      "prompt": "A wheel with rotational inertia 4 kg·m² experiences a constant net torque of 16 N·m for 3 s. Starting from rest, what is its angular speed?",
+      "choices": [
+        "12 rad/s",
+        "4 rad/s",
+        "1.33 rad/s",
+        "24 rad/s"
+      ],
+      "answer": 0,
+      "explanation": "The angular acceleration is torque divided by inertia. Multiply by 3 s."
+    },
+    {
+      "prompt": "A vertical spring stretches 4 cm when a 0.40 kg mass hangs at rest. Use g = 10 m/s². What is the spring constant?",
+      "choices": [
+        "100.0 N/m",
+        "1.0 N/m",
+        "200.0 N/m",
+        "50.0 N/m"
+      ],
+      "answer": 0,
+      "explanation": "At equilibrium kx = mg. Convert the stretch from centimeters to meters."
+    },
+    {
+      "prompt": "A cart starts from rest and accelerates uniformly at 5 m/s² for 4 s. How far does it move?",
+      "choices": [
+        "40 m",
+        "20 m",
+        "80 m",
+        "10 m"
+      ],
+      "answer": 0,
+      "explanation": "Use displacement = ½at² for motion starting from rest."
+    },
+    {
+      "prompt": "A 5 kg object moving at 6 m/s stops over 0.50 s. What is the magnitude of the average net force?",
+      "choices": [
+        "60 N",
+        "30 N",
+        "15 N",
+        "120 N"
+      ],
+      "answer": 0,
+      "explanation": "Average force magnitude is the momentum change divided by elapsed time."
+    },
+    {
+      "prompt": "A 5 kg cart traveling at 6 m/s sticks to an identical stationary cart. What is the total kinetic energy after the collision?",
+      "choices": [
+        "45 J",
+        "90 J",
+        "180 J",
+        "15 J"
+      ],
+      "answer": 0,
+      "explanation": "Momentum conservation gives a final speed of 3 m/s. Use ½(2m)(3²)."
+    },
+    {
+      "prompt": "A wheel with rotational inertia 5 kg·m² experiences a constant net torque of 25 N·m for 3 s. Starting from rest, what is its angular speed?",
+      "choices": [
+        "15 rad/s",
+        "5 rad/s",
+        "1.67 rad/s",
+        "30 rad/s"
+      ],
+      "answer": 0,
+      "explanation": "The angular acceleration is torque divided by inertia. Multiply by 3 s."
+    },
+    {
+      "prompt": "A vertical spring stretches 5 cm when a 0.40 kg mass hangs at rest. Use g = 10 m/s². What is the spring constant?",
+      "choices": [
+        "80.0 N/m",
+        "0.8 N/m",
+        "160.0 N/m",
+        "40.0 N/m"
+      ],
+      "answer": 0,
+      "explanation": "At equilibrium kx = mg. Convert the stretch from centimeters to meters."
+    }
+  ],
+  "calculus-ab": [
+    {
+      "prompt": "A function has a removable discontinuity at x = 2. Which information is sufficient to repair it by redefining f(2)?",
+      "choices": [
+        "The finite two-sided limit as x approaches 2.",
+        "Only the left-hand limit at x = 2.",
+        "Only the derivative at x = 3.",
+        "The average value of f on [1, 3]."
+      ],
+      "answer": 0,
+      "explanation": "Set f(2) equal to the existing finite two-sided limit."
+    },
+    {
+      "prompt": "A function is continuous on [0, 4], differentiable on (0, 4), and f(4) − f(0) = 12. What does the Mean Value Theorem guarantee?",
+      "choices": [
+        "f′(c) = 3 for some c in (0, 4).",
+        "f′(2) = 3.",
+        "f′(c) = 12 for some c in (0, 4).",
+        "f′(x) = 3 for every x in (0, 4)."
+      ],
+      "answer": 0,
+      "explanation": "The derivative equals the average rate 12/4 at some interior point."
+    },
+    {
+      "prompt": "At x = c, f′ changes from positive to negative. What conclusion follows?",
+      "choices": [
+        "f has a local maximum at c if f is continuous there.",
+        "f has a local minimum at c.",
+        "f necessarily has an inflection point at c.",
+        "f is increasing on both sides of c."
+      ],
+      "answer": 0,
+      "explanation": "A continuous function that rises then falls has a local maximum."
+    },
+    {
+      "prompt": "If f″ is positive throughout an interval, what follows on that interval?",
+      "choices": [
+        "f′ is increasing.",
+        "f is always increasing.",
+        "f is always positive.",
+        "f′ is constant."
+      ],
+      "answer": 0,
+      "explanation": "Positive second derivative means the first derivative is increasing."
+    },
+    {
+      "prompt": "Which integral gives total distance traveled by a particle with velocity v(t) on [a, b]?",
+      "choices": [
+        "∫ₐᵇ abs(v(t)) dt",
+        "∫ₐᵇ v(t) dt",
+        "The absolute value of ∫ₐᵇ v(t) dt",
+        "∫ₐᵇ v′(t) dt"
+      ],
+      "answer": 0,
+      "explanation": "Total distance accumulates speed, the absolute value of velocity."
+    },
+    {
+      "prompt": "If the upper bound on ∫₀ˣ f(t) dt is replaced by x², what is its derivative for continuous f?",
+      "choices": [
+        "2x f(x²)",
+        "f(x²)",
+        "2x f(x)",
+        "f′(x²)"
+      ],
+      "answer": 0,
+      "explanation": "Use the Fundamental Theorem of Calculus and the chain rule."
+    },
+    {
+      "prompt": "A continuous increasing function is sampled at left endpoints of equal subintervals. How does its left Riemann sum compare with the integral?",
+      "choices": [
+        "It underestimates or equals the integral.",
+        "It overestimates or equals the integral.",
+        "It always equals the integral.",
+        "The comparison depends on the sign of the function."
+      ],
+      "answer": 0,
+      "explanation": "Every left endpoint value is at most the other values on its subinterval."
+    },
+    {
+      "prompt": "Which expression gives average value of f on [2, 6]?",
+      "choices": [
+        "(1/4)∫₂⁶ f(x) dx",
+        "[f(6) − f(2)]/4",
+        "4∫₂⁶ f(x) dx",
+        "[f(6) + f(2)]/2 for every f"
+      ],
+      "answer": 0,
+      "explanation": "Average value is the integral divided by the interval length."
+    },
+    {
+      "prompt": "In dy/dx = k(10 − y) with k > 0, what is the equilibrium solution?",
+      "choices": [
+        "y = 10",
+        "y = 0",
+        "y = k",
+        "y = 10x"
+      ],
+      "answer": 0,
+      "explanation": "An equilibrium solution has derivative zero, which happens at y = 10."
+    },
+    {
+      "prompt": "A solid has circular cross sections of radius r(x) perpendicular to the x-axis from a to b. Which integral gives its volume?",
+      "choices": [
+        "∫ₐᵇ π[r(x)]² dx",
+        "∫ₐᵇ 2πr(x) dx",
+        "π[∫ₐᵇ r(x) dx]²",
+        "∫ₐᵇ r(x) dx"
+      ],
+      "answer": 0,
+      "explanation": "Integrate the cross-sectional area πr²."
+    },
+    {
+      "prompt": "What is the limit of (x² − 4)/(x − 2) as x approaches 2?",
+      "choices": [
+        "4",
+        "2",
+        "5",
+        "0"
+      ],
+      "answer": 0,
+      "explanation": "Factor the numerator and cancel x − 2; the remaining expression is x + 2."
+    },
+    {
+      "prompt": "For f(x) = (2x + 1)³, what is f′(0)?",
+      "choices": [
+        "6",
+        "2",
+        "1",
+        "12"
+      ],
+      "answer": 0,
+      "explanation": "The chain rule gives 3(2x + 1)² × 2."
+    },
+    {
+      "prompt": "What is the area between y = 2x and y = x² for 0 ≤ x ≤ 2?",
+      "choices": [
+        "8/6",
+        "8/3",
+        "8/2",
+        "4/6"
+      ],
+      "answer": 0,
+      "explanation": "The line lies above the parabola. Integrating 2x − x² yields n³/6 with n = 2."
+    },
+    {
+      "prompt": "If y′ = 2x and y(0) = 3, what is y(2)?",
+      "choices": [
+        "7",
+        "11",
+        "4",
+        "3"
+      ],
+      "answer": 0,
+      "explanation": "Integrating gives y = (2/2)x² + 3. Substitute x = 2."
+    },
+    {
+      "prompt": "A rectangular enclosure uses 8 meters of fencing on all four sides. What is the maximum possible area?",
+      "choices": [
+        "4 m²",
+        "8 m²",
+        "16 m²",
+        "12 m²"
+      ],
+      "answer": 0,
+      "explanation": "For side x, the other side is 4 − x. The product is maximized at x = 2."
+    },
+    {
+      "prompt": "What is the limit of (x² − 9)/(x − 3) as x approaches 3?",
+      "choices": [
+        "6",
+        "3",
+        "9",
+        "0"
+      ],
+      "answer": 0,
+      "explanation": "Factor the numerator and cancel x − 3; the remaining expression is x + 3."
+    },
+    {
+      "prompt": "For f(x) = (3x + 1)³, what is f′(0)?",
+      "choices": [
+        "9",
+        "3",
+        "1",
+        "27"
+      ],
+      "answer": 0,
+      "explanation": "The chain rule gives 3(3x + 1)² × 3."
+    },
+    {
+      "prompt": "What is the area between y = 3x and y = x² for 0 ≤ x ≤ 3?",
+      "choices": [
+        "27/6",
+        "27/3",
+        "27/2",
+        "9/6"
+      ],
+      "answer": 0,
+      "explanation": "The line lies above the parabola. Integrating 3x − x² yields n³/6 with n = 3."
+    },
+    {
+      "prompt": "If y′ = 3x and y(0) = 3, what is y(2)?",
+      "choices": [
+        "9",
+        "15",
+        "6",
+        "4"
+      ],
+      "answer": 0,
+      "explanation": "Integrating gives y = (3/2)x² + 3. Substitute x = 2."
+    },
+    {
+      "prompt": "A rectangular enclosure uses 12 meters of fencing on all four sides. What is the maximum possible area?",
+      "choices": [
+        "9 m²",
+        "18 m²",
+        "36 m²",
+        "27 m²"
+      ],
+      "answer": 0,
+      "explanation": "For side x, the other side is 6 − x. The product is maximized at x = 3."
+    },
+    {
+      "prompt": "What is the limit of (x² − 16)/(x − 4) as x approaches 4?",
+      "choices": [
+        "8",
+        "4",
+        "16",
+        "0"
+      ],
+      "answer": 0,
+      "explanation": "Factor the numerator and cancel x − 4; the remaining expression is x + 4."
+    },
+    {
+      "prompt": "For f(x) = (4x + 1)³, what is f′(0)?",
+      "choices": [
+        "12",
+        "4",
+        "1",
+        "48"
+      ],
+      "answer": 0,
+      "explanation": "The chain rule gives 3(4x + 1)² × 4."
+    },
+    {
+      "prompt": "What is the area between y = 4x and y = x² for 0 ≤ x ≤ 4?",
+      "choices": [
+        "64/6",
+        "64/3",
+        "64/2",
+        "16/6"
+      ],
+      "answer": 0,
+      "explanation": "The line lies above the parabola. Integrating 4x − x² yields n³/6 with n = 4."
+    },
+    {
+      "prompt": "If y′ = 4x and y(0) = 3, what is y(2)?",
+      "choices": [
+        "11",
+        "19",
+        "8",
+        "5"
+      ],
+      "answer": 0,
+      "explanation": "Integrating gives y = (4/2)x² + 3. Substitute x = 2."
+    },
+    {
+      "prompt": "A rectangular enclosure uses 16 meters of fencing on all four sides. What is the maximum possible area?",
+      "choices": [
+        "16 m²",
+        "32 m²",
+        "64 m²",
+        "48 m²"
+      ],
+      "answer": 0,
+      "explanation": "For side x, the other side is 8 − x. The product is maximized at x = 4."
+    },
+    {
+      "prompt": "What is the limit of (x² − 25)/(x − 5) as x approaches 5?",
+      "choices": [
+        "10",
+        "5",
+        "25",
+        "0"
+      ],
+      "answer": 0,
+      "explanation": "Factor the numerator and cancel x − 5; the remaining expression is x + 5."
+    },
+    {
+      "prompt": "For f(x) = (5x + 1)³, what is f′(0)?",
+      "choices": [
+        "15",
+        "5",
+        "1",
+        "75"
+      ],
+      "answer": 0,
+      "explanation": "The chain rule gives 3(5x + 1)² × 5."
+    },
+    {
+      "prompt": "What is the area between y = 5x and y = x² for 0 ≤ x ≤ 5?",
+      "choices": [
+        "125/6",
+        "125/3",
+        "125/2",
+        "25/6"
+      ],
+      "answer": 0,
+      "explanation": "The line lies above the parabola. Integrating 5x − x² yields n³/6 with n = 5."
+    },
+    {
+      "prompt": "If y′ = 5x and y(0) = 3, what is y(2)?",
+      "choices": [
+        "13",
+        "23",
+        "10",
+        "6"
+      ],
+      "answer": 0,
+      "explanation": "Integrating gives y = (5/2)x² + 3. Substitute x = 2."
+    },
+    {
+      "prompt": "A rectangular enclosure uses 20 meters of fencing on all four sides. What is the maximum possible area?",
+      "choices": [
+        "25 m²",
+        "50 m²",
+        "100 m²",
+        "75 m²"
+      ],
+      "answer": 0,
+      "explanation": "For side x, the other side is 10 − x. The product is maximized at x = 5."
+    }
+  ],
+  "macroeconomics": [
+    {
+      "prompt": "A previously unemployed person stops looking for work and is no longer in the labor force. What happens to the measured unemployment rate if other employment statuses are unchanged and some people are employed?",
+      "choices": [
+        "It falls.",
+        "It rises.",
+        "It stays fixed because employment is unchanged.",
+        "It becomes equal to the labor force participation rate."
+      ],
+      "answer": 0,
+      "explanation": "Both unemployment and the labor force fall by one, reducing the ratio when employment is positive."
+    },
+    {
+      "prompt": "A used bicycle is sold from one household to another this year. Why is the bicycle's sale price excluded from this year's GDP?",
+      "choices": [
+        "It was produced in an earlier period.",
+        "Household purchases are excluded from GDP.",
+        "Only imported goods are counted.",
+        "A bicycle is an intermediate good in every transaction."
+      ],
+      "answer": 0,
+      "explanation": "GDP measures current production; separately charged current services can count."
+    },
+    {
+      "prompt": "An increase in expected future sales makes firms invest more today. What is the initial effect on aggregate demand?",
+      "choices": [
+        "It shifts right.",
+        "It shifts left.",
+        "It becomes vertical.",
+        "There is only movement along it."
+      ],
+      "answer": 0,
+      "explanation": "Investment is a component of aggregate demand."
+    },
+    {
+      "prompt": "A widespread increase in the cost of a key imported input occurs. What is the short-run effect on aggregate supply?",
+      "choices": [
+        "Short-run aggregate supply shifts left.",
+        "Short-run aggregate supply shifts right.",
+        "Long-run aggregate supply necessarily shifts right immediately.",
+        "Only aggregate demand shifts right."
+      ],
+      "answer": 0,
+      "explanation": "Higher production costs reduce output supplied at each price level."
+    },
+    {
+      "prompt": "With sticky prices and no offsetting policy, a decline in consumer confidence shifts aggregate demand left. What happens in the short run?",
+      "choices": [
+        "Real output and the price level fall.",
+        "Real output and the price level rise.",
+        "Real output rises and the price level falls.",
+        "Real output falls and the price level rises."
+      ],
+      "answer": 0,
+      "explanation": "The new equilibrium moves down along upward-sloping short-run aggregate supply."
+    },
+    {
+      "prompt": "In a limited-reserves system, a central bank purchases government securities. What happens initially in the money market?",
+      "choices": [
+        "Money supply increases and the equilibrium nominal interest rate falls.",
+        "Money supply decreases and the interest rate rises.",
+        "Money demand increases and the interest rate rises.",
+        "Money supply stays fixed and the interest rate rises."
+      ],
+      "answer": 0,
+      "explanation": "A purchase adds reserves and expands the money supply in the standard model."
+    },
+    {
+      "prompt": "Which fiscal policy directly increases aggregate demand during a recession?",
+      "choices": [
+        "An increase in government purchases.",
+        "A decrease in government purchases.",
+        "An increase in personal income taxes.",
+        "A decrease in transfer payments."
+      ],
+      "answer": 0,
+      "explanation": "Government purchases are a direct component of aggregate demand."
+    },
+    {
+      "prompt": "In the loanable funds model, a larger government budget deficit reduces public saving, other things equal. What follows?",
+      "choices": [
+        "The real interest rate rises and private investment falls.",
+        "The real interest rate falls and private investment rises.",
+        "Both rise.",
+        "Both stay constant."
+      ],
+      "answer": 0,
+      "explanation": "Lower national saving reduces the supply of loanable funds and crowds out private investment."
+    },
+    {
+      "prompt": "Holding other factors constant, what is the effect of appreciation of the domestic currency on domestic net exports?",
+      "choices": [
+        "They tend to fall.",
+        "They tend to rise.",
+        "They must become exactly zero.",
+        "They are unchanged by relative prices."
+      ],
+      "answer": 0,
+      "explanation": "Appreciation makes domestic goods relatively more expensive to foreigners and imports cheaper to residents."
+    },
+    {
+      "prompt": "Which change is most likely to increase long-run potential output?",
+      "choices": [
+        "A sustained increase in worker productivity.",
+        "A temporary increase in consumer confidence.",
+        "A rise in the price level alone.",
+        "A one-time increase in household purchases with no supply change."
+      ],
+      "answer": 0,
+      "explanation": "Productivity raises the amount the economy can produce with its resources."
+    },
+    {
+      "prompt": "In a simple closed economy with no taxes, the MPC is 0.75. Government purchases increase by $20 billion. What is the maximum increase in equilibrium output under the simple spending multiplier?",
+      "choices": [
+        "$80 billion",
+        "$20 billion",
+        "$60 billion",
+        "$100 billion"
+      ],
+      "answer": 0,
+      "explanation": "The spending multiplier is 1/(1 − 0.75) = 4."
+    },
+    {
+      "prompt": "Nominal GDP is $240 billion and the GDP deflator is 120. What is real GDP?",
+      "choices": [
+        "$200 billion",
+        "$240 billion",
+        "$288 billion",
+        "$40 billion"
+      ],
+      "answer": 0,
+      "explanation": "Divide nominal GDP by the deflator expressed as a ratio, 1.20."
+    },
+    {
+      "prompt": "The labor force is 200 million and 4 million people are unemployed. What is the unemployment rate?",
+      "choices": [
+        "2%",
+        "0.2%",
+        "4%",
+        "98%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the unemployed count by the labor force and multiply by 100."
+    },
+    {
+      "prompt": "The price index rises from 200 to 204. What is the inflation rate for that period?",
+      "choices": [
+        "2%",
+        "0.2%",
+        "4%",
+        "102%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the increase by the starting index and multiply by 100."
+    },
+    {
+      "prompt": "An investment pays a nominal interest rate of 5% when expected inflation is 2%. What is the approximate expected real interest rate?",
+      "choices": [
+        "3%",
+        "5%",
+        "7%",
+        "0%"
+      ],
+      "answer": 0,
+      "explanation": "The approximate real interest rate equals the nominal interest rate minus expected inflation."
+    },
+    {
+      "prompt": "In a simple closed economy with no taxes, the MPC is 0.75. Government purchases increase by $30 billion. What is the maximum increase in equilibrium output under the simple spending multiplier?",
+      "choices": [
+        "$120 billion",
+        "$30 billion",
+        "$90 billion",
+        "$150 billion"
+      ],
+      "answer": 0,
+      "explanation": "The spending multiplier is 1/(1 − 0.75) = 4."
+    },
+    {
+      "prompt": "Nominal GDP is $360 billion and the GDP deflator is 120. What is real GDP?",
+      "choices": [
+        "$300 billion",
+        "$360 billion",
+        "$432 billion",
+        "$60 billion"
+      ],
+      "answer": 0,
+      "explanation": "Divide nominal GDP by the deflator expressed as a ratio, 1.20."
+    },
+    {
+      "prompt": "The labor force is 300 million and 9 million people are unemployed. What is the unemployment rate?",
+      "choices": [
+        "3%",
+        "0.3%",
+        "6%",
+        "97%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the unemployed count by the labor force and multiply by 100."
+    },
+    {
+      "prompt": "The price index rises from 300 to 309. What is the inflation rate for that period?",
+      "choices": [
+        "3%",
+        "0.3%",
+        "6%",
+        "103%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the increase by the starting index and multiply by 100."
+    },
+    {
+      "prompt": "An investment pays a nominal interest rate of 7% when expected inflation is 3%. What is the approximate expected real interest rate?",
+      "choices": [
+        "4%",
+        "7%",
+        "10%",
+        "0%"
+      ],
+      "answer": 0,
+      "explanation": "The approximate real interest rate equals the nominal interest rate minus expected inflation."
+    },
+    {
+      "prompt": "In a simple closed economy with no taxes, the MPC is 0.75. Government purchases increase by $40 billion. What is the maximum increase in equilibrium output under the simple spending multiplier?",
+      "choices": [
+        "$160 billion",
+        "$40 billion",
+        "$120 billion",
+        "$200 billion"
+      ],
+      "answer": 0,
+      "explanation": "The spending multiplier is 1/(1 − 0.75) = 4."
+    },
+    {
+      "prompt": "Nominal GDP is $480 billion and the GDP deflator is 120. What is real GDP?",
+      "choices": [
+        "$400 billion",
+        "$480 billion",
+        "$576 billion",
+        "$80 billion"
+      ],
+      "answer": 0,
+      "explanation": "Divide nominal GDP by the deflator expressed as a ratio, 1.20."
+    },
+    {
+      "prompt": "The labor force is 400 million and 16 million people are unemployed. What is the unemployment rate?",
+      "choices": [
+        "4%",
+        "0.4%",
+        "8%",
+        "96%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the unemployed count by the labor force and multiply by 100."
+    },
+    {
+      "prompt": "The price index rises from 400 to 416. What is the inflation rate for that period?",
+      "choices": [
+        "4%",
+        "0.4%",
+        "8%",
+        "104%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the increase by the starting index and multiply by 100."
+    },
+    {
+      "prompt": "An investment pays a nominal interest rate of 9% when expected inflation is 4%. What is the approximate expected real interest rate?",
+      "choices": [
+        "5%",
+        "9%",
+        "13%",
+        "0%"
+      ],
+      "answer": 0,
+      "explanation": "The approximate real interest rate equals the nominal interest rate minus expected inflation."
+    },
+    {
+      "prompt": "In a simple closed economy with no taxes, the MPC is 0.75. Government purchases increase by $50 billion. What is the maximum increase in equilibrium output under the simple spending multiplier?",
+      "choices": [
+        "$200 billion",
+        "$50 billion",
+        "$150 billion",
+        "$250 billion"
+      ],
+      "answer": 0,
+      "explanation": "The spending multiplier is 1/(1 − 0.75) = 4."
+    },
+    {
+      "prompt": "Nominal GDP is $600 billion and the GDP deflator is 120. What is real GDP?",
+      "choices": [
+        "$500 billion",
+        "$600 billion",
+        "$720 billion",
+        "$100 billion"
+      ],
+      "answer": 0,
+      "explanation": "Divide nominal GDP by the deflator expressed as a ratio, 1.20."
+    },
+    {
+      "prompt": "The labor force is 500 million and 25 million people are unemployed. What is the unemployment rate?",
+      "choices": [
+        "5%",
+        "0.5%",
+        "10%",
+        "95%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the unemployed count by the labor force and multiply by 100."
+    },
+    {
+      "prompt": "The price index rises from 500 to 525. What is the inflation rate for that period?",
+      "choices": [
+        "5%",
+        "0.5%",
+        "10%",
+        "105%"
+      ],
+      "answer": 0,
+      "explanation": "Divide the increase by the starting index and multiply by 100."
+    },
+    {
+      "prompt": "An investment pays a nominal interest rate of 11% when expected inflation is 5%. What is the approximate expected real interest rate?",
+      "choices": [
+        "6%",
+        "11%",
+        "16%",
+        "0%"
+      ],
+      "answer": 0,
+      "explanation": "The approximate real interest rate equals the nominal interest rate minus expected inflation."
+    }
+  ]
+}

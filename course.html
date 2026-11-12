@@ -43,6 +43,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=2"></script>
+<link rel="stylesheet" href="./progress.css">
+<script type="module" src="./progress.js"></script>
 </head>
 <body>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html">← All courses</a></nav></div></header>
@@ -53,6 +55,24 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div id="guides"></div></section>
 <section class="panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
 </div>
+<section class="wrap panel progress" id="progress-check" aria-labelledby="progress-title" hidden>
+  <h2 id="progress-title">Progress Checking</h2>
+  <p>Practice with original AP-style multiple-choice questions. Submit your set to see your score and explanations.</p>
+  <form class="progress-setup">
+    <label for="progress-size">Questions per set</label>
+    <select id="progress-size">
+      <option value="5">5 questions</option>
+      <option value="10">10 questions</option>
+      <option value="15">15 questions</option>
+      <option value="20">20 questions</option>
+      <option value="25">25 questions</option>
+      <option value="30">30 questions</option>
+    </select>
+    <button type="submit">Start practice</button>
+  </form>
+  <p class="progress-status" role="status"></p>
+  <form class="progress-quiz" hidden></form>
+</section>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>

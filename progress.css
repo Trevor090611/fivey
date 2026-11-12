@@ -1,0 +1,15 @@
+.columns { padding-bottom: 14px; }
+.progress { margin-bottom: 72px; }
+.progress-setup { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 18px; }
+.progress button, .progress select { font: inherit; padding: 8px 12px; border: 1px solid #63775e; border-radius: 6px; }
+.progress button { background: #d9f783; color: #19271f; font-weight: 750; cursor: pointer; }
+.progress button:disabled { cursor: wait; opacity: .65; }
+.progress-status:empty { display: none; }
+.progress-status { margin-top: 12px; }
+.progress-quiz { margin-top: 18px; }
+.progress-quiz fieldset { min-width: 0; margin: 0 0 16px; border: 1px solid #d4d9cd; border-radius: 8px; padding: 10px 14px 14px; }
+.progress-quiz legend { padding: 0 6px; font-weight: 700; }
+.progress-quiz label { display: flex; gap: 8px; align-items: baseline; padding-block: 4px; cursor: pointer; }
+.progress-quiz input { flex: 0 0 auto; accent-color: #204b34; }
+.progress-quiz .answer-review { margin-top: 9px; border-top: 1px solid #d4d9cd; padding-top: 7px; }
+.progress-summary { margin-top: 16px; }
