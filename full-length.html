@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Full Length Practice Test | Fivey</title>
+<link rel="stylesheet" href="./brand.css">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,summary:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+nav a{font-size:14px;font-weight:700}
+.hero{padding:clamp(40px,8vw,92px) 0;background:var(--ink);color:var(--white)}
+h1,h2,p{margin:0}
+h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em}
+.tag{display:inline-block;margin-bottom:14px;border-radius:4px;background:var(--tint,#d9f783);color:var(--ink);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
+main{flex:1}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-block:34px 72px}
+.panel{min-width:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
+.panel h2{font-size:23px;margin-bottom:8px;letter-spacing:-.025em}
+.panel p,.panel li{color:var(--muted)}
+.panel ul{margin:0;padding-left:20px}
+.panel li+li{margin-top:10px}
+details{padding:12px 0;border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:750}
+details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
+#status{padding-top:24px}
+footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
+[hidden]{display:none}
+@media(max-width:620px){.columns{grid-template-columns:1fr}}
+@view-transition{navigation:auto}
+::view-transition-group(root){background:#f8f7ef}
+::view-transition-old(root){animation:300ms ease-in both fivey-fade-out;mix-blend-mode:normal}
+::view-transition-new(root){animation:400ms ease-out 300ms both fivey-fade-in;mix-blend-mode:normal}
+@keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+</style>
+<link rel="stylesheet" href="./fivey-chat.css">
+<script type="module" src="./fivey-chat.js?v=6"></script>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html" id="practice-back">← All courses</a></nav></div></header>
+<main>
+<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Full Length Practice Test</h1></div></section>
+<p class="wrap" id="status" role="status" hidden></p>
+<div class="wrap columns" id="exam-sections" hidden>
+  <section class="panel" aria-labelledby="official-title">
+    <h2 id="official-title">Official AP Past Exam</h2>
+    <p>Find released free-response questions and scoring materials for this course on AP Central.</p>
+    <p><a id="official-exam" href="https://apcentral.collegeboard.org/courses/past-exam-questions">View released AP exam materials</a></p>
+  </section>
+  <section class="panel" aria-labelledby="practice-title">
+    <h2 id="practice-title">Practice Exams</h2>
+    <div id="practice-exams"><p>No full-length practice exams have been posted yet.</p></div>
+  </section>
+</div>
+<noscript><p class="wrap">Enable JavaScript to view exam resources for this course.</p></noscript>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script>
+const courses = [
+  ['biology', 'AP Biology', 'STEM', '#d9f783'],
+  ['environmental-science', 'AP Environmental Science', 'STEM', '#d9f783'],
+  ['chemistry', 'AP Chemistry', 'STEM', '#d9f783'],
+  ['physics-1', 'AP Physics 1', 'STEM', '#d9f783'],
+  ['psychology', 'AP Psychology', 'Humanities', '#fff1b8'],
+  ['calculus-ab', 'AP Calculus AB', 'STEM', '#d9f783'],
+  ['macroeconomics', 'AP Macroeconomics', 'Humanities', '#fff1b8']
+];
+async function loadPracticeExams(course) {
+  const response = await fetch('./library.json');
+  if (!response.ok) throw new Error('Exam catalog unavailable');
+  const catalog = await response.json();
+  const exams = catalog[course]?.practiceExams;
+  if (!Array.isArray(exams)) return;
+  const list = document.createElement('ul');
+  for (const exam of exams) {
+    if (typeof exam?.title !== 'string' || typeof exam.url !== 'string') continue;
+    let url;
+    try {
+      url = new URL(exam.url, document.baseURI);
+    } catch {
+      continue;
+    }
+    if (!['https:', 'http:'].includes(url.protocol)) continue;
+    const link = document.createElement('a');
+    link.href = url.href;
+    link.textContent = exam.title;
+    const item = document.createElement('li');
+    item.append(link);
+    list.append(item);
+  }
+  if (list.children.length) document.querySelector('#practice-exams').replaceChildren(list);
+}
+
+const id = new URLSearchParams(location.search).get('course');
+const selected = courses.find(([courseId]) => courseId === id);
+if (selected) {
+  const [, name, category, tint] = selected;
+  document.title = name + ' Full Length Practice Test | Fivey';
+  const tag = document.querySelector('#tag');
+  tag.textContent = name;
+  tag.style.setProperty('--tint', tint);
+  tag.hidden = false;
+  const back = document.querySelector('#practice-back');
+  back.href = './course.html?course=' + encodeURIComponent(id);
+  back.textContent = '← ' + name;
+  document.querySelector('#official-exam').href =
+    'https://apcentral.collegeboard.org/courses/ap-' + id + '/exam/past-exam-questions';
+  document.querySelector('#exam-sections').hidden = false;
+  loadPracticeExams(id).catch(() => {
+    document.querySelector('#practice-exams p').textContent = 'Practice exams could not be loaded. Try refreshing the page.';
+  });
+} else {
+  const status = document.querySelector('#status');
+  status.textContent = 'Choose a subject from the course library to view exam resources.';
+  status.hidden = false;
+}
+</script>
+</body>
+</html>

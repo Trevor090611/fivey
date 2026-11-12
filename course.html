@@ -42,7 +42,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .columns{padding-bottom:14px}
 .progress-link{margin-bottom:72px}
-.practice-button{display:inline-block;margin-top:14px;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
+.progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
@@ -59,7 +60,10 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
   <p>Test your understanding with original AP-style multiple-choice questions.</p>
-  <a class="practice-button" id="practice-button" href="./courses.html">Check my Progress! &gt;:)</a>
+  <div class="progress-actions">
+    <a class="practice-button" id="practice-button" href="./courses.html">Check my Progress! &gt;:)</a>
+    <a class="practice-button" id="full-length-button" href="./courses.html">Full Length Practice Test</a>
+  </div>
 </section>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
@@ -143,6 +147,7 @@ if (selected) {
   tag.style.setProperty('--tint', tint);
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
+  document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
   document.querySelector('#progress-link').hidden = false;
   loadResources(id).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
 } else {
