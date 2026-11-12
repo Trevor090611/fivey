@@ -7,6 +7,16 @@ const subjects = {
   macroeconomics: ['AP Macroeconomics', 'economic indicators, business cycles, aggregate demand and supply, fiscal and monetary policy, growth, open economy and exchange rates']
 };
 
+// Offer original course practice when the browser cannot run the model.
+const practiceExamples = {
+  biology: ['In a population in Hardy–Weinberg equilibrium, 16% of individuals show a recessive phenotype. What fraction of the population is expected to be heterozygous?', '48%. The recessive allele frequency is 0.4, so 2pq = 2(0.6)(0.4) = 0.48.'],
+  chemistry: ['A 25.0 mL sample of 0.100 M HCl is titrated with 0.125 M NaOH. What volume of base reaches the equivalence point?', '20.0 mL. There are 0.00250 mol of HCl. The reaction is 1:1, so divide 0.00250 mol by 0.125 mol/L.'],
+  'physics-1': ['A 2 kg cart traveling right at 3 m/s sticks to a stationary 1 kg cart. What is their final velocity if the net external impulse is negligible?', '2 m/s to the right. Initial momentum is 6 kg·m/s and the combined mass is 3 kg.'],
+  psychology: ['A researcher randomly assigns participants to study with music or in silence and then measures quiz scores. What is the independent variable, and what does random assignment help control?', 'The independent variable is the study condition. Random assignment helps balance preexisting differences between groups.'],
+  'calculus-ab': ['A particle has velocity v(t) = 3t² − 6t for 0 ≤ t ≤ 3. What is its total distance traveled?', '8 units. The velocity changes sign at t = 2. Integrating its absolute value gives 4 units from 0 to 2 and 4 from 2 to 3.'],
+  macroeconomics: ['The economy has a recessionary gap. If the central bank buys government securities, what happens to the money supply and aggregate demand in the standard AP model?', 'The money supply increases. Lower interest rates stimulate interest-sensitive spending, shifting aggregate demand right.']
+};
+
 const widget = document.createElement('aside');
 widget.className = 'fivey-chat';
 widget.setAttribute('aria-label', 'Fivey AP tutor');
@@ -20,6 +30,7 @@ widget.innerHTML = `
         <option value="">Choose a course</option>
       </select>
       <button class="chat-practice" type="button">Generate a practice question</button>
+      <button class="chat-practice chat-sample" type="button">Try a ready-made question</button>
     </div>
     <div class="chat-log" role="log" aria-label="Conversation" tabindex="0"></div>
     <form class="chat-form">
@@ -167,3 +178,23 @@ form.addEventListener('submit', event => {
   ask();
 });
 practice.addEventListener('click', () => ask(true));
+
+widget.querySelector('.chat-sample').addEventListener('click', () => {
+  const example = practiceExamples[select.value];
+  if (!example) {
+    status.textContent = 'Choose an AP subject first.';
+    select.focus();
+    return;
+  }
+  const [question, answer] = example;
+  addMessage('Practice example', question);
+  const details = document.createElement('details');
+  details.className = 'chat-message';
+  const summary = document.createElement('summary');
+  summary.textContent = 'Show answer';
+  const solution = document.createElement('p');
+  solution.textContent = answer;
+  details.append(summary, solution);
+  log.append(details);
+  log.scrollTop = log.scrollHeight;
+});
