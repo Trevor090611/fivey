@@ -1,8 +1,8 @@
-import { variantAt } from './progress-variants.js?v=3';
+import { variantAt } from './progress-variants.js?v=4';
 
 const course = new URLSearchParams(location.search).get('course');
 const section = document.querySelector('#progress-check');
-const supported = new Set(['biology', 'chemistry', 'physics-1', 'psychology', 'calculus-ab', 'macroeconomics']);
+const supported = new Set(['biology', 'environmental-science', 'chemistry', 'physics-1', 'psychology', 'calculus-ab', 'macroeconomics']);
 
 if (supported.has(course)) setupPractice();
 
@@ -62,7 +62,7 @@ function setupPractice() {
     status.textContent = 'Loading practice questions…';
     try {
       if (!questions) {
-        const response = await fetch(new URL('./progress-questions.json', import.meta.url));
+        const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
         if (!response.ok) throw new Error('Question bank unavailable');
         questions = (await response.json())[course];
       }

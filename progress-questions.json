@@ -1990,5 +1990,337 @@
       "answer": 0,
       "explanation": "The approximate real interest rate equals the nominal interest rate minus expected inflation."
     }
+  ],
+  "environmental-science": [
+    {
+      "prompt": "A grassland produces 24,000 kJ/m² of chemical energy annually by photosynthesis and uses 9,000 kJ/m² in plant respiration. What is its annual net primary productivity?",
+      "choices": [
+        "15,000 kJ/m²",
+        "9,000 kJ/m²",
+        "24,000 kJ/m²",
+        "33,000 kJ/m²"
+      ],
+      "answer": 0,
+      "explanation": "Subtract producer respiration from gross primary productivity."
+    },
+    {
+      "prompt": "What is the largest reservoir of nitrogen accessible to nitrogen-fixing bacteria at Earth's surface?",
+      "choices": [
+        "Atmospheric N₂",
+        "Nitrate in freshwater",
+        "Organic matter in animals",
+        "Ammonium in soil"
+      ],
+      "answer": 0,
+      "explanation": "Atmospheric nitrogen gas is abundant, and nitrogen fixation converts some of it to biologically usable compounds."
+    },
+    {
+      "prompt": "After wolves return to an area, browsing by elk declines and young willow survival increases. Which process best describes the willow response?",
+      "choices": [
+        "A trophic cascade",
+        "Primary succession",
+        "Nitrogen fixation",
+        "Competitive exclusion"
+      ],
+      "answer": 0,
+      "explanation": "A change at the predator level indirectly affects producers through herbivory."
+    },
+    {
+      "prompt": "Two farms grow the same crop. One plants several genetically distinct varieties. Why might that farm be more resilient to a new pathogen?",
+      "choices": [
+        "Some varieties may carry resistance that others lack.",
+        "Genetic diversity guarantees that no plants become infected.",
+        "All varieties have identical immune responses.",
+        "Different varieties prevent pathogens from reproducing in soil."
+      ],
+      "answer": 0,
+      "explanation": "Genetic diversity increases the chance that some individuals can tolerate a disturbance."
+    },
+    {
+      "prompt": "Which site is most likely to begin primary succession?",
+      "choices": [
+        "New rock exposed by a retreating glacier",
+        "A field abandoned after farming",
+        "A forest floor after a low-intensity fire",
+        "A grassland recovering after grazing stops"
+      ],
+      "answer": 0,
+      "explanation": "Primary succession begins on a surface where developed soil is absent."
+    },
+    {
+      "prompt": "Under the basic island biogeography model, which island should support the most species when other conditions are comparable?",
+      "choices": [
+        "A large island close to the mainland",
+        "A small island far from the mainland",
+        "A small island close to the mainland",
+        "A large island far from the mainland"
+      ],
+      "answer": 0,
+      "explanation": "Nearby islands receive more immigrants, and larger islands tend to have lower extinction rates."
+    },
+    {
+      "prompt": "A lake's fish population approaches its carrying capacity. Which change best explains the slowing growth?",
+      "choices": [
+        "Competition for limited resources increases.",
+        "Each fish requires fewer resources as density rises.",
+        "The population necessarily stops reproducing.",
+        "Density-independent mortality always falls."
+      ],
+      "answer": 0,
+      "explanation": "As population density rises, competition can reduce per-capita population growth."
+    },
+    {
+      "prompt": "A population starts the year with 2,000 individuals. There are 90 births, 40 deaths, 25 immigrants, and 15 emigrants. What is the population at year end?",
+      "choices": [
+        "2,060",
+        "2,050",
+        "2,080",
+        "2,170"
+      ],
+      "answer": 0,
+      "explanation": "Add births and immigration, then subtract deaths and emigration. The net increase is 60."
+    },
+    {
+      "prompt": "Which change is generally expected early in a demographic transition, before birth rates decline substantially?",
+      "choices": [
+        "Death rates decline and population growth accelerates.",
+        "Death rates rise and population growth accelerates.",
+        "Birth rates and death rates both immediately approach zero.",
+        "Life expectancy falls and fertility falls at the same time."
+      ],
+      "answer": 0,
+      "explanation": "Improvements in sanitation and medicine can reduce mortality before fertility changes."
+    },
+    {
+      "prompt": "Why are many regions on the leeward side of mountain ranges relatively dry?",
+      "choices": [
+        "Descending air warms, reducing its relative humidity.",
+        "Ascending leeward air cools and releases more precipitation.",
+        "The mountains prevent sunlight from reaching the region.",
+        "Descending air always gains more water vapor from the ocean."
+      ],
+      "answer": 0,
+      "explanation": "Moist air loses precipitation on the windward side and warms as it descends on the leeward side."
+    },
+    {
+      "prompt": "Soils at two sites have similar organic matter. One is dominated by sand and the other by clay. Which is more likely in the sandy soil?",
+      "choices": [
+        "Faster infiltration and less water retained after drainage",
+        "Slower infiltration and more water retained after drainage",
+        "No infiltration and no pore spaces",
+        "Identical drainage because organic matter is equal"
+      ],
+      "answer": 0,
+      "explanation": "Large pores in sandy soils typically allow rapid drainage and reduce water retention."
+    },
+    {
+      "prompt": "Which process occurs where a dense oceanic plate converges with a continental plate?",
+      "choices": [
+        "The oceanic plate commonly subducts beneath the continent.",
+        "Both plates always move away from each other.",
+        "The continental plate necessarily subducts under the oceanic plate.",
+        "Neither plate can move vertically."
+      ],
+      "answer": 0,
+      "explanation": "The denser oceanic lithosphere can sink beneath the continental plate."
+    },
+    {
+      "prompt": "Which change would most directly reduce stormwater runoff from a paved school parking lot?",
+      "choices": [
+        "Replace some pavement with permeable surfaces.",
+        "Extend the asphalt to cover nearby grass.",
+        "Install smooth concrete over the drains.",
+        "Remove all vegetated strips along the lot."
+      ],
+      "answer": 0,
+      "explanation": "Permeable surfaces let more water infiltrate rather than running off."
+    },
+    {
+      "prompt": "How can maintaining a vegetated strip between a crop field and a stream improve water quality?",
+      "choices": [
+        "It can trap sediment and take up some nutrients before runoff enters the stream.",
+        "It increases the speed of runoff into the stream.",
+        "It eliminates nutrient uptake by plants.",
+        "It converts all dissolved pollutants to oxygen."
+      ],
+      "answer": 0,
+      "explanation": "Vegetated buffers slow runoff, retain sediment, and can absorb nutrients."
+    },
+    {
+      "prompt": "Why can drip irrigation use less water than flood irrigation for the same crop?",
+      "choices": [
+        "It delivers water near roots, reducing evaporation and runoff losses.",
+        "It increases evaporation from the entire field.",
+        "It raises the crop's water demand.",
+        "It requires water to cover the whole field."
+      ],
+      "answer": 0,
+      "explanation": "Applying water where roots can absorb it reduces losses outside the root zone."
+    },
+    {
+      "prompt": "Which practice most directly slows the evolution of pest resistance to a pesticide?",
+      "choices": [
+        "Use several control methods and apply the pesticide only when needed.",
+        "Apply the same pesticide frequently even when pests are scarce.",
+        "Increase the number of untreated pests exposed to a lethal dose.",
+        "Use the same pesticide exclusively year after year."
+      ],
+      "answer": 0,
+      "explanation": "Reducing repeated selection from one pesticide helps preserve susceptibility."
+    },
+    {
+      "prompt": "A 3 kW electric pump runs for 4 hours. How much electrical energy does it consume?",
+      "choices": [
+        "12 kWh",
+        "0.75 kWh",
+        "4 kWh",
+        "7 kWh"
+      ],
+      "answer": 0,
+      "explanation": "Multiply power by operating time: 3 kW × 4 h = 12 kWh."
+    },
+    {
+      "prompt": "Which limitation is most directly associated with relying on solar panels alone for electricity?",
+      "choices": [
+        "Output varies with sunlight and drops at night.",
+        "Solar panels need a continuous supply of coal.",
+        "Output cannot be measured as electrical energy.",
+        "Solar panels generate more power at night than at noon."
+      ],
+      "answer": 0,
+      "explanation": "Storage or complementary power sources can help match variable solar output to demand."
+    },
+    {
+      "prompt": "Which ecological cost can result from building a dam for hydroelectric power?",
+      "choices": [
+        "Migration routes for fish can be blocked.",
+        "The dam eliminates all sediment trapping.",
+        "The river's flow becomes identical to its pre-dam flow.",
+        "Fish passage always improves."
+      ],
+      "answer": 0,
+      "explanation": "A dam can fragment river habitat and disrupt migration."
+    },
+    {
+      "prompt": "Which combination contributes to formation of ground-level ozone in a city?",
+      "choices": [
+        "Nitrogen oxides and volatile organic compounds reacting in sunlight",
+        "Carbon dioxide and water vapor reacting in darkness",
+        "Stratospheric ozone and sulfur dioxide reacting in soil",
+        "Nitrogen gas and oxygen forming ozone without an energy source"
+      ],
+      "answer": 0,
+      "explanation": "Sunlight drives reactions involving nitrogen oxides and volatile organic compounds that produce ground-level ozone."
+    },
+    {
+      "prompt": "What is a common air-quality effect of a temperature inversion over a valley?",
+      "choices": [
+        "Pollutants accumulate near the ground because vertical mixing is limited.",
+        "Pollutants immediately rise through the warm layer.",
+        "Ground-level air is replaced continuously by stratospheric air.",
+        "Particulate matter ceases to be emitted."
+      ],
+      "answer": 0,
+      "explanation": "A warmer layer above cooler surface air suppresses vertical mixing."
+    },
+    {
+      "prompt": "Which power-plant intervention most directly reduces sulfur dioxide emissions and the resulting risk of acid deposition?",
+      "choices": [
+        "Install flue-gas desulfurization equipment.",
+        "Raise the smokestack without reducing emissions.",
+        "Install a turbine that releases more waste heat.",
+        "Release untreated exhaust only at night."
+      ],
+      "answer": 0,
+      "explanation": "Scrubbers can remove sulfur dioxide from exhaust before it enters the atmosphere."
+    },
+    {
+      "prompt": "Which water-quality result is consistent with greater microbial decomposition of organic waste downstream of a discharge?",
+      "choices": [
+        "Higher biochemical oxygen demand and lower dissolved oxygen",
+        "Lower biochemical oxygen demand and higher dissolved oxygen",
+        "Higher dissolved oxygen with no microbial respiration",
+        "Lower oxygen demand because more organic material is present"
+      ],
+      "answer": 0,
+      "explanation": "Microbes consume oxygen as they break down organic matter, increasing oxygen demand and lowering dissolved oxygen."
+    },
+    {
+      "prompt": "Which treatment step most directly removes large debris early in municipal wastewater treatment?",
+      "choices": [
+        "Screening",
+        "Chlorination",
+        "Aeration in a biological reactor",
+        "Ultraviolet disinfection"
+      ],
+      "answer": 0,
+      "explanation": "Screens physically remove large solids before later treatment steps."
+    },
+    {
+      "prompt": "In a lake contaminated with methylmercury, which organism would generally have the highest tissue concentration?",
+      "choices": [
+        "A long-lived fish that feeds on other fish",
+        "An alga at the base of the food web",
+        "A small herbivorous zooplankton",
+        "A short-lived fish that eats only algae"
+      ],
+      "answer": 0,
+      "explanation": "Persistent contaminants can biomagnify as predators consume contaminated prey."
+    },
+    {
+      "prompt": "Which landfill feature most directly reduces contamination of groundwater by liquid draining through waste?",
+      "choices": [
+        "A liner and leachate collection system",
+        "A taller entrance gate",
+        "A paved employee parking area",
+        "An uncovered waste surface"
+      ],
+      "answer": 0,
+      "explanation": "A liner limits seepage, and leachate collection allows the contaminated liquid to be managed."
+    },
+    {
+      "prompt": "Why can increasing atmospheric carbon dioxide reduce the availability of carbonate ions in seawater?",
+      "choices": [
+        "Dissolved carbon dioxide increases hydrogen ions, which react with carbonate ions.",
+        "Carbon dioxide raises pH and removes all bicarbonate.",
+        "Dissolved carbon dioxide directly adds calcium ions.",
+        "Increasing carbon dioxide causes all seawater to evaporate."
+      ],
+      "answer": 0,
+      "explanation": "Extra hydrogen ions shift carbonate chemistry, reducing carbonate availability for shell formation."
+    },
+    {
+      "prompt": "Which example illustrates a positive feedback that amplifies warming?",
+      "choices": [
+        "Sea ice melts, exposing darker water that absorbs more solar energy.",
+        "Warming increases outgoing infrared radiation, which reduces the initial warming.",
+        "A city paints roofs white, increasing their reflectivity.",
+        "A wetland restoration increases carbon storage."
+      ],
+      "answer": 0,
+      "explanation": "The loss of reflective ice increases absorption and can cause additional melting."
+    },
+    {
+      "prompt": "Which substances historically contributed to stratospheric ozone depletion by releasing chlorine after exposure to ultraviolet radiation?",
+      "choices": [
+        "Chlorofluorocarbons",
+        "Water vapor",
+        "Carbon dioxide",
+        "Nitrogen gas"
+      ],
+      "answer": 0,
+      "explanation": "Ultraviolet radiation can break down CFCs and release chlorine that catalyzes ozone destruction."
+    },
+    {
+      "prompt": "Which action is an example of adapting to projected sea-level rise?",
+      "choices": [
+        "Elevating critical infrastructure in flood-prone coastal areas",
+        "Replacing coal power with wind power",
+        "Capturing carbon dioxide from industrial exhaust",
+        "Increasing vehicle fuel efficiency"
+      ],
+      "answer": 0,
+      "explanation": "Elevating infrastructure reduces vulnerability to an expected impact of climate change."
+    }
   ]
 }

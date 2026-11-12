@@ -1,5 +1,6 @@
 const subjects = {
   biology: ['AP Biology', 'biochemistry, cells, energetics, cell signaling, heredity, gene expression, evolution, ecology'],
+  'environmental-science': ['AP Environmental Science', 'ecosystems, biodiversity, populations, Earth systems, land and water use, energy, air pollution, aquatic and terrestrial pollution, and global change'],
   chemistry: ['AP Chemistry', 'atomic structure, bonding, intermolecular forces, reactions, kinetics, thermodynamics, equilibria, acids and bases, electrochemistry'],
   'physics-1': ['AP Physics 1', 'kinematics, forces, energy, momentum, rotation, oscillations, fluids; use algebra rather than calculus'],
   psychology: ['AP Psychology', 'research methods, biological bases, cognition, development and learning, social psychology, personality, mental and physical health'],
@@ -10,6 +11,7 @@ const subjects = {
 // Offer original course practice when the browser cannot run the model.
 const practiceExamples = {
   biology: ['In a population in Hardy–Weinberg equilibrium, 16% of individuals show a recessive phenotype. What fraction of the population is expected to be heterozygous?', '48%. The recessive allele frequency is 0.4, so 2pq = 2(0.6)(0.4) = 0.48.'],
+  'environmental-science': ['A solar array delivers an average of 5 kW for 6 hours. How much electrical energy does it produce?', '30 kWh. Multiply power (5 kW) by operating time (6 h).'],
   chemistry: ['A 25.0 mL sample of 0.100 M HCl is titrated with 0.125 M NaOH. What volume of base reaches the equivalence point?', '20.0 mL. There are 0.00250 mol of HCl. The reaction is 1:1, so divide 0.00250 mol by 0.125 mol/L.'],
   'physics-1': ['A 2 kg cart traveling right at 3 m/s sticks to a stationary 1 kg cart. What is their final velocity if the net external impulse is negligible?', '2 m/s to the right. Initial momentum is 6 kg·m/s and the combined mass is 3 kg.'],
   psychology: ['A researcher randomly assigns participants to study with music or in silence and then measures quiz scores. What is the independent variable, and what does random assignment help control?', 'The independent variable is the study condition. Random assignment helps balance preexisting differences between groups.'],

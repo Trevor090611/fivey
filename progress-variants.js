@@ -8,6 +8,36 @@ function question(prompt, correct, distractors, explanation) {
 const percent = value => Number(value.toFixed(2)) + '%';
 
 const templates = {
+  'environmental-science': [
+    (a, b) => {
+      const gross = (a + 20) * 100;
+      const respiration = b * 100;
+      const units = ' kJ/m² per year';
+      return question(
+        `A wetland has gross primary productivity of ${gross}${units}. Producer respiration uses ${respiration}${units}. What is the net primary productivity?`,
+        (gross - respiration) + units,
+        [gross + units, (gross + respiration) + units, (gross - respiration / 2) + units],
+        `Net primary productivity is gross primary productivity minus producer respiration: ${gross} − ${respiration} = ${gross - respiration}${units}.`
+      );
+    },
+    (a, b) => question(
+      `A wastewater plant runs a ${a} kW aeration motor for ${b} hours. How much electricity does the motor consume during that period?`,
+      (a * b) + ' kWh',
+      [(a * b + a) + ' kWh', (a * b * 2) + ' kWh', (a * b / 2) + ' kWh'],
+      `Electrical energy is power multiplied by time: ${a} kW × ${b} h = ${a * b} kWh.`
+    ),
+    (a, b) => {
+      const births = a * 10;
+      const deaths = b * 5;
+      const starting = 500;
+      return question(
+        `A fenced reserve starts the year with ${starting} deer. It records ${births} births and ${deaths} deaths, with no immigration or emigration. What is the population at year end?`,
+        starting + births - deaths,
+        [starting + births + deaths, starting + births, starting - deaths],
+        `Add births and subtract deaths: ${starting} + ${births} − ${deaths} = ${starting + births - deaths} deer.`
+      );
+    }
+  ],
   biology: [
     (a, b) => {
       const p = (20 + a) / 100;

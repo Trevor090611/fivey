@@ -30,4 +30,4 @@ Separate multiple entries with commas. You can also use a full HTTPS link to a g
 
 3. Commit the edit. After Pages publishes it, open the course and click the article title to read it.
 
-The course keys are `biology`, `chemistry`, `physics-1`, `psychology`, `calculus-ab`, and `macroeconomics`. If your text contains a double quote, escape it as `\"`. Guides and articles committed to this public repository can be read by anyone.
+The course keys are `biology`, `chemistry`, `physics-1`, `psychology`, `calculus-ab`, `macroeconomics`, and `environmental-science`. If your text contains a double quote, escape it as `\"`. Guides and articles committed to this public repository can be read by anyone.
