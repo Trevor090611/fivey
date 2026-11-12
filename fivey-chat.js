@@ -82,7 +82,10 @@ function getWorker() {
   worker = new Worker(new URL('./fivey-worker.js', import.meta.url), { type: 'module' });
   worker.addEventListener('message', ({ data }) => {
     if (data.type === 'loading') {
-      status.textContent = 'Preparing the local model… ' + data.percent + '%';
+      const model = data.fallback ? 'compact' : 'local';
+      status.textContent = 'Preparing the ' + model + ' model… ' + data.percent + '%';
+    } else if (data.type === 'fallback') {
+      status.textContent = 'Trying a smaller model for this device…';
     } else if (data.type === 'generating') {
       status.textContent = 'Fivey is writing a reply…';
     } else if (data.type === 'answer') {
@@ -93,6 +96,7 @@ function getWorker() {
     } else if (data.type === 'unsupported') {
       fail('This browser could not access WebGPU. Open Fivey in a WebGPU-enabled browser to use the tutor.');
     } else if (data.type === 'error') {
+      console.warn('Fivey model error:', data.reason);
       fail('Fivey could not complete the request. Check your connection and device memory, then try again.');
     }
   });
