@@ -100,6 +100,11 @@ function getWorker() {
     } else if (data.type === 'generating') {
       status.textContent = 'Fivey is writing a reply…';
     } else if (data.type === 'answer') {
+      if (pending.review && introducesNumbers(data.answer, pending.question.content)) {
+        addMessage('Fivey', 'I couldn’t verify the numbers in my expanded explanation. The answer key above has the checked solution.');
+        finish('Review the answer key or ask Fivey a more specific follow-up.');
+        return;
+      }
       const answer = { role: 'assistant', content: data.answer };
       history.set(pending.key, [...pending.previous, pending.question, answer].slice(-4));
       addMessage('Fivey', data.answer);
@@ -127,6 +132,13 @@ function fail(message) {
   worker?.terminate();
   worker = undefined;
   finish(message);
+}
+
+function introducesNumbers(answer, source) {
+  const numbers = text => (text.replace(/^\s*\d+[.)]\s+/gm, '').match(/\d+(?:[.,]\d+)*/g) ?? [])
+    .map(value => Number(value.replaceAll(',', '')));
+  const provided = new Set(numbers(source));
+  return numbers(answer).some(value => !provided.has(value));
 }
 
 function ask(isPractice = false, review) {
@@ -162,7 +174,7 @@ function ask(isPractice = false, review) {
       'My choice: ' + review.selected,
       'Correct answer: ' + review.correct,
       'Answer key explanation: ' + review.explanation,
-      'Walk through how to solve it in plain language. Explicitly explain why my chosen option is wrong for this question, and how to avoid that mistake. Keep the two parts clearly labeled.'
+      'Use the checked explanation as your only source of facts and arithmetic. Do not invent intermediate values, definitions, or a different answer. In plain text, explain how the checked reasoning leads to the correct option, then contrast my selected option with that reasoning. If the checked explanation lacks a step, describe the method in words instead of guessing numbers.'
     ].join('\n');
   } else if (isPractice) {
     content = 'Write one original AP-style practice question for ' + name + '. ' +
@@ -171,7 +183,7 @@ function ask(isPractice = false, review) {
   }
   const question = { role: 'user', content };
   const previous = history.get(key) ?? [];
-  pending = { key, draft, previous, question };
+  pending = { key, draft, previous, question, review };
   const request = review ? 'Explain why my answer was wrong and walk me through the correct answer.'
     : isPractice && !draft ? 'Generate a practice question for ' + name + '.' : content;
   addMessage('You', request);

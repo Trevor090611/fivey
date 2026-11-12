@@ -127,7 +127,7 @@ const templates = {
     (a, b) => question(
       `The GDP deflator increases from ${a * 100} to ${a * (100 + b)}. By what percentage did the overall price level rise?`,
       percent(b), [percent(b / 10), percent(100 + b), percent(2 * b)],
-      'Subtract the initial index from the new index and divide the result by the initial index.'
+      `The index rose by ${a * b}, since ${a * (100 + b)} − ${a * 100} = ${a * b}. Divide the rise by the starting index: ${a * b} ÷ ${a * 100} = ${b / 100}. Express that fraction as a percentage: ${percent(b)}.`
     )
   ]
 };

@@ -1,4 +1,4 @@
-import { variantAt } from './progress-variants.js';
+import { variantAt } from './progress-variants.js?v=2';
 
 const course = new URLSearchParams(location.search).get('course');
 const section = document.querySelector('#progress-check');
