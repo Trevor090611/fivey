@@ -40,11 +40,12 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 @keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
 @keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+.columns{padding-bottom:14px}
+.progress-link{margin-bottom:72px}
+.practice-button{display:inline-block;margin-top:14px;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=5"></script>
-<link rel="stylesheet" href="./progress.css?v=3">
-<script type="module" src="./progress.js?v=5"></script>
 </head>
 <body>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html">← All courses</a></nav></div></header>
@@ -55,23 +56,10 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div id="guides"></div></section>
 <section class="panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
 </div>
-<section class="wrap panel progress" id="progress-check" aria-labelledby="progress-title" hidden>
+<section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
-  <p>Practice with original AP-style multiple-choice questions. Submit your set to see your score and explanations.</p>
-  <form class="progress-setup">
-    <label for="progress-size">Questions per set</label>
-    <select id="progress-size">
-      <option value="5">5 questions</option>
-      <option value="10">10 questions</option>
-      <option value="15">15 questions</option>
-      <option value="20">20 questions</option>
-      <option value="25">25 questions</option>
-      <option value="30">30 questions</option>
-    </select>
-    <button type="submit">Start practice</button>
-  </form>
-  <p class="progress-status" role="status"></p>
-  <form class="progress-quiz" hidden></form>
+  <p>Test your understanding with original AP-style multiple-choice questions.</p>
+  <a class="practice-button" id="practice-button" href="./courses.html">Practice Questions</a>
 </section>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
@@ -153,6 +141,8 @@ if (selected) {
   tag.textContent = category;
   tag.style.setProperty('--tint', tint);
   tag.hidden = false;
+  document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
+  document.querySelector('#progress-link').hidden = false;
   loadResources(id).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
 } else {
   document.querySelector('#title').textContent = 'Course not found';
