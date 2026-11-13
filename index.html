@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="fivey-auth-pending">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -67,8 +67,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
+<link rel="stylesheet" href="./auth.css">
+<script type="module" src="./auth-gate.js?v=2"></script>
 </head>
 <body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html">Browse courses</a></nav></div></header>
 <main class="home-main"><section class="hero" aria-labelledby="title"><div class="wrap"><div>
 <h1 id="title">Fivey.</h1>

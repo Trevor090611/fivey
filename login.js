@@ -54,6 +54,7 @@ try {
     if (completed(data.user)) {
       continueToSite();
     } else {
+      status.textContent = '';
       show(data.user?.email_confirmed_at ? 'password' : 'login');
       document.querySelector('#show-signup').addEventListener('click', () => show('email'));
       document.querySelector('#show-login').addEventListener('click', () => show('login'));
