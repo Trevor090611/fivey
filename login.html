@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log in | Fivey</title>
+<link rel="stylesheet" href="./auth.css">
+<script type="module" src="./login.js"></script>
+</head>
+<body class="fivey-login">
+<main class="auth-card">
+  <h1>Fivey.</h1>
+  <p>Test email sign-up or log in to your Fivey account.</p>
+  <button type="button" id="google" hidden>Continue with Google</button>
+  <nav id="auth-modes" aria-label="Account options" hidden>
+    <button type="button" id="show-login">Log in</button>
+    <button type="button" id="show-signup">Sign up with email</button>
+  </nav>
+  <form data-stage="login" hidden>
+    <h2>Log in with email</h2>
+    <label>Email address<input name="email" type="email" autocomplete="username" required></label>
+    <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+    <button type="submit">Log in</button>
+  </form>
+  <form data-stage="email" hidden>
+    <h2>Create an account</h2>
+    <label>Email address<input name="email" type="email" autocomplete="email" required></label>
+    <button type="submit">Send verification code</button>
+  </form>
+  <form data-stage="verify" hidden>
+    <h2>Verify your email</h2>
+    <label>Verification code<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" maxlength="8" required></label>
+    <button type="submit">Verify code</button>
+    <button type="button" id="resend">Resend code</button>
+  </form>
+  <form data-stage="password" hidden>
+    <h2>Create your password</h2>
+    <label>Create New Password<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+    <label>Confirm Password<input name="confirm" type="password" autocomplete="new-password" minlength="8" required></label>
+    <button type="submit">Create account</button>
+  </form>
+  <p id="auth-status" role="status">Loading sign-in…</p>
+  <noscript>Enable JavaScript to sign in.</noscript>
+</main>
+</body>
+</html>
