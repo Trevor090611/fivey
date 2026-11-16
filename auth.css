@@ -39,7 +39,7 @@
 :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) {
   border: 2px solid #204b34 !important;
   background-color: #fff !important;
-  background-image: linear-gradient(#d9f783, #d9f783) !important;
+  background-image: linear-gradient(var(--button-fill, #d9f783), var(--button-fill, #d9f783)) !important;
   background-position: right center !important;
   background-repeat: no-repeat !important;
   background-size: 0% 100% !important;
@@ -54,6 +54,7 @@
     background-size: 100% 100% !important;
   }
 }
+a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 .card small { color: #4e5d52; }
 @media (prefers-reduced-motion: reduce) {
   :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) { transition: none; }
