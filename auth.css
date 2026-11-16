@@ -53,7 +53,7 @@
   :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card):hover:not(:disabled) {
     background-size: 100% 100% !important;
     @media (prefers-reduced-motion: no-preference) {
-      translate: 0 -2px;
+      translate: 0 -5px;
     }
   }
 }
