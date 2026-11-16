@@ -42,6 +42,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .columns{padding-bottom:14px}
 .progress-link{margin-bottom:72px}
+.guide-view .columns{grid-template-columns:1fr;padding-bottom:72px}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 </style>
@@ -52,13 +53,13 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
-<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html">← All courses</a></nav></div></header>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a id="course-back" href="./courses.html">← All courses</a></nav></div></header>
 <main>
 <section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div id="guides"></div></section>
-<section class="panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
+<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" id="articles-panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
 </div>
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
@@ -107,13 +108,9 @@ function guideLink(entry) {
   }
 }
 
-async function loadResources(id) {
-  const response = await fetch('./library.json');
-  if (!response.ok) throw new Error('Could not load the resource library');
-  const library = await response.json();
-  const course = library[id] ?? {};
+function renderGuides(course) {
   const guides = document.querySelector('#guides');
-  const articles = document.querySelector('#articles');
+  guides.hidden = false;
   const links = (course.guides ?? []).map(guideLink).filter(Boolean);
   if (links.length) {
     const list = document.createElement('ul');
@@ -126,6 +123,10 @@ async function loadResources(id) {
   } else {
     guides.append(element('p', 'No study guides posted yet.'));
   }
+}
+
+function renderArticles(course) {
+  const articles = document.querySelector('#articles');
   const posts = course.articles ?? [];
   if (!posts.length) articles.append(element('p', 'No articles posted yet.'));
   for (const post of posts) {
@@ -136,23 +137,48 @@ async function loadResources(id) {
     }
     articles.append(details);
   }
-  document.querySelector('#resources').hidden = false;
 }
 
-const id = new URLSearchParams(location.search).get('course');
+async function loadResources(id, guideView) {
+  const response = await fetch('./library.json');
+  if (!response.ok) throw new Error('Could not load the resource library');
+  const library = await response.json();
+  const course = library[id] ?? {};
+  if (guideView) renderGuides(course);
+  else renderArticles(course);
+}
+
+const params = new URLSearchParams(location.search);
+const id = params.get('course');
+const guideView = params.get('view') === 'guides';
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
-  document.title = name + ' | Fivey';
-  document.querySelector('#title').textContent = name;
+  const title = guideView ? name + ' Study Guides' : name;
+  document.title = title + ' | Fivey';
+  document.querySelector('#title').textContent = title;
   const tag = document.querySelector('#tag');
   tag.textContent = category;
   tag.style.setProperty('--tint', tint);
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  document.querySelector('#progress-link').hidden = false;
-  loadResources(id).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
+  const courseHref = './course.html?course=' + encodeURIComponent(id);
+  if (guideView) {
+    document.querySelector('main').classList.add('guide-view');
+    const back = document.querySelector('#course-back');
+    back.href = courseHref;
+    back.textContent = '← Back to ' + name;
+    document.querySelector('#articles-panel').hidden = true;
+    document.querySelector('#guides-title').textContent = 'Available Study Guides';
+  } else {
+    const button = document.querySelector('#view-guides');
+    button.href = courseHref + '&view=guides';
+    button.hidden = false;
+    document.querySelector('#progress-link').hidden = false;
+  }
+  document.querySelector('#resources').hidden = false;
+  loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
 } else {
   document.querySelector('#title').textContent = 'Course not found';
   showStatus('Use All courses to choose a subject.');
