@@ -51,3 +51,33 @@ export function completed(user) {
   return Boolean(user && (user.app_metadata?.providers?.includes('google') ||
     (user.email_confirmed_at && user.user_metadata?.fivey_password_ready === true)));
 }
+
+const buttonLinks = 'a.practice-button, a.intro-link, .home-main .hero a, a.card';
+const buttonControls = 'button, input[type="button"], input[type="submit"], input[type="reset"]';
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let buttonNavigationPending = false;
+
+document.addEventListener('click', event => {
+  if (reducedMotion.matches || !(event.target instanceof Element)) return;
+  const button = event.target.closest(buttonControls + ', ' + buttonLinks);
+  if (!button || button.matches(':disabled') || typeof button.animate !== 'function') return;
+
+  if (!(button instanceof HTMLAnchorElement)) {
+    button.animate([{ opacity: 1 }, { opacity: .2 }, { opacity: 1 }], 240);
+    return;
+  }
+
+  if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+      !button.href || button.hasAttribute('download') || (button.target && button.target !== '_self')) return;
+
+  event.preventDefault();
+  if (buttonNavigationPending) return;
+  buttonNavigationPending = true;
+  const destination = button.href;
+  const fade = button.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: 'ease-out' });
+  const navigate = () => {
+    buttonNavigationPending = false;
+    location.assign(destination);
+  };
+  fade.finished.then(navigate, navigate);
+});
