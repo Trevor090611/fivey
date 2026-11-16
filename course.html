@@ -42,7 +42,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .columns{padding-bottom:14px}
 .progress-link{margin-bottom:72px}
-.guide-view .columns{grid-template-columns:1fr;padding-bottom:72px}
+.columns:has(> #articles-panel[hidden]){grid-template-columns:1fr}
+.guide-view .columns{padding-bottom:72px}
 .guide-description{font-size:.875rem;margin-bottom:12px}
 #view-guides[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
@@ -61,7 +62,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
 <section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
-<section class="panel" id="articles-panel" aria-labelledby="articles-title"><h2 id="articles-title"></h2><div id="articles"></div></section>
+<section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><div id="articles"></div></section>
 </div>
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
@@ -165,16 +166,19 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
+  const showArticles = !guideView && id !== 'environmental-science';
+  if (showArticles) {
+    document.querySelector('#articles-title').textContent = 'How i got a 5 on ' + name;
+    document.querySelector('#articles-panel').hidden = false;
+  }
   const courseHref = './course.html?course=' + encodeURIComponent(id);
   if (guideView) {
     document.querySelector('main').classList.add('guide-view');
     const back = document.querySelector('#course-back');
     back.href = courseHref;
     back.textContent = '← Back to ' + name;
-    document.querySelector('#articles-panel').hidden = true;
     document.querySelector('#guides-title').textContent = 'Available Study Guides';
   } else {
-    document.querySelector('#articles-title').textContent = 'How i got a 5 on ' + name;
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
     button.hidden = false;
@@ -182,7 +186,9 @@ if (selected) {
     document.querySelector('#progress-link').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
-  loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
+  if (guideView || showArticles) {
+    loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
+  }
 } else {
   document.querySelector('#title').textContent = 'Course not found';
   showStatus('Use All courses to choose a subject.');
