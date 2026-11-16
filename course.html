@@ -61,7 +61,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
 <section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
-<section class="panel" id="articles-panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
+<section class="panel" id="articles-panel" aria-labelledby="articles-title"><h2 id="articles-title"></h2><div id="articles"></div></section>
 </div>
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
@@ -174,6 +174,7 @@ if (selected) {
     document.querySelector('#articles-panel').hidden = true;
     document.querySelector('#guides-title').textContent = 'Available Study Guides';
   } else {
+    document.querySelector('#articles-title').textContent = 'How i got a 5 on ' + name;
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
     button.hidden = false;
