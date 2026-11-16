@@ -48,6 +48,11 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .practice-button[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
+main[data-category="humanities"] .panel{background:#fff1b8}
+main[data-category="humanities"] .practice-button{
+  --button-fill:#fff;
+  background-color:#c39019 !important;
+}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
@@ -169,7 +174,7 @@ if (selected) {
   const tag = document.querySelector('#tag');
   tag.textContent = category;
   tag.style.setProperty('--tint', tint);
-  document.querySelector('main').style.setProperty('--button-fill', tint);
+  document.querySelector('main').dataset.category = category.toLowerCase();
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
