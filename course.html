@@ -10,7 +10,7 @@
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
 a{color:inherit}
-a:focus-visible,summary:focus-visible{outline:3px solid #467335;outline-offset:5px}
+a:focus-visible{outline:3px solid #467335;outline-offset:5px}
 .wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
 header{border-bottom:1px solid var(--line)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
@@ -26,9 +26,6 @@ main{flex:1}
 .panel p,.panel li{color:var(--muted)}
 .panel ul{margin:0;padding-left:20px}
 .panel li+li{margin-top:10px}
-details{padding:12px 0;border-bottom:1px solid var(--line)}
-summary{cursor:pointer;font-weight:750}
-details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 #status{padding-top:24px}
 footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
 [hidden]{display:none}
@@ -43,9 +40,12 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .columns{padding-bottom:14px}
 .progress-link{margin-bottom:72px}
 .columns:has(> #articles-panel[hidden]){grid-template-columns:1fr}
-.guide-view .columns{padding-bottom:72px}
+.resource-view .columns{grid-template-columns:1fr;padding-bottom:72px}
+.article-entry + .article-entry{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.article-entry h3,.article-entry p{margin:0 0 12px}
+.article-entry p{max-width:72ch;white-space:pre-wrap;overflow-wrap:anywhere}
 .guide-description{font-size:.875rem;margin-bottom:12px}
-#view-guides[hidden]{display:none}
+.practice-button[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 </style>
@@ -61,8 +61,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
-<section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><div id="articles"></div></section>
+<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 </div>
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
   <h2 id="progress-title">Progress Checking</h2>
@@ -133,12 +133,13 @@ function renderArticles(course) {
   const posts = course.articles ?? [];
   if (!posts.length) articles.append(element('p', 'No articles posted yet.'));
   for (const post of posts) {
-    const details = document.createElement('details');
-    details.append(element('summary', post.title));
+    const article = document.createElement('article');
+    article.className = 'article-entry';
+    article.append(element('h3', post.title));
     for (const paragraph of post.paragraphs) {
-      details.append(element('p', paragraph));
+      article.append(element('p', paragraph));
     }
-    articles.append(details);
+    articles.append(article);
   }
 }
 
@@ -157,7 +158,12 @@ const guideView = params.get('view') === 'guides';
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
-  const title = guideView ? name + ' Study Guides' : name;
+  const hasArticleSection = id !== 'environmental-science';
+  const articleView = hasArticleSection && params.get('view') === 'article';
+  const articleTitle = 'How I got a 5 on ' + name;
+  let title = name;
+  if (guideView) title = name + ' Study Guides';
+  if (articleView) title = articleTitle;
   document.title = title + ' | Fivey';
   document.querySelector('#title').textContent = title;
   const tag = document.querySelector('#tag');
@@ -166,27 +172,33 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  const showArticles = !guideView && id !== 'environmental-science';
+  const showArticles = !guideView && hasArticleSection;
   if (showArticles) {
-    document.querySelector('#articles-title').textContent = 'How I got a 5 on ' + name;
+    document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
   const courseHref = './course.html?course=' + encodeURIComponent(id);
-  if (guideView) {
-    document.querySelector('main').classList.add('guide-view');
+  if (guideView || articleView) {
+    document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
     back.href = courseHref;
     back.textContent = '← Back to ' + name;
-    document.querySelector('#guides-title').textContent = 'Available Study Guides';
+    if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides';
+    else document.querySelector('#guides-panel').hidden = true;
   } else {
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
     button.hidden = false;
     document.querySelector('#guide-description').hidden = false;
+    if (showArticles) {
+      const articleButton = document.querySelector('#view-article');
+      articleButton.href = courseHref + '&view=article';
+      articleButton.hidden = false;
+    }
     document.querySelector('#progress-link').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
-  if (guideView || showArticles) {
+  if (guideView || articleView) {
     loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
   }
 } else {
