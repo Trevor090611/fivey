@@ -4,6 +4,7 @@ export const root = new URL('./', import.meta.url);
 export const login = new URL('login.html', root);
 const pages = new Set(['', 'index.html', 'about.html', 'courses.html', 'course.html', 'practice.html', 'full-length.html']);
 const returnKey = 'fivey-auth-return';
+const tabKey = 'fivey-auth-tab';
 
 export function safeDestination(value) {
   try {
@@ -29,8 +30,20 @@ export function continueToSite() {
 export async function connect() {
   if (!authConfig.url || !authConfig.key) return null;
   const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.95.3');
+  const storage = window.sessionStorage;
+  let tabId = storage.getItem(tabKey);
+  if (!tabId) {
+    tabId = crypto.randomUUID();
+    storage.setItem(tabKey, tabId);
+  }
+
   return createClient(authConfig.url, authConfig.key, {
-    auth: { flowType: 'pkce', detectSessionInUrl: true, storageKey: 'fivey-auth' }
+    auth: {
+      flowType: 'pkce',
+      detectSessionInUrl: true,
+      storage,
+      storageKey: `fivey-auth-${tabId}`
+    }
   }).auth;
 }
 
