@@ -34,3 +34,26 @@
 #fivey-access-status { display: none; }
 .fivey-auth-pending body > :not(#fivey-access-status) { display: none !important; }
 .fivey-auth-pending #fivey-access-status { display: block; padding: 24px; }
+
+/* Shared button paint overrides the individual page themes. */
+:is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) {
+  background-color: #fff !important;
+  background-image: linear-gradient(#d9f783, #d9f783) !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  background-size: 0% 100% !important;
+  color: #19271f !important;
+  transition: background-size 220ms ease-out;
+}
+:is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card):focus-visible:not(:disabled) {
+  background-size: 100% 100% !important;
+}
+@media (hover: hover) {
+  :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card):hover:not(:disabled) {
+    background-size: 100% 100% !important;
+  }
+}
+.card small { color: #4e5d52; }
+@media (prefers-reduced-motion: reduce) {
+  :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) { transition: none; }
+}
