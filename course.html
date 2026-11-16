@@ -51,7 +51,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
-<link rel="stylesheet" href="./auth.css">
+<link rel="stylesheet" href="./auth.css?v=653706b">
 <script type="module" src="./auth-gate.js?v=2"></script>
 </head>
 <body>
@@ -169,6 +169,7 @@ if (selected) {
   const tag = document.querySelector('#tag');
   tag.textContent = category;
   tag.style.setProperty('--tint', tint);
+  document.querySelector('main').style.setProperty('--button-fill', tint);
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
