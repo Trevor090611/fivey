@@ -44,7 +44,7 @@
   background-repeat: no-repeat !important;
   background-size: 0% 100% !important;
   color: #19271f !important;
-  transition: background-size 220ms ease-out;
+  transition: background-size 220ms ease-out, translate 160ms ease-out;
 }
 :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card):focus-visible:not(:disabled) {
   background-size: 100% 100% !important;
@@ -52,6 +52,9 @@
 @media (hover: hover) {
   :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card):hover:not(:disabled) {
     background-size: 100% 100% !important;
+    @media (prefers-reduced-motion: no-preference) {
+      translate: 0 -2px;
+    }
   }
 }
 a.card[data-category="humanities"] { --button-fill: #fff1b8; }
