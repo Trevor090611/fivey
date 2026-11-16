@@ -37,6 +37,7 @@
 
 /* Shared button paint overrides the individual page themes. */
 :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) {
+  border: 2px solid #204b34 !important;
   background-color: #fff !important;
   background-image: linear-gradient(#d9f783, #d9f783) !important;
   background-position: right center !important;
