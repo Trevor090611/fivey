@@ -43,6 +43,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .columns{padding-bottom:14px}
 .progress-link{margin-bottom:72px}
 .guide-view .columns{grid-template-columns:1fr;padding-bottom:72px}
+.guide-description{font-size:.875rem;margin-bottom:12px}
 #view-guides[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
@@ -59,7 +60,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
 <section class="panel" id="articles-panel" aria-labelledby="articles-title"><h2 id="articles-title">How I Studied for a 5</h2><div id="articles"></div></section>
 </div>
 <section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
@@ -176,6 +177,7 @@ if (selected) {
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
     button.hidden = false;
+    document.querySelector('#guide-description').hidden = false;
     document.querySelector('#progress-link').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
