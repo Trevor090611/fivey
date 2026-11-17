@@ -266,6 +266,8 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 </section>
 <section class="panel" id="course-resources" aria-labelledby="course-resources-title">
   <h2 id="course-resources-title">Resources</h2>
+  <p class="panel-description" id="resources-description"></p>
+  <p><strong>View All Resources</strong></p>
 </section>
 </div>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
@@ -420,6 +422,7 @@ if (selected) {
       articleButton.href = courseHref + '&view=article';
       articleButton.hidden = false;
     }
+    document.querySelector('#resources-description').textContent = `All the resources you need to prepare for ${name}`;
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
