@@ -8,3 +8,17 @@
 .brand-bill:nth-of-type(5){bottom:4px;right:3px;--tilt:29deg}
 .brand-bill:nth-of-type(6){bottom:3px;left:5px;--tilt:-16deg}
 .brand-bill:nth-of-type(7){top:26px;left:0;--tilt:15deg}
+
+/* Internal pages keep the branded top bar in the document flow. */
+html:has(body > header .brand) { scroll-padding-top: 70px; }
+body:where(:not(:has(.home-main))) > header:where(:has(.brand)) {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: rgb(25 39 31 / 75%);
+  color: #fffef8;
+}
+body > header.over-dark-hero {
+  background: rgb(217 247 131 / 75%);
+  color: #19271f;
+}
