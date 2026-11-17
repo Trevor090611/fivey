@@ -32,6 +32,8 @@ function appendAccountNavigation(nav, signOut) {
 
   const styles = document.createElement('style');
   styles.textContent = `
+header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
+.fivey-account-actions{display:inline-flex;align-items:center;gap:8px;flex:none}
 .fivey-subjects{position:relative;flex:none;color:#19271f}
 .fivey-subjects summary{cursor:pointer;white-space:nowrap;border:2px solid #294735;border-radius:6px;padding:8px;background:#fff;font:700 14px/1.4 system-ui,sans-serif}
 .fivey-subjects summary:hover,.fivey-subjects[open] summary{background:#d9f783}
@@ -41,7 +43,10 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
 .fivey-subjects summary:focus-visible{outline:3px solid #76974d;outline-offset:2px}
 `;
   document.head.append(styles);
-  nav.append(dropdown, signOut);
+  const accountActions = document.createElement('div');
+  accountActions.className = 'fivey-account-actions';
+  accountActions.append(dropdown, signOut);
+  nav.append(accountActions);
 
   dropdown.addEventListener('keydown', event => {
     if (event.key === 'Escape' && dropdown.open) {
