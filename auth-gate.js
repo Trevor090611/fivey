@@ -38,3 +38,20 @@ try {
 } catch {
   document.querySelector('#fivey-access-status').textContent = 'Fivey could not check your sign-in. Refresh the page to try again.';
 }
+
+// The homepage already manages its fixed header and hero overlap.
+const pageHeader = document.querySelector('body > header');
+const pageHero = document.querySelector('main > .hero');
+if (pageHeader?.querySelector('.brand') && pageHero && !document.querySelector('.home-main')) {
+  function updatePageHeader() {
+    const header = pageHeader.getBoundingClientRect();
+    const hero = pageHero.getBoundingClientRect();
+    const midpoint = header.top + header.height / 2;
+    pageHeader.classList.toggle('over-dark-hero', hero.top <= midpoint && midpoint < hero.bottom);
+  }
+
+  window.addEventListener('scroll', updatePageHeader, { passive: true });
+  window.addEventListener('resize', updatePageHeader);
+  window.addEventListener('pageshow', updatePageHeader);
+  updatePageHeader();
+}
