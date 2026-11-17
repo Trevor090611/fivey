@@ -38,53 +38,65 @@ nav a{font-size:14px;font-weight:700}
   mask-image:linear-gradient(90deg,#000 0%,transparent 39%,transparent 61%,#000 100%);
   pointer-events:none;
 }
-.hero::after{
-  content:var(--hero-equations,none) / "";
+.hero-equations{
   position:absolute;
-  right:clamp(12px,7vw,110px);
-  bottom:clamp(10px,2.2vw,30px);
-  color:color-mix(in srgb,var(--hero-accent,#fff) 40%,transparent);
-  font:500 clamp(12px,2.15vw,31px)/1.55 Georgia,serif;
-  text-align:right;
-  white-space:pre;
+  inset:8px clamp(12px,4vw,66px);
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:42px 1fr 42px;
+  align-items:center;
+  justify-items:center;
   pointer-events:none;
+  user-select:none;
+  color:color-mix(in srgb,var(--hero-accent,#fff) 43%,transparent);
+  font:500 clamp(12px,1.52vw,22px)/1.15 Georgia,serif;
+  white-space:nowrap;
+}
+.hero-equations span{rotate:var(--angle);translate:var(--offset-x) var(--offset-y);scale:var(--size)}
+.hero-equations span:nth-child(n+6){grid-row:3}
+@media(max-width:760px){
+  .hero[data-course]{padding-block:64px}
+  .hero-equations{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:22px 22px 1fr 22px 22px}
+  .hero-equations span{translate:0 var(--offset-y)}
+  .hero-equations span:nth-child(5),.hero-equations span:nth-child(6){grid-row:4}
+  .hero-equations span:nth-child(7),.hero-equations span:nth-child(8){grid-row:5}
+  .hero-equations span:nth-child(n+9){display:none}
 }
 .hero .wrap{position:relative;z-index:1}
 .hero h1{max-width:19ch;margin-inline:auto;text-wrap:balance;text-shadow:0 3px 24px #0007}
 .hero .tag{background:#ffffff12;color:var(--hero-accent,#e5f2db);border:1px solid #ffffff40;border-radius:999px;padding:4px 11px}
-@media(max-width:620px){.hero::after{right:12px;opacity:.8}}
 .hero[data-course="biology"]{
-  --hero-base:#0a2024;--hero-glow:#409b83;--hero-accent:#9be0c5;--hero-equations:"p + q = 1\A p² + 2pq + q² = 1";
+  --hero-base:#0a2024;--hero-glow:#409b83;--hero-accent:#9be0c5;
   --hero-texture:radial-gradient(ellipse,#a5ead64a 1px,transparent 2px);
   --hero-texture-size:22px 22px;
 }
 .hero[data-course="environmental-science"]{
-  --hero-base:#142517;--hero-glow:#75944d;--hero-accent:#d9edac;--hero-equations:"NPP = GPP − R\A ΔN = B + I − D − E";
+  --hero-base:#142517;--hero-glow:#75944d;--hero-accent:#d9edac;
   --hero-texture:repeating-radial-gradient(ellipse at 95% 100%,transparent 0 17px,#ddeda62f 18px 19px,transparent 20px 29px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="chemistry"]{
-  --hero-base:#191a35;--hero-glow:#7953a4;--hero-accent:#dac1f5;--hero-equations:"PV = nRT\A pH = −log₁₀[H⁺]";
+  --hero-base:#191a35;--hero-glow:#7953a4;--hero-accent:#dac1f5;
   --hero-texture:radial-gradient(circle,#dac1f54d 1px,transparent 2px);
   --hero-texture-size:22px 22px;
 }
 .hero[data-course="physics-1"]{
-  --hero-base:#101e39;--hero-glow:#3e72ac;--hero-accent:#bad9ff;--hero-equations:"ΣF = ma\A K = ½mv²";
+  --hero-base:#101e39;--hero-glow:#3e72ac;--hero-accent:#bad9ff;
   --hero-texture:repeating-linear-gradient(-24deg,transparent 0 19px,#bad9ff30 20px 21px,transparent 22px 37px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="psychology"]{
-  --hero-base:#281a32;--hero-glow:#a65379;--hero-accent:#f4bccf;--hero-equations:"ΔI / I = k\A z = (x − μ) / σ";
+  --hero-base:#281a32;--hero-glow:#a65379;--hero-accent:#f4bccf;
   --hero-texture:repeating-radial-gradient(ellipse at 0 80%,transparent 0 22px,#f4bccf27 23px 24px,transparent 25px 40px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="calculus-ab"]{
-  --hero-base:#102533;--hero-glow:#287a9a;--hero-accent:#aee5fa;--hero-equations:"d(xⁿ)/dx = nxⁿ⁻¹\A ∫₀¹ 2x dx = 1";
+  --hero-base:#102533;--hero-glow:#287a9a;--hero-accent:#aee5fa;
   --hero-texture:linear-gradient(#aee5fa33 1px,transparent 1px),linear-gradient(90deg,#aee5fa33 1px,transparent 1px);
   --hero-texture-size:28px 28px;
 }
 .hero[data-course="macroeconomics"]{
-  --hero-base:#26241c;--hero-glow:#9b7540;--hero-accent:#f5d798;--hero-equations:"Y = C + I + G + NX\A k = 1 / (1 − MPC)";
+  --hero-base:#26241c;--hero-glow:#9b7540;--hero-accent:#f5d798;
   --hero-texture:repeating-linear-gradient(90deg,transparent 0 28px,#f5d79830 29px 30px,transparent 31px 43px);
   --hero-texture-size:100% 100%;
 }
@@ -132,7 +144,7 @@ main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a id="course-back" href="./courses.html">← All courses</a></nav></div></header>
 <main>
-<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
+<section class="hero" aria-labelledby="title"><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
 <section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
@@ -159,6 +171,16 @@ const courses = [
   ['calculus-ab', 'AP Calculus AB', 'STEM', '#d9f783'],
   ['macroeconomics', 'AP Macroeconomics', 'Humanities', '#fff1b8']
 ];
+
+const courseEquations = {
+  "biology": ["p + q = 1","p² + 2pq + q² = 1","Ψ = Ψₛ + Ψₚ","Ψₛ = −iCRT","χ² = Σ (O − E)² / E","N(t) = N₀eʳᵗ","dN/dt = rN","dN/dt = rN(1 − N/K)","ΔG = ΔH − TΔS","SA / V = 6 / a"],
+  "environmental-science": ["NPP = GPP − R","ΔN = B + I − D − E","GPP = NPP + R","P = E / t","E = Pt","D = N / A","η = Eₒᵤₜ / Eᵢₙ","CO₂ + H₂O ⇌ H₂CO₃","ΔT = T₂ − T₁","r = ΔN / Δt"],
+  "chemistry": ["PV = nRT","pH = −log₁₀[H⁺]","pH + pOH = 14 (25 °C)","q = mcΔT","ΔG = ΔH − TΔS","A = εℓc","M = n / V","λν = c","E = hν","ΔG° = −RT ln K"],
+  "physics-1": ["ΣF = ma","K = ½mv²","p = mv","J = Δp","W = Fd cos θ","τ = rF sin θ","a = v² / r","Uₛ = ½kx²","v = v₀ + at","T = 2π√(m/k)"],
+  "psychology": ["ΔI / I = k","z = (x − μ) / σ","x̄ = Σx / n","σ² = Σ(x − μ)² / N","σ = √σ²","r² = r × r","range = max − min","IQR = Q₃ − Q₁","SE = s / √n","P(Aᶜ) = 1 − P(A)"],
+  "calculus-ab": ["d(xⁿ)/dx = nxⁿ⁻¹","∫₀¹ 2x dx = 1","(sin x)′ = cos x","(eˣ)′ = eˣ","(ln x)′ = 1/x","(uv)′ = u′v + uv′","(f ∘ g)′ = (f′ ∘ g)g′","∫ₐᵇ f′(x) dx = f(b) − f(a)","∫₀² x dx = 2","(cos x)′ = −sin x"],
+  "macroeconomics": ["Y = C + I + G + NX","k = 1 / (1 − MPC)","MPC + MPS = 1","NX = exports − imports","MV = PY","S = Y − C − G","CPI = 100 × Cₜ / C₀","GDP deflator = 100 × N / R","ΔY = k × ΔG","r ≈ i − π"]
+};
 
 function element(tag, text) {
   const node = document.createElement(tag);
@@ -232,7 +254,17 @@ const guideView = params.get('view') === 'guides';
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
-  document.querySelector('.hero').dataset.course = id;
+  const hero = document.querySelector('.hero');
+  hero.dataset.course = id;
+  const equationLayer = hero.querySelector('.hero-equations');
+  for (const formula of courseEquations[id]) {
+    const equation = element('span', formula);
+    equation.style.setProperty('--angle', (Math.random() * 20 - 10).toFixed(1) + 'deg');
+    equation.style.setProperty('--offset-x', (Math.random() * 28 - 14).toFixed(1) + 'px');
+    equation.style.setProperty('--offset-y', (Math.random() * 10 - 5).toFixed(1) + 'px');
+    equation.style.setProperty('--size', (0.88 + Math.random() * 0.24).toFixed(2));
+    equationLayer.append(equation);
+  }
   const hasArticleSection = id !== 'environmental-science';
   const articleView = hasArticleSection && params.get('view') === 'article';
   const articleTitle = 'How I got a 5 on ' + name;
