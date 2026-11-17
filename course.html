@@ -174,7 +174,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 @keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .columns{padding-bottom:14px}
-.progress-link{margin-bottom:72px}
+.course-actions{padding-block:0 72px}
 .columns:has(> #articles-panel[hidden]){grid-template-columns:1fr}
 .resource-view .columns{grid-template-columns:1fr;padding-bottom:72px}
 .article-entry + .article-entry{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
@@ -255,7 +255,8 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 <section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
 <section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 </div>
-<section class="wrap panel progress-link" id="progress-link" aria-labelledby="progress-title" hidden>
+<div class="wrap columns course-actions" id="course-actions" hidden>
+<section class="panel" id="progress-link" aria-labelledby="progress-title">
   <h2 id="progress-title">Progress Checking</h2>
   <p>Test your understanding with original AP-style multiple-choice questions.</p>
   <div class="progress-actions">
@@ -263,6 +264,10 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     <a class="practice-button" id="full-length-button" href="./courses.html">Full Length Practice Test</a>
   </div>
 </section>
+<section class="panel" id="course-resources" aria-labelledby="course-resources-title">
+  <h2 id="course-resources-title">Resources</h2>
+</section>
+</div>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div>
@@ -412,7 +417,7 @@ if (selected) {
       articleButton.href = courseHref + '&view=article';
       articleButton.hidden = false;
     }
-    document.querySelector('#progress-link').hidden = false;
+    document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
   if (guideView || articleView) {
