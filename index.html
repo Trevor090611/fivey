@@ -13,10 +13,10 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var
 a{color:inherit}
 a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
 .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
-header{border-bottom:1px solid var(--line)}
+body > header{position:absolute;inset:0 0 auto;z-index:5;background:transparent;color:var(--white)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 nav a{font-size:14px;font-weight:700}
-.hero{padding:clamp(52px,9vw,120px) 0;background:var(--ink);color:var(--white)}
+.hero{padding:calc(70px + clamp(52px,9vw,120px)) 0 clamp(52px,9vw,120px);background:var(--ink);color:var(--white)}
 .hero .wrap{display:grid;grid-template-columns:1fr minmax(0,43%);align-items:center;gap:32px}
 h1,h2,h3,p{margin:0}
 h1,h2{line-height:1.04;letter-spacing:-.055em}
@@ -49,7 +49,7 @@ h1{font-size:clamp(58px,11vw,142px)}
 }
 @media(prefers-reduced-motion:reduce){.bill{animation:none}}
 .home-main{display:flex;flex:1;flex-direction:column}
-.hero{min-height:calc(100svh - 192px)}
+.hero{min-height:calc(100svh - 122px)}
 .site-intro{padding:clamp(44px,7vw,88px) 0}
 .site-intro h2{font-size:clamp(34px,5vw,58px)}
 .site-intro p{max-width:62ch;margin-top:16px;color:var(--muted);font-size:18px}
