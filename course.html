@@ -180,7 +180,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .article-entry + .article-entry{margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
 .article-entry h3,.article-entry p{margin:0 0 12px}
 .article-entry p{max-width:72ch;white-space:pre-wrap;overflow-wrap:anywhere}
-.guide-description{font-size:.875rem;margin-bottom:12px}
+.panel-description{font-size:.875rem;margin-bottom:12px}
 .practice-button[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
@@ -252,8 +252,8 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="guide-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
-<section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
+<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><p class="panel-description" id="article-description" hidden></p><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 </div>
 <div class="wrap columns course-actions" id="course-actions" hidden>
 <section class="panel" id="progress-link" aria-labelledby="progress-title">
@@ -413,6 +413,9 @@ if (selected) {
     button.hidden = false;
     document.querySelector('#guide-description').hidden = false;
     if (showArticles) {
+      const description = document.querySelector('#article-description');
+      description.textContent = `Here are some tips and tricks (based on personal experiences) on how to get a 5 on ${name}!`;
+      description.hidden = false;
       const articleButton = document.querySelector('#view-article');
       articleButton.href = courseHref + '&view=article';
       articleButton.hidden = false;
