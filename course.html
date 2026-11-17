@@ -254,6 +254,10 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 <div class="wrap columns" id="resources" hidden>
 <section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
 <section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><p class="panel-description" id="article-description" hidden></p><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
+<section class="panel" id="college-board-panel" aria-labelledby="college-board-title" hidden>
+  <h2 id="college-board-title">College Board Resources</h2>
+  <ul id="college-board-links"></ul>
+</section>
 </div>
 <div class="wrap columns course-actions" id="course-actions" hidden>
 <section class="panel" id="progress-link" aria-labelledby="progress-title">
@@ -267,7 +271,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 <section class="panel" id="course-resources" aria-labelledby="course-resources-title">
   <h2 id="course-resources-title">Resources</h2>
   <p class="panel-description" id="resources-description"></p>
-  <p><strong>View All Resources</strong></p>
+  <a class="practice-button" id="view-resources">View All Resources</a>
 </section>
 </div>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
@@ -306,6 +310,42 @@ function showStatus(message) {
   const status = document.querySelector('#status');
   status.textContent = message;
   status.hidden = false;
+}
+
+function renderCollegeBoardResources(id) {
+  const slug = 'ap-' + id;
+  const collegeBoard = 'https://apcentral.collegeboard.org';
+  const pdf = collegeBoard + '/media/pdf/';
+  const ced = id === 'calculus-ab' ? 'ap-calculus-ab-and-bc' : slug;
+  const syllabus = id === 'physics-1' ? 'ap-physics-1-algebra-based' : slug;
+  const formulaSheets = {
+    biology: 'ap-biology-equations-and-formulas-sheet.pdf',
+    chemistry: 'ap-chemistry-equations-sheet.pdf',
+    'physics-1': 'ap-physics-1-equations-sheet.pdf',
+  };
+  const links = [
+    { title: 'Course and Exam Description', url: pdf + ced + '-course-and-exam-description.pdf' },
+    { title: 'Sample Syllabus', url: pdf + syllabus + '-sample-syllabus-1.pdf' },
+  ];
+  if (formulaSheets[id]) {
+    links.push({ title: 'AP Equation and Formula Sheet', url: pdf + formulaSheets[id] });
+  } else if (id === 'environmental-science') {
+    links.push({
+      title: 'AP Exam Reference Information (in Bluebook)',
+      url: collegeBoard + '/exam-administration-ordering-scores/administering-exams/subject-specific/reference-information#:~:text=AP%20Environmental%20Science',
+    });
+  }
+  links.push({
+    title: 'College Board Textbook Resources',
+    url: collegeBoard + '/courses/' + slug + '/course-audit#:~:text=Example%20Textbook%20List',
+  });
+  const list = document.querySelector('#college-board-links');
+  for (const entry of links) {
+    const item = document.createElement('li');
+    item.append(guideLink(entry));
+    list.append(item);
+  }
+  document.querySelector('#college-board-panel').hidden = false;
 }
 
 function guideLink(entry) {
@@ -365,6 +405,7 @@ async function loadResources(id, guideView) {
 const params = new URLSearchParams(location.search);
 const id = params.get('course');
 const guideView = params.get('view') === 'guides';
+const resourcesView = params.get('view') === 'resources';
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
@@ -387,6 +428,7 @@ if (selected) {
   let title = name;
   if (guideView) title = name + ' Study Guides';
   if (articleView) title = articleTitle;
+  if (resourcesView) title = name + ' Resources';
   document.title = title + ' | Fivey';
   document.querySelector('#title').textContent = title;
   const tag = document.querySelector('#tag');
@@ -396,19 +438,20 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  const showArticles = !guideView && hasArticleSection;
+  const showArticles = !guideView && !resourcesView && hasArticleSection;
   if (showArticles) {
     document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
   const courseHref = './course.html?course=' + encodeURIComponent(id);
-  if (guideView || articleView) {
+  if (guideView || articleView || resourcesView) {
     document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
     back.href = courseHref;
     back.textContent = '← Back to ' + name;
     if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides';
     else document.querySelector('#guides-panel').hidden = true;
+    if (resourcesView) renderCollegeBoardResources(id);
   } else {
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
@@ -423,6 +466,7 @@ if (selected) {
       articleButton.hidden = false;
     }
     document.querySelector('#resources-description').textContent = `All the resources you need to prepare for ${name}`;
+    document.querySelector('#view-resources').href = courseHref + '&view=resources';
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
