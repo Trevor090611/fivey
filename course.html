@@ -68,7 +68,8 @@ nav a{font-size:14px;font-weight:700}
   object-position:right center;
   mask-image:radial-gradient(ellipse at 72% 50%,#000 10%,transparent 72%);
 }
-.hero[data-course="environmental-science"] .hero-art img{
+.hero[data-course="environmental-science"] .hero-art img,
+.hero[data-course="chemistry"] .hero-art img{
   filter:saturate(.7) brightness(.82);
   mix-blend-mode:normal;
 }
@@ -171,6 +172,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 main[data-category="humanities"] .panel{background:#fff}
 main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
+.chemistry-credits{display:none}
+body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;padding-bottom:12px;font-size:12px}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
@@ -189,6 +192,9 @@ main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
 <template id="environmental-science-art"><div class="hero-art" aria-hidden="true">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Marsh_at_National_wildlife_Refuge.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Mississippi_River_Delta_%28MODIS_2024-04-01%29.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template><template id="chemistry-art"><div class="hero-art" aria-hidden="true">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Test_tubes_in_a_laboratory.jpg/960px-Test_tubes_in_a_laboratory.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Copper_Sulfate_Crystal.jpg/960px-Copper_Sulfate_Crystal.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
@@ -205,7 +211,8 @@ main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
 </section>
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
-<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div>
+<p class="wrap chemistry-credits">Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p></footer>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
