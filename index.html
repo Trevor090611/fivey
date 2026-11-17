@@ -14,8 +14,9 @@ a{color:inherit}
 a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
 .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
 html{scroll-padding-top:70px}
-body > header{position:fixed;inset:0 0 auto;z-index:5;background:rgb(95 55 88 / 64%);color:var(--white)}
-body > header.over-content{background:rgb(57 40 62 / 92%)}
+body > header{position:fixed;inset:0 0 auto;z-index:5;background:var(--green);color:var(--ink)}
+body > header.over-content{background:var(--ink);color:var(--white)}
+body > header:not(.over-content) .brand-number{color:var(--ink)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 nav a{font-size:14px;font-weight:700}
 .hero{padding:calc(70px + clamp(52px,9vw,120px)) 0 clamp(52px,9vw,120px);background:var(--ink);color:var(--white)}
