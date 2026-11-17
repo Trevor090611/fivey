@@ -39,51 +39,52 @@ nav a{font-size:14px;font-weight:700}
   pointer-events:none;
 }
 .hero::after{
-  content:var(--hero-mark,none) / "";
+  content:var(--hero-equations,none) / "";
   position:absolute;
   right:clamp(12px,7vw,110px);
-  bottom:-.24em;
-  color:color-mix(in srgb,var(--hero-accent,#fff) 25%,transparent);
-  font:450 clamp(104px,20vw,300px)/1 Georgia,serif;
-  letter-spacing:-.09em;
+  bottom:clamp(10px,2.2vw,30px);
+  color:color-mix(in srgb,var(--hero-accent,#fff) 40%,transparent);
+  font:500 clamp(12px,2.15vw,31px)/1.55 Georgia,serif;
+  text-align:right;
+  white-space:pre;
   pointer-events:none;
 }
 .hero .wrap{position:relative;z-index:1}
 .hero h1{max-width:19ch;margin-inline:auto;text-wrap:balance;text-shadow:0 3px 24px #0007}
 .hero .tag{background:#ffffff12;color:var(--hero-accent,#e5f2db);border:1px solid #ffffff40;border-radius:999px;padding:4px 11px}
-@media(max-width:620px){.hero::after{right:8px;opacity:.6}}
+@media(max-width:620px){.hero::after{right:12px;opacity:.8}}
 .hero[data-course="biology"]{
-  --hero-base:#0a2024;--hero-glow:#409b83;--hero-accent:#9be0c5;--hero-mark:"A·T";
+  --hero-base:#0a2024;--hero-glow:#409b83;--hero-accent:#9be0c5;--hero-equations:"p + q = 1\A p² + 2pq + q² = 1";
   --hero-texture:radial-gradient(ellipse,#a5ead64a 1px,transparent 2px);
   --hero-texture-size:22px 22px;
 }
 .hero[data-course="environmental-science"]{
-  --hero-base:#142517;--hero-glow:#75944d;--hero-accent:#d9edac;--hero-mark:"↻";
+  --hero-base:#142517;--hero-glow:#75944d;--hero-accent:#d9edac;--hero-equations:"NPP = GPP − R\A ΔN = B + I − D − E";
   --hero-texture:repeating-radial-gradient(ellipse at 95% 100%,transparent 0 17px,#ddeda62f 18px 19px,transparent 20px 29px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="chemistry"]{
-  --hero-base:#191a35;--hero-glow:#7953a4;--hero-accent:#dac1f5;--hero-mark:"⌬";
+  --hero-base:#191a35;--hero-glow:#7953a4;--hero-accent:#dac1f5;--hero-equations:"PV = nRT\A pH = −log₁₀[H⁺]";
   --hero-texture:radial-gradient(circle,#dac1f54d 1px,transparent 2px);
   --hero-texture-size:22px 22px;
 }
 .hero[data-course="physics-1"]{
-  --hero-base:#101e39;--hero-glow:#3e72ac;--hero-accent:#bad9ff;--hero-mark:"ω";
+  --hero-base:#101e39;--hero-glow:#3e72ac;--hero-accent:#bad9ff;--hero-equations:"ΣF = ma\A K = ½mv²";
   --hero-texture:repeating-linear-gradient(-24deg,transparent 0 19px,#bad9ff30 20px 21px,transparent 22px 37px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="psychology"]{
-  --hero-base:#281a32;--hero-glow:#a65379;--hero-accent:#f4bccf;--hero-mark:"Ψ";
+  --hero-base:#281a32;--hero-glow:#a65379;--hero-accent:#f4bccf;--hero-equations:"ΔI / I = k\A z = (x − μ) / σ";
   --hero-texture:repeating-radial-gradient(ellipse at 0 80%,transparent 0 22px,#f4bccf27 23px 24px,transparent 25px 40px);
   --hero-texture-size:100% 100%;
 }
 .hero[data-course="calculus-ab"]{
-  --hero-base:#102533;--hero-glow:#287a9a;--hero-accent:#aee5fa;--hero-mark:"∫";
+  --hero-base:#102533;--hero-glow:#287a9a;--hero-accent:#aee5fa;--hero-equations:"d(xⁿ)/dx = nxⁿ⁻¹\A ∫₀¹ 2x dx = 1";
   --hero-texture:linear-gradient(#aee5fa33 1px,transparent 1px),linear-gradient(90deg,#aee5fa33 1px,transparent 1px);
   --hero-texture-size:28px 28px;
 }
 .hero[data-course="macroeconomics"]{
-  --hero-base:#26241c;--hero-glow:#9b7540;--hero-accent:#f5d798;--hero-mark:"ΔY";
+  --hero-base:#26241c;--hero-glow:#9b7540;--hero-accent:#f5d798;--hero-equations:"Y = C + I + G + NX\A k = 1 / (1 − MPC)";
   --hero-texture:repeating-linear-gradient(90deg,transparent 0 28px,#f5d79830 29px 30px,transparent 31px 43px);
   --hero-texture-size:100% 100%;
 }
