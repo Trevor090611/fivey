@@ -188,6 +188,28 @@ main[data-category="humanities"] .panel{background:#fff}
 main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
 .chemistry-credits{display:none}
 body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;padding-bottom:12px;font-size:12px}
+.macro-port{filter:saturate(.7) brightness(.8);mix-blend-mode:normal}
+.macro-graphs{
+  width:37%;
+  display:grid;
+  grid-template-columns:minmax(0,3fr) minmax(0,2fr);
+  gap:12px;
+  align-items:center;
+  padding-inline:0 12px;
+  mask-image:linear-gradient(90deg,transparent,#000 24%);
+}
+.hero-art .macro-graphs img{
+  width:100%;
+  height:auto;
+  max-height:68%;
+  object-fit:contain;
+  filter:grayscale(1) invert(1);
+  mix-blend-mode:screen;
+  mask-image:radial-gradient(ellipse,#000 33%,transparent 82%);
+}
+@media(max-width:760px){.macro-graphs{width:42%;gap:4px;padding-inline-end:4px}}
+.macro-credits{display:none}
+body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;padding-bottom:12px;font-size:12px}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
@@ -221,6 +243,12 @@ body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;paddin
   <!-- Public-domain Riemann sum and CC0 tangent and normal diagrams from Wikimedia Commons. -->
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Integration_rectangle.svg/960px-Integration_rectangle.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Tangent_and_normal_to_a_curve.svg/960px-Tangent_and_normal_to_a_curve.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template><template id="macroeconomics-art"><div class="hero-art" aria-hidden="true">
+  <img class="macro-port" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Port_of_Los_Angeles_Aerial.jpg/960px-Port_of_Los_Angeles_Aerial.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <div class="macro-graphs">
+    <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/AS_%2B_AD_graph.svg/960px-AS_%2B_AD_graph.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Phillips_curve.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  </div>
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
@@ -238,7 +266,8 @@ body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;paddin
 <noscript><p class="wrap">Enable JavaScript to view this course.</p></noscript>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div>
-<p class="wrap chemistry-credits">Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p></footer>
+<p class="wrap chemistry-credits">Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+<p class="wrap macro-credits">Banner artwork (cropped or tinted). <a href="https://commons.wikimedia.org/wiki/File:Port_of_Los_Angeles_Aerial.jpg">Port photo by Antoine Fleitz</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>), <a href="https://commons.wikimedia.org/wiki/File:AS_%2B_AD_graph.svg">AD–AS graph by Syed</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>), and <a href="https://commons.wikimedia.org/wiki/File:Phillips_curve.jpg">Phillips curve by Eric Findlay</a> (public domain).</p></footer>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
