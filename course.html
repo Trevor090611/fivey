@@ -80,6 +80,13 @@ nav a{font-size:14px;font-weight:700}
 }
 .hero[data-course="psychology"] .hero-art img:first-child{object-position:left center}
 .hero[data-course="psychology"] .hero-art img:last-child{object-position:right center}
+.hero[data-course="calculus-ab"] .hero-art img{
+  object-fit:contain;
+  filter:grayscale(1) invert(1);
+  mix-blend-mode:screen;
+}
+.hero[data-course="calculus-ab"] .hero-art img:first-child{object-position:left center}
+.hero[data-course="calculus-ab"] .hero-art img:last-child{object-position:right center}
 @media(max-width:760px){
   .hero-art img{width:42%;opacity:.34}
 }
@@ -210,6 +217,10 @@ body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;paddin
   <!-- Public-domain fMRI image and CC0 Rubin vase illustration from Wikimedia Commons. -->
   <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/MRI_brain.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Two_silhouette_profile_or_a_white_vase.svg/960px-Two_silhouette_profile_or_a_white_vase.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template><template id="calculus-ab-art"><div class="hero-art" aria-hidden="true">
+  <!-- Public-domain Riemann sum and CC0 tangent and normal diagrams from Wikimedia Commons. -->
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Integration_rectangle.svg/960px-Integration_rectangle.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Tangent_and_normal_to_a_curve.svg/960px-Tangent_and_normal_to_a_curve.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
