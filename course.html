@@ -74,6 +74,12 @@ nav a{font-size:14px;font-weight:700}
   filter:saturate(.7) brightness(.82);
   mix-blend-mode:normal;
 }
+.hero[data-course="psychology"] .hero-art img{
+  object-fit:contain;
+  mask-image:radial-gradient(ellipse,#000 28%,transparent 73%);
+}
+.hero[data-course="psychology"] .hero-art img:first-child{object-position:left center}
+.hero[data-course="psychology"] .hero-art img:last-child{object-position:right center}
 @media(max-width:760px){
   .hero-art img{width:42%;opacity:.34}
 }
@@ -200,6 +206,10 @@ body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;paddin
   <!-- Apollo 15 hammer and feather experiment and X-66 wind-tunnel testing, NASA via Wikimedia Commons. -->
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Apollo_15_F%26H.jpg/500px-Apollo_15_F%26H.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Wind_Over_Its_Wing-_NASA%E2%80%99s_X-66_Model_Tests_Airflow_%28ACD24-0108-010%29.jpg/960px-Wind_Over_Its_Wing-_NASA%E2%80%99s_X-66_Model_Tests_Airflow_%28ACD24-0108-010%29.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template><template id="psychology-art"><div class="hero-art" aria-hidden="true">
+  <!-- Public-domain fMRI image and CC0 Rubin vase illustration from Wikimedia Commons. -->
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/MRI_brain.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Two_silhouette_profile_or_a_white_vase.svg/960px-Two_silhouette_profile_or_a_white_vase.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
