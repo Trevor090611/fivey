@@ -13,7 +13,9 @@ body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var
 a{color:inherit}
 a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
 .wrap{width:min(1120px,calc(100% - 40px));margin:auto}
-body > header{position:absolute;inset:0 0 auto;z-index:5;background:transparent;color:var(--white)}
+html{scroll-padding-top:70px}
+body > header{position:fixed;inset:0 0 auto;z-index:5;background:transparent;color:var(--white)}
+body > header.over-content{background:rgb(25 39 31 / 90%)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 nav a{font-size:14px;font-weight:700}
 .hero{padding:calc(70px + clamp(52px,9vw,120px)) 0 clamp(52px,9vw,120px);background:var(--ink);color:var(--white)}
@@ -101,5 +103,16 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </section>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script>
+const homeHeader = document.querySelector('body > header');
+const homeHero = document.querySelector('.hero');
+function updateHeaderBackdrop() {
+  homeHeader.classList.toggle('over-content', homeHero.getBoundingClientRect().bottom < homeHeader.offsetHeight);
+}
+window.addEventListener('scroll', updateHeaderBackdrop, { passive: true });
+window.addEventListener('resize', updateHeaderBackdrop);
+window.addEventListener('pageshow', updateHeaderBackdrop);
+updateHeaderBackdrop();
+</script>
 </body>
 </html>
