@@ -6,9 +6,9 @@ const subjects = [
   ['environmental-science', 'AP Environmental Science'],
   ['chemistry', 'AP Chemistry'],
   ['physics-1', 'AP Physics 1'],
-  ['psychology', 'AP Psychology'],
+  ['psychology', 'AP Psychology', 'humanities'],
   ['calculus-ab', 'AP Calculus AB'],
-  ['macroeconomics', 'AP Macroeconomics'],
+  ['macroeconomics', 'AP Macroeconomics', 'humanities'],
 ];
 
 function appendAccountNavigation(nav, signOut) {
@@ -26,11 +26,12 @@ function appendAccountNavigation(nav, signOut) {
   links.id = 'fivey-subject-links';
   links.hidden = true;
   links.setAttribute('aria-label', 'AP subjects');
-  for (const [id, name] of subjects) {
+  for (const [id, name, category] of subjects) {
     const item = document.createElement('li');
     const link = document.createElement('a');
     link.href = new URL('./course.html?course=' + id, import.meta.url).href;
     link.textContent = name;
+    if (category) link.dataset.category = category;
     item.append(link);
     links.append(item);
   }
@@ -46,7 +47,8 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 .fivey-subjects ul[hidden]{display:none}
 .fivey-subjects ul{position:absolute;z-index:10;inset-inline-end:0;inset-block-start:calc(100% + 6px);width:max-content;max-width:calc(100vw - 32px);max-height:65vh;overflow:auto;margin:0;padding:6px;list-style:none;background:#fff;border:2px solid #294735;border-radius:8px;box-shadow:0 8px 22px #19271f30}
 header nav .fivey-subjects li a{display:block;padding:8px 10px;border-radius:4px;color:#19271f;background:#fff;text-decoration:none;white-space:normal}
-header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visible{color:#19271f;background:#d9f783}
+header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visible{color:#19271f;background:var(--subject-hover,#d9f783)}
+.fivey-subjects a[data-category="humanities"]{--subject-hover:#fff1b8}
 `;
   document.head.append(styles);
   const accountActions = document.createElement('div');
