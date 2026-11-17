@@ -12,13 +12,19 @@ const subjects = [
 ];
 
 function appendAccountNavigation(nav, signOut) {
-  const dropdown = document.createElement('details');
+  const dropdown = document.createElement('div');
   dropdown.className = 'fivey-subjects';
-  const trigger = document.createElement('summary');
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'fivey-subjects-trigger';
   trigger.textContent = 'AP Subjects';
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('aria-controls', 'fivey-subject-links');
   dropdown.append(trigger);
 
   const links = document.createElement('ul');
+  links.id = 'fivey-subject-links';
+  links.hidden = true;
   links.setAttribute('aria-label', 'AP subjects');
   for (const [id, name] of subjects) {
     const item = document.createElement('li');
@@ -33,14 +39,14 @@ function appendAccountNavigation(nav, signOut) {
   const styles = document.createElement('style');
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
-.fivey-account-actions{display:inline-flex;align-items:center;gap:8px;flex:none}
-.fivey-subjects{position:relative;flex:none;color:#19271f}
-.fivey-subjects summary{cursor:pointer;white-space:nowrap;border:2px solid #294735;border-radius:6px;padding:8px;background:#fff;font:700 14px/1.4 system-ui,sans-serif}
-.fivey-subjects summary:hover,.fivey-subjects[open] summary{background:#d9f783}
+.fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none}
+.fivey-subjects{flex:none}
+.fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
+.fivey-account-actions .fivey-sign-out{margin-inline-start:0}
+.fivey-subjects ul[hidden]{display:none}
 .fivey-subjects ul{position:absolute;z-index:10;inset-inline-end:0;inset-block-start:calc(100% + 6px);width:max-content;max-width:calc(100vw - 32px);max-height:65vh;overflow:auto;margin:0;padding:6px;list-style:none;background:#fff;border:2px solid #294735;border-radius:8px;box-shadow:0 8px 22px #19271f30}
 header nav .fivey-subjects li a{display:block;padding:8px 10px;border-radius:4px;color:#19271f;background:#fff;text-decoration:none;white-space:normal}
 header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visible{color:#19271f;background:#d9f783}
-.fivey-subjects summary:focus-visible{outline:3px solid #76974d;outline-offset:2px}
 `;
   document.head.append(styles);
   const accountActions = document.createElement('div');
@@ -48,15 +54,21 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   accountActions.append(dropdown, signOut);
   nav.append(accountActions);
 
+  function setExpanded(expanded) {
+    links.hidden = !expanded;
+    trigger.setAttribute('aria-expanded', String(expanded));
+  }
+
+  trigger.addEventListener('click', () => setExpanded(links.hidden));
   dropdown.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && dropdown.open) {
+    if (event.key === 'Escape' && !links.hidden) {
       event.preventDefault();
-      dropdown.open = false;
+      setExpanded(false);
       trigger.focus();
     }
   });
   document.addEventListener('click', event => {
-    if (!dropdown.contains(event.target)) dropdown.open = false;
+    if (!dropdown.contains(event.target)) setExpanded(false);
   });
 }
 
