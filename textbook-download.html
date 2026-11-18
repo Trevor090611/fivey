@@ -66,6 +66,11 @@
   --hero-texture:radial-gradient(circle,#dac1f54d 1px,transparent 2px);
   --hero-texture-size:22px 22px;
 }
+.download-backdrop[data-course="physics-1"]{
+  --hero-base:#101e39;--hero-glow:#3e72ac;--hero-accent:#bad9ff;
+  --hero-texture:repeating-linear-gradient(-24deg,transparent 0 19px,#bad9ff30 20px 21px,transparent 22px 37px);
+  --hero-texture-size:100% 100%;
+}
 @media(max-width:760px){.hero-art img{width:42%;opacity:.34}}
 body:has(.download-backdrop[data-course="environmental-science"]){background:#142517}
 body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
@@ -108,6 +113,11 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Test_tubes_in_a_laboratory.jpg/960px-Test_tubes_in_a_laboratory.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Copper_Sulfate_Crystal.jpg/960px-Copper_Sulfate_Crystal.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
 </div></template>
+<template id="physics-1-art"><div class="hero-art" aria-hidden="true">
+  <!-- Apollo 15 hammer and feather experiment and X-66 wind-tunnel testing, NASA via Wikimedia Commons. -->
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/Apollo_15_F%26H.jpg/500px-Apollo_15_F%26H.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Wind_Over_Its_Wing-_NASA%E2%80%99s_X-66_Model_Tests_Airflow_%28ACD24-0108-010%29.jpg/960px-Wind_Over_Its_Wing-_NASA%E2%80%99s_X-66_Model_Tests_Airflow_%28ACD24-0108-010%29.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template>
 <main>
   <h1>Textbook Download</h1>
   <p id="download-status" role="status">Choose a textbook from your course’s Resources page.</p>
@@ -116,11 +126,13 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
 <p id="chemistry-credits" hidden>Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 <script>
 const textbookDownloads = {
+  'physics-1': 'https://github.com/Trevor090611/fivey/releases/download/ap-physics-1-textbook-10e/Fundamentals.of.Physics.10e.pdf',
   'environmental-science': 'https://github.com/Trevor090611/fivey/releases/download/apes-textbook-2015/Rick-Relyea-Andrew-Friedland-Environmental-Science-for-AP-WH-Freeman-2015.pdf',
   chemistry: 'https://github.com/Trevor090611/fivey/releases/download/ap-chemistry-textbook-4e/Chemistry.A.Molecular.Approach.4e.by.Nivaldo.Tro.pdf',
 };
 
 const courseEquations = {
+  "physics-1": ["ΣF = ma","K = ½mv²","p = mv","J = Δp","W = Fd cos θ","τ = rF sin θ","a = v² / r","Uₛ = ½kx²","v = v₀ + at","T = 2π√(m/k)"],
   "environmental-science": ["NPP = GPP − R","ΔN = B + I − D − E","GPP = NPP + R","P = E / t","E = Pt","D = N / A","η = Eₒᵤₜ / Eᵢₙ","CO₂ + H₂O ⇌ H₂CO₃","ΔT = T₂ − T₁","r = ΔN / Δt"],
   "chemistry": ["PV = nRT","pH = −log₁₀[H⁺]","pH + pOH = 14 (25 °C)","q = mcΔT","ΔG = ΔH − TΔS","A = εℓc","M = n / V","λν = c","E = hν","ΔG° = −RT ln K"],
 };
