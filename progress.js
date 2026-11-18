@@ -191,7 +191,7 @@ function markChoice(field, index, result, text) {
 
 function setupPractice(selected, timed) {
   const setup = section.querySelector('.progress-setup');
-  const size = section.querySelector('select');
+  const size = setup.querySelector('#progress-size');
   const start = setup.querySelector('button');
   const quiz = section.querySelector('.progress-quiz');
   const status = section.querySelector('.progress-status');
@@ -221,7 +221,7 @@ function setupPractice(selected, timed) {
         const set = navigator.locks
           ? await navigator.locks.request('fivey-progress:' + course, reserve)
           : reserve();
-        if (!set) throw new Error('Too few questions');
+        if (!set?.length || set.length !== count) throw new Error('Incorrect practice set size');
         if (timed) {
           attempt = { url: location.search, set, deadline: Date.now() + timed.minutes * 60000, answers: {}, finished: false };
           save();
