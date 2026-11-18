@@ -1,4 +1,4 @@
-import { analyticsAccount } from './auth-gate.js?v=analytics1';
+import { analyticsAccount } from './auth-gate.js?v=streak1';
 import { units, unitPool } from './practice-units.js?v=5';
 
 
