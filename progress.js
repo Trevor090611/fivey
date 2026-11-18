@@ -1,11 +1,103 @@
 import { analyticsAccount } from './auth-gate.js?v=analytics1';
-import { variantAt } from './progress-variants.js?v=4';
+import { units, unitPool } from './practice-units.js?v=1';
 
-const course = new URLSearchParams(location.search).get('course');
+
+const params = new URLSearchParams(location.search);
+const course = params.get('course');
 const section = document.querySelector('#progress-check');
-const supported = new Set(['biology', 'environmental-science', 'chemistry', 'physics-1', 'psychology', 'calculus-ab', 'macroeconomics']);
+const supported = new Set(Object.keys(units));
+const sizes = [20, 30, 40, 50, 60];
 
-if (section && supported.has(course)) setupPractice();
+function timeLimits() {
+  if (course === 'chemistry' || course === 'biology') return [30, 45, 60, 75, 90];
+  if (course === 'physics-1' || course === 'calculus-ab') return [40, 60, 80, 100, 120];
+  return [24, 36, 48, 60, 72];
+}
+
+function practiceUrl(options = {}) {
+  return './practice.html?' + new URLSearchParams({ course, ...options });
+}
+
+function unitLabel(unit) {
+  return 'Unit ' + unit + ': ' + units[course][unit - 1];
+}
+
+function addLink(container, label, options) {
+  const link = document.createElement('a');
+  link.className = 'practice-button';
+  link.href = practiceUrl(options);
+  link.textContent = label;
+  container.append(link);
+}
+
+function showPractice() {
+  section.hidden = false;
+  const heading = section.querySelector('#progress-title');
+  const description = heading.nextElementSibling;
+  const mode = params.get('mode');
+  const available = units[course].map((_, index) => index + 1);
+  const unit = Number(params.get('unit'));
+  const count = Number(params.get('count'));
+  const minutes = Number(params.get('minutes'));
+  const selected = [...new Set((params.get('units') || '').split(',').map(Number))];
+  const back = document.querySelector('#practice-back');
+  if (mode) {
+    back.href = practiceUrl(mode === 'unit' ? { mode: 'choose' } : mode === 'timed' ? { mode: 'mixed', units: selected.join(','), count, minutes } : {});
+    back.textContent = mode === 'unit' ? '← Choose a unit' : mode === 'timed' ? '← Practice setup' : '← Practice options';
+  }
+  if (mode === 'choose') {
+    heading.textContent = 'Practice By Units';
+    description.hidden = true;
+    const list = section.querySelector('#practice-unit-list');
+    list.hidden = false;
+    for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
+  } else if (mode === 'unit' && available.includes(unit)) {
+    heading.textContent = unitLabel(unit);
+    setupPractice([unit]);
+  } else if (mode === 'mixed') {
+    heading.textContent = 'Practice All Units';
+    description.textContent = 'Select one or more units, a question count, and a time limit.';
+    const form = section.querySelector('#mixed-setup');
+    form.hidden = false;
+    for (const id of available) {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.name = 'unit';
+      input.value = id;
+      input.checked = params.has('units') ? selected.includes(id) : true;
+      label.append(input, ' ' + unitLabel(id));
+      form.querySelector('#mixed-units').append(label);
+    }
+    for (const size of sizes) form.elements.count.add(new Option(size + ' questions', size, false, count === size));
+    for (const limit of timeLimits()) form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      const values = new FormData(form);
+      const chosen = values.getAll('unit');
+      if (!chosen.length) {
+        form.querySelector('details').open = true;
+        form.querySelector('input').focus();
+        section.querySelector('.progress-status').textContent = 'Select at least one unit.';
+        return;
+      }
+      location.assign(practiceUrl({ mode: 'timed', units: chosen.join(','), count: values.get('count'), minutes: values.get('minutes'), run: crypto.randomUUID() }));
+    });
+  } else if (mode === 'timed' && selected.every(id => available.includes(id)) && sizes.includes(count) && timeLimits().includes(minutes) && /^[a-f0-9-]{36}$/.test(params.get('run') || '')) {
+    heading.textContent = 'Timed Practice';
+    description.textContent = selected.map(unitLabel).join(' · ');
+    setupPractice(selected, { count, minutes, key: 'fivey-timed-practice:' + analyticsAccount });
+  } else {
+    const choices = section.querySelector('#practice-modes');
+    if (!choices) {
+      setupPractice(available);
+      return;
+    }
+    choices.hidden = false;
+    addLink(choices, 'Practice By Units', { mode: 'choose' });
+    addLink(choices, 'Practice All Units', { mode: 'mixed' });
+  }
+}
 
 function analyticsKey() {
   return analyticsAccount && 'fivey-practice-analytics-v1:' + analyticsAccount + ':' + course;
@@ -59,23 +151,32 @@ function shuffle(values) {
   return result;
 }
 
-function reserveUnseen(questions, count) {
+function reserveQuestions(bank, selected, count) {
   const key = 'fivey-progress-seen-v1:' + course;
   const saved = JSON.parse(localStorage.getItem(key) ?? '{"seen":[],"offset":0}');
   const seen = new Set(saved.seen);
-  const set = shuffle(questions.filter(item => !seen.has(item.prompt))).slice(0, count);
-  for (const item of set) seen.add(item.prompt);
-
-  let offset = saved.offset;
+  const pools = shuffle(selected).map(unit => {
+    const pool = unitPool(course, unit, bank);
+    const original = new Set(bank);
+    const fresh = pool.filter(item => !seen.has(item.prompt));
+    return [...shuffle(pool), ...shuffle(fresh.filter(item => !original.has(item))), ...shuffle(fresh.filter(item => original.has(item)))];
+  });
+  const set = [];
+  const used = new Set();
   while (set.length < count) {
-    const item = variantAt(course, offset);
-    if (!item) return null;
-    offset++;
-    set.push(item);
+    const before = set.length;
+    for (const pool of pools) {
+      let item = pool.pop();
+      while (item && used.has(item.prompt)) item = pool.pop();
+      if (!item) continue;
+      set.push(item);
+      used.add(item.prompt);
+      seen.add(item.prompt);
+      if (set.length === count) break;
+    }
+    if (before === set.length) return null;
   }
-
-  // Save before showing the set so abandoned questions also stay reserved.
-  localStorage.setItem(key, JSON.stringify({ seen: [...seen], offset }));
+  localStorage.setItem(key, JSON.stringify({ ...saved, seen: [...seen] }));
   return shuffle(set);
 }
 
@@ -88,8 +189,7 @@ function markChoice(field, index, result, text) {
   label.append(badge);
 }
 
-function setupPractice() {
-  section.hidden = false;
+function setupPractice(selected, timed) {
   const setup = section.querySelector('.progress-setup');
   const size = section.querySelector('select');
   const start = setup.querySelector('button');
@@ -98,36 +198,58 @@ function setupPractice() {
   let questions;
   let active = false;
 
-  setup.addEventListener('submit', async event => {
-    event.preventDefault();
-    if (active && !window.confirm('Start a new set and clear your current answers?')) return;
+  const timer = section.querySelector('#practice-timer');
+  let attempt;
+  let interval;
+  const save = () => sessionStorage.setItem(timed.key, JSON.stringify(attempt));
 
+  async function startSet(count) {
     start.disabled = true;
     status.textContent = 'Loading practice questions…';
     try {
-      if (!questions) {
-        const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
-        if (!response.ok) throw new Error('Question bank unavailable');
-        questions = (await response.json())[course];
+      if (timed) {
+        const saved = JSON.parse(sessionStorage.getItem(timed.key) || 'null');
+        if (saved?.url === location.search) attempt = saved;
       }
-      const count = Number(size.value);
-      const reserve = () => reserveUnseen(questions, count);
-      const set = navigator.locks
-        ? await navigator.locks.request('fivey-progress:' + course, reserve)
-        : reserve();
-      if (!set) {
-        status.textContent = 'There are fewer unseen questions than this set size. Try a smaller set.';
-        return;
+      if (!attempt) {
+        if (!questions) {
+          const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
+          if (!response.ok) throw new Error('Question bank unavailable');
+          questions = (await response.json())[course];
+        }
+        const reserve = () => reserveQuestions(questions, selected, count);
+        const set = navigator.locks
+          ? await navigator.locks.request('fivey-progress:' + course, reserve)
+          : reserve();
+        if (!set) throw new Error('Too few questions');
+        if (timed) {
+          attempt = { url: location.search, set, deadline: Date.now() + timed.minutes * 60000, answers: {}, finished: false };
+          save();
+        } else {
+          render(set);
+        }
       }
-      render(set);
       status.textContent = count + ' questions ready.';
-      quiz.querySelector('input').focus();
+      if (timed) render(attempt.set);
+      if (active) quiz.querySelector('input').focus();
     } catch {
-      status.textContent = 'Could not start a fresh set. Check your connection and allow site storage, then try again.';
+      status.textContent = 'Could not load the practice set. Check your connection and site storage, then try again.';
+      if (timed) status.textContent += ' Refresh this page to retry.';
     } finally {
       start.disabled = false;
     }
-  });
+  }
+
+  if (timed) {
+    void startSet(timed.count);
+  } else {
+    setup.hidden = false;
+    setup.addEventListener('submit', event => {
+      event.preventDefault();
+      if (active && !window.confirm('Start a new set and clear your current answers?')) return;
+      void startSet(Number(size.value));
+    });
+  }
 
   function render(set) {
     active = true;
@@ -148,6 +270,20 @@ function setupPractice() {
         input.type = 'radio';
         input.name = 'question-' + index;
         input.value = String(choice.value);
+        input.checked = attempt?.answers[index] === choice.value;
+        if (timed) {
+          input.addEventListener('change', () => {
+            if (Date.now() >= attempt.deadline) {
+              input.checked = false;
+              const previous = field.querySelector('input[value="' + attempt.answers[index] + '"]');
+              if (previous) previous.checked = true;
+              finish(true);
+              return;
+            }
+            attempt.answers[index] = choice.value;
+            save();
+          });
+        }
         label.append(input, document.createTextNode(choice.text));
         field.append(label);
       }
@@ -172,9 +308,13 @@ function setupPractice() {
 
     quiz.onsubmit = event => {
       event.preventDefault();
+      finish(timed && Date.now() >= attempt.deadline);
+    };
+
+    function finish(expired, restoring = false) {
       if (!active) return;
       const unanswered = reviews.filter(({ field }) => !field.querySelector(':checked'));
-      if (unanswered.length) {
+      if (!expired && !restoring && unanswered.length) {
         status.textContent = 'Answer all questions before submitting. Remaining: ' + unanswered.length + '.';
         unanswered[0].field.querySelector('input').focus();
         return;
@@ -182,16 +322,17 @@ function setupPractice() {
 
       let score = 0;
       for (const [index, { field, review, item }] of reviews.entries()) {
-        const selected = Number(field.querySelector(':checked').value);
+        const checked = field.querySelector(':checked');
+        const selected = checked ? Number(checked.value) : null;
         const correct = selected === item.answer;
         if (correct) score++;
         markChoice(field, item.answer, 'correct', '✓ Correct answer');
-        if (!correct) markChoice(field, selected, 'incorrect', '✕ Your answer was incorrect');
+        if (checked && !correct) markChoice(field, selected, 'incorrect', '✕ Your answer was incorrect');
 
         review.textContent = item.explanation;
         review.hidden = false;
         field.disabled = true;
-        if (!correct) {
+        if (checked && !correct) {
           const explain = document.createElement('button');
           explain.type = 'button';
           explain.className = 'progress-explain';
@@ -208,13 +349,39 @@ function setupPractice() {
       }
       active = false;
       submit.hidden = true;
-      status.textContent = 'Set submitted.';
-      recordSet(set.length, score).catch(() => {
-        status.textContent = 'Set submitted. Your analytics could not be saved.';
+      clearInterval(interval);
+      if (timer) timer.hidden = true;
+      const message = expired ? 'Time is up. Your set was submitted.' : 'Set submitted.';
+      status.textContent = message;
+      if (timed && !restoring) {
+        attempt.finished = true;
+        attempt.expired = Boolean(expired);
+        save();
+      }
+      const attempted = set.length - unanswered.length;
+      if (!restoring && attempted) recordSet(attempted, score).catch(() => {
+        status.textContent = message + ' Your analytics could not be saved.';
       });
       summary.textContent = 'Score: ' + score + ' of ' + set.length + ' (' + Math.round(score / set.length * 100) + '%).';
       summary.hidden = false;
-      summary.focus();
-    };
+      if (!restoring) summary.focus();
+    }
+
+    if (timed) {
+      if (attempt.finished) {
+        finish(attempt.expired, true);
+        return;
+      }
+      timer.hidden = false;
+      const tick = () => {
+        const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));
+        timer.textContent = 'Time remaining: ' + Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+        if (!seconds) finish(true);
+      };
+      interval = setInterval(tick, 250);
+      tick();
+    }
   }
 }
+
+if (section && supported.has(course)) showPractice();
