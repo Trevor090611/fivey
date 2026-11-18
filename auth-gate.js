@@ -13,6 +13,61 @@ const subjects = [
   ['macroeconomics', 'AP Macroeconomics', 'humanities'],
 ];
 
+function createStreakCounter(accountId) {
+  const counter = document.createElement('span');
+  counter.className = 'fivey-streak';
+  counter.title = 'Daily streak';
+  counter.setAttribute('role', 'status');
+  const fire = document.createElement('span');
+  fire.className = 'fivey-streak-fire';
+  fire.textContent = '🔥';
+  fire.setAttribute('aria-hidden', 'true');
+  const number = document.createElement('span');
+  counter.append(fire, number);
+
+  const key = 'fivey-visit-streak-v1:' + accountId;
+  const format = new Intl.NumberFormat();
+  let streak = 0;
+
+  function increment() {
+    const now = new Date();
+    const day = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || 'null');
+      const continuous = saved && Number.isSafeInteger(saved.count) && saved.count > 0
+        && (saved.day === day || saved.day === day - 1);
+      streak = continuous ? saved.count + 1 : 1;
+      localStorage.setItem(key, JSON.stringify({ day, count: streak }));
+    } catch {
+      streak = Math.max(1, streak);
+    }
+  }
+
+  async function recordVisit() {
+    if (navigator.locks) {
+      try {
+        await navigator.locks.request(key, increment);
+      } catch {
+        increment();
+      }
+    } else {
+      increment();
+    }
+    number.textContent = format.format(streak);
+    counter.setAttribute('aria-label', 'Daily streak: ' + number.textContent);
+    counter.classList.remove('is-burning');
+    // Restart the sweep when a page is restored from the back/forward cache.
+    void counter.offsetWidth;
+    counter.classList.add('is-burning');
+  }
+
+  void recordVisit();
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) void recordVisit();
+  });
+  return counter;
+}
+
 function appendAccountNavigation(nav, signOut) {
   const dropdown = document.createElement('div');
   dropdown.className = 'fivey-subjects';
@@ -43,6 +98,14 @@ function appendAccountNavigation(nav, signOut) {
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
 .fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none}
+.fivey-streak{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
+.fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;transform:translateX(-101%)}
+.fivey-streak.is-burning::before{animation:fivey-streak-sweep 1s ease-out}
+.fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn 1s ease-out}
+@keyframes fivey-streak-sweep{0%{opacity:.85;transform:translateX(-101%)}45%{opacity:.8;transform:translateX(0)}100%{opacity:0;transform:translateX(101%)}}
+@keyframes fivey-streak-burn{0%,100%{transform:scale(1)}20%{transform:translateY(-2px) rotate(-12deg) scale(1.25);filter:drop-shadow(0 0 3px #ffab42)}43%{transform:rotate(8deg) scale(1.08)}65%{transform:translateY(-1px) rotate(-5deg) scale(1.2);filter:drop-shadow(0 0 2px #ffab42)}}
+@media(prefers-reduced-motion:reduce){.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire{animation:none}}
 .fivey-subjects{flex:none}
 .fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
@@ -55,7 +118,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   document.head.append(styles);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(dropdown, signOut);
+  accountActions.append(createStreakCounter(analyticsAccount), dropdown, signOut);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
