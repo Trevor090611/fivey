@@ -13,7 +13,7 @@ const subjects = [
   ['macroeconomics', 'AP Macroeconomics', 'humanities'],
 ];
 
-function createStreakCounter(accountId) {
+function createStreakCounter(accountId, subjectTrigger) {
   const counter = document.createElement('span');
   counter.className = 'fivey-streak';
   counter.title = 'Daily streak';
@@ -57,11 +57,16 @@ function createStreakCounter(accountId) {
     counter.setAttribute('aria-label', 'Daily streak: ' + number.textContent);
     counter.classList.remove('is-burning');
     // Restart the sweep when a page is restored from the back/forward cache.
-    void counter.offsetWidth;
+    const scale = 1.24;
+    const expandedWidth = Math.ceil((subjectTrigger.offsetWidth + 8) / scale);
+    const expandedHeight = Math.ceil((subjectTrigger.offsetHeight + 8) / scale);
+    counter.style.setProperty('--fivey-streak-scale', scale);
+    counter.style.setProperty('--fivey-streak-extra-width', Math.max(0, expandedWidth - counter.offsetWidth) + 'px');
+    counter.style.setProperty('--fivey-streak-extra-height', Math.max(0, expandedHeight - counter.offsetHeight) + 'px');
     counter.classList.add('is-burning');
   }
 
-  void recordVisit();
+  queueMicrotask(recordVisit);
   window.addEventListener('pageshow', event => {
     if (event.persisted) void recordVisit();
   });
@@ -98,14 +103,29 @@ function appendAccountNavigation(nav, signOut) {
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
 .fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none}
-.fivey-streak{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;overflow:hidden;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
-.fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;transform:translateX(-101%)}
-.fivey-streak.is-burning::before{animation:fivey-streak-sweep 1s ease-out}
+.fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
+.fivey-streak.is-burning{animation:fivey-streak-grow 1250ms ease-in-out}
+.fivey-streak.is-burning::before{animation:fivey-streak-sweep 1s linear}
 .fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn 1s ease-out}
-@keyframes fivey-streak-sweep{0%{opacity:.85;transform:translateX(-101%)}45%{opacity:.8;transform:translateX(0)}100%{opacity:0;transform:translateX(101%)}}
-@keyframes fivey-streak-burn{0%,100%{transform:scale(1)}20%{transform:translateY(-2px) rotate(-12deg) scale(1.25);filter:drop-shadow(0 0 3px #ffab42)}43%{transform:rotate(8deg) scale(1.08)}65%{transform:translateY(-1px) rotate(-5deg) scale(1.2);filter:drop-shadow(0 0 2px #ffab42)}}
-@media(prefers-reduced-motion:reduce){.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire{animation:none}}
+@keyframes fivey-streak-grow{
+  0%,100%{transform:scale(1);min-height:36px;padding-inline:9px;margin-inline-start:0}
+  16%,80%{transform:scale(var(--fivey-streak-scale,1.24));min-height:calc(36px + var(--fivey-streak-extra-height,0px));padding-inline:calc(9px + var(--fivey-streak-width-growth) / 2);margin-inline-start:calc(0px - var(--fivey-streak-width-growth))}
+}
+@keyframes fivey-streak-sweep{
+  0%{opacity:.85;clip-path:inset(0 100% 0 0);animation-timing-function:cubic-bezier(.45,0,.8,.32)}
+  38%{opacity:.85;clip-path:inset(0 calc(100% - 11px - var(--fivey-streak-width-growth) / 2) 0 0);animation-timing-function:cubic-bezier(.2,.65,.4,1)}
+  70%{opacity:.85;clip-path:inset(0)}
+  100%{opacity:0;clip-path:inset(0)}
+}
+@keyframes fivey-streak-burn{
+  0%,38%,100%{transform:scale(1)}
+  49%{transform:translateY(-2px) rotate(-12deg) scale(1.25);filter:drop-shadow(0 0 3px #ffab42)}
+  63%{transform:rotate(8deg) scale(1.08)}
+  76%{transform:translateY(-1px) rotate(-5deg) scale(1.2);filter:drop-shadow(0 0 2px #ffab42)}
+}
+@media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire{animation:none}}
 .fivey-subjects{flex:none}
 .fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
@@ -118,7 +138,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   document.head.append(styles);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(analyticsAccount), dropdown, signOut);
+  accountActions.append(createStreakCounter(analyticsAccount, trigger), dropdown, signOut);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
