@@ -67,7 +67,20 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
 .study-planner{padding:26px 0;border-bottom:1px solid var(--line)}
 .study-planner button{padding:10px 16px;border:2px solid #294735;border-radius:6px;background:var(--green);color:var(--ink);font:inherit;font-weight:750;cursor:pointer}
-.study-planner form,.study-results{margin-top:20px;max-width:760px}
+.study-planner form{margin-top:20px;max-width:760px}
+.study-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+.study-results[hidden]{display:none}
+.study-result-card{min-width:0;padding:clamp(16px,3vw,26px);border:1px solid var(--line);border-radius:16px;background:var(--white)}
+.study-result-card h2{font-size:clamp(22px,3vw,30px)}
+.study-result-card ul{list-style:none;padding:0;margin:14px 0 0}
+.study-result-card li{min-height:82px;padding:10px 0;overflow-wrap:anywhere}
+.study-result-card li+li{border-top:1px solid var(--line)}
+.study-score-row{display:flex;align-items:center;gap:12px}
+.study-score{display:inline-grid;place-items:center;flex:none;width:58px;height:58px;border-radius:13px;background:#2d322e;color:#79e5a7;font:800 italic 38px/1 "DM Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.study-exam-row time,.study-countdown{display:block}
+.study-exam-row time{color:var(--muted);font-size:.875rem}
+.study-countdown{color:#28503b;font-weight:750;font-variant-numeric:tabular-nums}
+@media(max-width:520px){.study-results{grid-template-columns:1fr}}
 .study-planner fieldset{min-width:0;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
 .study-planner legend{padding-inline:4px;font-weight:750}
 .study-fields{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:8px}
@@ -76,8 +89,6 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 .study-fields[hidden]{display:none}
 .study-planner input[type="checkbox"]{accent-color:#294735}
 .study-actions{display:flex;gap:10px;flex-wrap:wrap}
-.study-results ul{padding-left:22px;margin-bottom:0}
-.study-results li+li{margin-top:6px}
 .study-status:not(:empty){margin-top:10px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
@@ -119,10 +130,16 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
         <button type="button" id="study-cancel">Cancel</button>
       </div>
     </form>
-    <section class="study-results" aria-labelledby="study-results-title" hidden>
-      <h2 id="study-results-title" tabindex="-1">Your AP Targets</h2>
-      <ul id="study-targets"></ul>
-    </section>
+    <div class="study-results" hidden>
+      <section class="study-result-card" aria-labelledby="study-results-title">
+        <h2 id="study-results-title" tabindex="-1">My Target Score</h2>
+        <ul id="study-targets" role="list"></ul>
+      </section>
+      <section class="study-result-card" aria-labelledby="study-exam-title">
+        <h2 id="study-exam-title">My Exam Date</h2>
+        <ul id="study-exams" role="list"></ul>
+      </section>
+    </div>
     <p class="study-status" id="study-status" role="status"></p>
   </div>
 </section>
@@ -157,6 +174,7 @@ const form = document.querySelector('#study-form');
 const subjectList = document.querySelector('#study-subjects');
 const summary = document.querySelector('.study-results');
 const targets = document.querySelector('#study-targets');
+const exams = document.querySelector('#study-exams');
 const status = document.querySelector('#study-status');
 const storageKey = 'fivey-study-plan-v1:' + analyticsAccount;
 const formatDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
@@ -171,15 +189,47 @@ function readPlan() {
   return [];
 }
 
+function updateCountdowns() {
+  const now = new Date();
+  // Compare calendar days in UTC to avoid daylight-saving differences in day length.
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  for (const label of exams.querySelectorAll('.study-countdown')) {
+    const days = (Date.parse(label.dataset.date) - today) / 86400000;
+    const message = days > 0
+      ? days + (days === 1 ? ' day away' : ' days away')
+      : days === 0 ? 'Good Luck with ' + label.dataset.subject + ' TODAY!! :D' : 'Exam date passed';
+    if (label.textContent !== message) label.textContent = message;
+  }
+}
+
 function showTargets(plan) {
   targets.replaceChildren();
+  exams.replaceChildren();
   for (const { subject, score, date } of plan) {
-    const row = document.createElement('li');
+    const scoreRow = document.createElement('li');
+    scoreRow.className = 'study-score-row';
     const name = document.createElement('strong');
     name.textContent = subject;
-    row.append(name, ' · Target score: ' + score + ' · Exam date: ' + formatDate.format(new Date(date)));
-    targets.append(row);
+    const badge = document.createElement('span');
+    badge.className = 'study-score';
+    badge.textContent = score;
+    scoreRow.append(name, badge);
+    targets.append(scoreRow);
+
+    const examRow = document.createElement('li');
+    examRow.className = 'study-exam-row';
+    const examName = name.cloneNode(true);
+    const examDate = document.createElement('time');
+    examDate.dateTime = date;
+    examDate.textContent = formatDate.format(new Date(date));
+    const countdown = document.createElement('span');
+    countdown.className = 'study-countdown';
+    countdown.dataset.date = date;
+    countdown.dataset.subject = subject;
+    examRow.append(examName, examDate, countdown);
+    exams.append(examRow);
   }
+  updateCountdowns();
   summary.hidden = plan.length === 0;
 }
 
@@ -236,6 +286,9 @@ function openForm(plan) {
 if (analyticsAccount) {
   let plan = readPlan();
   showTargets(plan);
+  setInterval(updateCountdowns, 1000);
+  window.addEventListener('pageshow', updateCountdowns);
+  document.addEventListener('visibilitychange', updateCountdowns);
   toggle.hidden = false;
   function closeForm() {
     form.hidden = true;
