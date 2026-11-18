@@ -13,7 +13,29 @@ const subjects = [
   ['macroeconomics', 'AP Macroeconomics', 'humanities'],
 ];
 
-function createStreakCounter(accountId, subjectTrigger) {
+const streakCooldownMs = 24 * 60 * 60 * 1000;
+
+function streakAfterSignIn(previous, signedInAt) {
+  const count = Number.isSafeInteger(previous?.count) && previous.count > 0 ? previous.count : 0;
+  if (!Number.isFinite(signedInAt)) return count ? previous : null;
+  if (!count) return { count: 1, countedAt: signedInAt };
+
+  if (!Number.isFinite(previous.countedAt)) {
+    // Older records saved a calendar day without an exact sign-in time.
+    const date = new Date();
+    const day = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / streakCooldownMs;
+    const continuous = previous.day === day || previous.day === day - 1;
+    if (!continuous) return { count: 1, countedAt: signedInAt };
+    const savedDayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate() - (day - previous.day));
+    return { count, countedAt: Math.max(signedInAt, savedDayStart.getTime()) };
+  }
+
+  const elapsed = signedInAt - previous.countedAt;
+  if (elapsed < streakCooldownMs) return previous;
+  return { count: elapsed < 2 * streakCooldownMs ? count + 1 : 1, countedAt: signedInAt };
+}
+
+function createStreakCounter(user, subjectTrigger) {
   const counter = document.createElement('span');
   counter.className = 'fivey-streak';
   counter.title = 'Daily streak';
@@ -25,38 +47,45 @@ function createStreakCounter(accountId, subjectTrigger) {
   const number = document.createElement('span');
   counter.append(fire, number);
 
-  const key = 'fivey-visit-streak-v1:' + accountId;
+  const key = 'fivey-sign-in-streak-v2:' + user.id;
+  const legacyKey = 'fivey-visit-streak-v1:' + user.id;
+  const signedInAt = Date.parse(user.last_sign_in_at);
   const format = new Intl.NumberFormat();
-  let streak = 0;
+  let knownStreak = null;
 
-  function increment() {
-    const now = new Date();
-    const day = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000;
+  function recordSignIn() {
+    let previous = knownStreak;
     try {
-      const saved = JSON.parse(localStorage.getItem(key) || 'null');
-      const continuous = saved && Number.isSafeInteger(saved.count) && saved.count > 0
-        && (saved.day === day || saved.day === day - 1);
-      streak = continuous ? saved.count + 1 : 1;
-      localStorage.setItem(key, JSON.stringify({ day, count: streak }));
+      previous = JSON.parse(localStorage.getItem(key) || 'null') ?? knownStreak
+        ?? JSON.parse(localStorage.getItem(legacyKey) || 'null');
     } catch {
-      streak = Math.max(1, streak);
+      // Keep the last known count if storage is unavailable.
     }
+
+    const next = streakAfterSignIn(previous, signedInAt);
+    if (next && next !== previous) {
+      try {
+        localStorage.setItem(key, JSON.stringify(next));
+      } catch {
+        // Keep the updated count in memory for this page.
+      }
+    }
+    knownStreak = next;
+    return { count: next?.count ?? 0, increased: next !== previous && next?.count > (previous?.count ?? 0) };
   }
 
-  async function recordVisit() {
-    if (navigator.locks) {
-      try {
-        await navigator.locks.request(key, increment);
-      } catch {
-        increment();
-      }
-    } else {
-      increment();
+  async function renderStreak() {
+    let state;
+    try {
+      state = navigator.locks ? await navigator.locks.request(key, recordSignIn) : recordSignIn();
+    } catch {
+      state = recordSignIn();
     }
-    number.textContent = format.format(streak);
+    number.textContent = format.format(state.count);
     counter.setAttribute('aria-label', 'Daily streak: ' + number.textContent);
+    if (!state.increased) return;
     counter.classList.remove('is-burning');
-    // Restart the sweep when a page is restored from the back/forward cache.
+    // Measure the badge at its resting size before starting the sweep.
     const scale = 1.24;
     const expandedWidth = Math.ceil((subjectTrigger.offsetWidth + 8) / scale);
     const expandedHeight = Math.ceil((subjectTrigger.offsetHeight + 8) / scale);
@@ -66,14 +95,14 @@ function createStreakCounter(accountId, subjectTrigger) {
     counter.classList.add('is-burning');
   }
 
-  queueMicrotask(recordVisit);
+  queueMicrotask(renderStreak);
   window.addEventListener('pageshow', event => {
-    if (event.persisted) void recordVisit();
+    if (event.persisted) void renderStreak();
   });
   return counter;
 }
 
-function appendAccountNavigation(nav, signOut) {
+function appendAccountNavigation(nav, signOut, user) {
   const dropdown = document.createElement('div');
   dropdown.className = 'fivey-subjects';
   const trigger = document.createElement('button');
@@ -106,9 +135,9 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 .fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;overflow:hidden;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
 .fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
-.fivey-streak.is-burning{animation:fivey-streak-grow 1250ms ease-in-out}
-.fivey-streak.is-burning::before{animation:fivey-streak-sweep 1s linear}
-.fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn 1s ease-out}
+.fivey-streak.is-burning{--fivey-streak-sweep-time:1800ms;animation:fivey-streak-grow calc(var(--fivey-streak-sweep-time) * 1.25) ease-in-out}
+.fivey-streak.is-burning::before{animation:fivey-streak-sweep var(--fivey-streak-sweep-time) linear}
+.fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn var(--fivey-streak-sweep-time) ease-out}
 @keyframes fivey-streak-grow{
   0%,100%{transform:scale(1);min-height:36px;padding-inline:9px;margin-inline-start:0}
   16%,80%{transform:scale(var(--fivey-streak-scale,1.24));min-height:calc(36px + var(--fivey-streak-extra-height,0px));padding-inline:calc(9px + var(--fivey-streak-width-growth) / 2);margin-inline-start:calc(0px - var(--fivey-streak-width-growth))}
@@ -138,7 +167,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   document.head.append(styles);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(analyticsAccount, trigger), dropdown, signOut);
+  accountActions.append(createStreakCounter(user, trigger), dropdown, signOut);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
@@ -184,7 +213,7 @@ try {
         }
       });
       const nav = document.querySelector('header nav');
-      if (nav) appendAccountNavigation(nav, signOut);
+      if (nav) appendAccountNavigation(nav, signOut, data.user);
       document.documentElement.classList.remove('fivey-auth-pending');
       auth.onAuthStateChange(event => {
         if (event === 'SIGNED_OUT') location.replace(login.href);
