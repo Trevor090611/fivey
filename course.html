@@ -352,6 +352,8 @@ function renderCollegeBoardResources(id) {
     const item = document.createElement('li');
     const link = guideLink(entry);
     link.classList.add('practice-button');
+    link.target = '_blank';
+    link.rel = 'noopener';
     item.append(link);
     list.append(item);
   }
