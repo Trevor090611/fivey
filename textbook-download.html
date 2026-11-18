@@ -108,8 +108,33 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
   .hero-equations span:nth-child(7),.hero-equations span:nth-child(8){grid-row:5}
   .hero-equations span:nth-child(n+9){display:none}
 }
-#chemistry-credits{position:absolute;inset:auto 12px 0;margin:0;padding:8px;text-align:center;color:#fffef8;font-size:12px}
-#chemistry-credits a{color:inherit}
+#chemistry-credits,#macro-credits{position:absolute;inset:auto 12px 0;margin:0;padding:8px;text-align:center;color:#fffef8;font-size:12px}
+#chemistry-credits a,#macro-credits a{color:inherit}
+.download-backdrop[data-course="macroeconomics"]{
+  --hero-base:#26241c;--hero-glow:#9b7540;--hero-accent:#f5d798;
+  --hero-texture:repeating-linear-gradient(90deg,transparent 0 28px,#f5d79830 29px 30px,transparent 31px 43px);
+  --hero-texture-size:100% 100%;
+}
+.macro-port{filter:saturate(.7) brightness(.8);mix-blend-mode:normal}
+.macro-graphs{
+  width:37%;
+  display:grid;
+  grid-template-columns:minmax(0,3fr) minmax(0,2fr);
+  gap:12px;
+  align-items:center;
+  padding-inline:0 12px;
+  mask-image:linear-gradient(90deg,transparent,#000 24%);
+}
+.hero-art .macro-graphs img{
+  width:100%;
+  height:auto;
+  max-height:68%;
+  object-fit:contain;
+  filter:grayscale(1) invert(1);
+  mix-blend-mode:screen;
+  mask-image:radial-gradient(ellipse,#000 33%,transparent 82%);
+}
+@media(max-width:760px){.macro-graphs{width:42%;gap:4px;padding-inline-end:4px}}
 </style>
 </head>
 <body>
@@ -134,14 +159,23 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
   <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/MRI_brain.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Two_silhouette_profile_or_a_white_vase.svg/960px-Two_silhouette_profile_or_a_white_vase.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
 </div></template>
+<template id="macroeconomics-art"><div class="hero-art" aria-hidden="true">
+  <img class="macro-port" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Port_of_Los_Angeles_Aerial.jpg/960px-Port_of_Los_Angeles_Aerial.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <div class="macro-graphs">
+    <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/AS_%2B_AD_graph.svg/960px-AS_%2B_AD_graph.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Phillips_curve.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  </div>
+</div></template>
 <main>
   <h1>Textbook Download</h1>
   <p id="download-status" role="status">Choose a textbook from your course’s Resources page.</p>
   <a id="download-pdf" class="practice-button" hidden>Download PDF manually</a>
 </main>
+<p id="macro-credits" hidden>Banner artwork (cropped or tinted). <a href="https://commons.wikimedia.org/wiki/File:Port_of_Los_Angeles_Aerial.jpg">Port photo by Antoine Fleitz</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>), <a href="https://commons.wikimedia.org/wiki/File:AS_%2B_AD_graph.svg">AD–AS graph by Syed</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>), and <a href="https://commons.wikimedia.org/wiki/File:Phillips_curve.jpg">Phillips curve by Eric Findlay</a> (public domain).</p>
 <p id="chemistry-credits" hidden>Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 <script>
 const textbookDownloads = {
+  macroeconomics: 'https://github.com/Trevor090611/fivey/releases/download/ap-macroeconomics-textbook/Krugman-AP-Macroeconomics-Textbook.pdf',
   psychology: 'https://github.com/Trevor090611/fivey/releases/download/ap-psychology-textbook-4e/Myers-Psychology-for-the-AP-Course-4th-Edition.pdf',
   'physics-1': 'https://github.com/Trevor090611/fivey/releases/download/ap-physics-1-textbook-10e/Fundamentals.of.Physics.10e.pdf',
   'environmental-science': 'https://github.com/Trevor090611/fivey/releases/download/apes-textbook-2015/Rick-Relyea-Andrew-Friedland-Environmental-Science-for-AP-WH-Freeman-2015.pdf',
@@ -150,6 +184,7 @@ const textbookDownloads = {
 
 const courseEquations = {
   "psychology": ["ΔI / I = k","z = (x − μ) / σ","x̄ = Σx / n","σ² = Σ(x − μ)² / N","σ = √σ²","r² = r × r","range = max − min","IQR = Q₃ − Q₁","SE = s / √n","P(Aᶜ) = 1 − P(A)"],
+  "macroeconomics": ["Y = C + I + G + NX","k = 1 / (1 − MPC)","MPC + MPS = 1","NX = exports − imports","MV = PY","S = Y − C − G","CPI = 100 × Cₜ / C₀","GDP deflator = 100 × N / R","ΔY = k × ΔG","r ≈ i − π"]
   "physics-1": ["ΣF = ma","K = ½mv²","p = mv","J = Δp","W = Fd cos θ","τ = rF sin θ","a = v² / r","Uₛ = ½kx²","v = v₀ + at","T = 2π√(m/k)"],
   "environmental-science": ["NPP = GPP − R","ΔN = B + I − D − E","GPP = NPP + R","P = E / t","E = Pt","D = N / A","η = Eₒᵤₜ / Eᵢₙ","CO₂ + H₂O ⇌ H₂CO₃","ΔT = T₂ − T₁","r = ΔN / Δt"],
   "chemistry": ["PV = nRT","pH = −log₁₀[H⁺]","pH + pOH = 14 (25 °C)","q = mcΔT","ΔG = ΔH − TΔS","A = εℓc","M = n / V","λν = c","E = hν","ΔG° = −RT ln K"],
@@ -168,6 +203,7 @@ if (Object.hasOwn(textbookDownloads, course)) {
   }
   backdrop.hidden = false;
   document.querySelector('#chemistry-credits').hidden = course !== 'chemistry';
+  document.querySelector('#macro-credits').hidden = course !== 'macroeconomics';
   const url = textbookDownloads[course];
   const status = document.querySelector('#download-status');
   status.textContent = 'By clicking the button below, the PDF version of the textbook will be downloaded to your computer.';
