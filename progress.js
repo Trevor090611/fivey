@@ -1,5 +1,5 @@
 import { analyticsAccount } from './auth-gate.js?v=analytics1';
-import { units, unitPool } from './practice-units.js?v=1';
+import { units, unitPool } from './practice-units.js?v=2';
 
 
 const params = new URLSearchParams(location.search);
