@@ -314,40 +314,7 @@ function showStatus(message) {
   status.hidden = false;
 }
 
-const textbookDownloads = {
-  'environmental-science': 'https://github.com/Trevor090611/fivey/releases/download/apes-textbook-2015/Rick-Relyea-Andrew-Friedland-Environmental-Science-for-AP-WH-Freeman-2015.pdf',
-  chemistry: 'https://github.com/Trevor090611/fivey/releases/download/ap-chemistry-textbook-4e/Chemistry.A.Molecular.Approach.4e.by.Nivaldo.Tro.pdf',
-};
-
-function renderTextbookDownload(url) {
-  const panel = document.querySelector('#college-board-panel');
-  document.querySelector('#college-board-title').textContent = 'Textbook Download';
-  const message = element('p', 'the PDF version of this textbook is being downloaded into your computer');
-  message.className = 'panel-description';
-  message.setAttribute('role', 'status');
-  const retry = guideLink({ title: 'Download PDF manually', url });
-  retry.className = 'practice-button';
-  document.querySelector('#college-board-links').replaceWith(message, retry);
-  panel.hidden = false;
-
-  const root = document.documentElement;
-  function startWhenSignedIn() {
-    if (root.classList.contains('fivey-auth-pending')) return;
-    observer.disconnect();
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const download = document.createElement('iframe');
-      download.hidden = true;
-      download.title = 'Textbook PDF download';
-      download.src = url;
-      panel.append(download);
-    }));
-  }
-  const observer = new MutationObserver(startWhenSignedIn);
-  observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-  startWhenSignedIn();
-}
-
-function renderCollegeBoardResources(id, courseHref) {
+function renderCollegeBoardResources(id) {
   const slug = 'ap-' + id;
   const collegeBoard = 'https://apcentral.collegeboard.org';
   const pdf = collegeBoard + '/media/pdf/';
@@ -380,8 +347,11 @@ function renderCollegeBoardResources(id, courseHref) {
       url: 'https://assets.openstax.org/oscms-prodcms/media/documents/Biology-AP-Courses_-_WEB.pdf',
     });
   }
-  if (Object.hasOwn(textbookDownloads, id)) {
-    links.push({ title: 'The textbook I Used for the Exam', url: courseHref + '&view=textbook-download' });
+  if (id === 'environmental-science' || id === 'chemistry') {
+    links.push({
+      title: 'The textbook I Used for the Exam',
+      url: './textbook-download.html?course=' + encodeURIComponent(id),
+    });
   }
   const list = document.querySelector('#college-board-links');
   for (const entry of links) {
@@ -472,13 +442,11 @@ if (selected) {
   }
   const hasArticleSection = id !== 'environmental-science';
   const articleView = hasArticleSection && params.get('view') === 'article';
-  const downloadView = params.get('view') === 'textbook-download' && Object.hasOwn(textbookDownloads, id);
   const articleTitle = 'How I got a 5 on ' + name;
   let title = name;
   if (guideView) title = name + ' Study Guides';
   if (articleView) title = articleTitle;
   if (resourcesView) title = name + ' Resources';
-  if (downloadView) title = name + ' Textbook';
   document.title = title + ' | Fivey';
   document.querySelector('#title').textContent = title;
   const tag = document.querySelector('#tag');
@@ -488,25 +456,20 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  const showArticles = !guideView && !resourcesView && !downloadView && hasArticleSection;
+  const showArticles = !guideView && !resourcesView && hasArticleSection;
   if (showArticles) {
     document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
   const courseHref = './course.html?course=' + encodeURIComponent(id);
-  if (guideView || articleView || resourcesView || downloadView) {
+  if (guideView || articleView || resourcesView) {
     document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
     back.href = courseHref;
     back.textContent = '← Back to ' + name;
     if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides';
     else document.querySelector('#guides-panel').hidden = true;
-    if (resourcesView) renderCollegeBoardResources(id, courseHref);
-    if (downloadView) {
-      back.href = courseHref + '&view=resources';
-      back.textContent = '← Back to Resources';
-      renderTextbookDownload(textbookDownloads[id]);
-    }
+    if (resourcesView) renderCollegeBoardResources(id);
   } else {
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
