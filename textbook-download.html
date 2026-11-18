@@ -6,19 +6,87 @@
 <title>Textbook Download | Fivey</title>
 <link rel="stylesheet" href="./auth.css?v=8643d4f">
 <style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f8f7ef;color:#19271f;font:16px/1.55 system-ui,sans-serif}
+  body{position:relative;isolation:isolate;margin:0;min-height:100vh;display:grid;place-items:center;background:#f8f7ef;color:#19271f;font:16px/1.55 system-ui,sans-serif}
   main{box-sizing:border-box;width:min(560px,calc(100% - 32px));padding:24px;background:#fffef8;border:1px solid #d4d9cd;border-radius:10px}
   [hidden]{display:none!important}
   h1{margin:0;font-size:1.6rem}
   .practice-button{display:inline-block;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
+.download-backdrop{
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  isolation:isolate;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 50% 90%,#0005,transparent 68%),
+    radial-gradient(ellipse at 8% 110%,color-mix(in srgb,var(--hero-glow,#386553) 55%,transparent),transparent 59%),
+    radial-gradient(ellipse at 95% 0%,color-mix(in srgb,var(--hero-glow,#386553) 76%,transparent),transparent 57%),
+    var(--hero-base,#19271f);
+}
+.download-backdrop::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:var(--hero-texture,none);
+  background-size:var(--hero-texture-size,auto);
+  background-position:center;
+  mask-image:linear-gradient(90deg,#000 0%,transparent 39%,transparent 61%,#000 100%);
+  pointer-events:none;
+}
+.hero-art{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:space-between;
+  overflow:hidden;
+  pointer-events:none;
+  user-select:none;
+}
+.hero-art img{
+  width:37%;
+  height:100%;
+  min-width:0;
+  object-fit:cover;
+  opacity:.46;
+  filter:saturate(.7) brightness(.82);
+}
+.hero-art img:first-child{
+  mask-image:linear-gradient(90deg,#000 24%,transparent 97%);
+}
+.hero-art img:last-child{
+  mask-image:linear-gradient(270deg,#000 24%,transparent 97%);
+}
+.download-backdrop[data-course="environmental-science"]{
+  --hero-base:#142517;--hero-glow:#75944d;--hero-accent:#d9edac;
+  --hero-texture:repeating-radial-gradient(ellipse at 95% 100%,transparent 0 17px,#ddeda62f 18px 19px,transparent 20px 29px);
+  --hero-texture-size:100% 100%;
+}
+.download-backdrop[data-course="chemistry"]{
+  --hero-base:#191a35;--hero-glow:#7953a4;--hero-accent:#dac1f5;
+  --hero-texture:radial-gradient(circle,#dac1f54d 1px,transparent 2px);
+  --hero-texture-size:22px 22px;
+}
+@media(max-width:760px){.hero-art img{width:42%;opacity:.34}}
+#chemistry-credits{position:absolute;inset:auto 12px 0;margin:0;padding:8px;text-align:center;color:#fffef8;font-size:12px}
+#chemistry-credits a{color:inherit}
 </style>
 </head>
 <body>
+<div class="download-backdrop" aria-hidden="true" hidden></div>
+<template id="environmental-science-art"><div class="hero-art" aria-hidden="true">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Marsh_at_National_wildlife_Refuge.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Mississippi_River_Delta_%28MODIS_2024-04-01%29.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template>
+<template id="chemistry-art"><div class="hero-art" aria-hidden="true">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/Test_tubes_in_a_laboratory.jpg/960px-Test_tubes_in_a_laboratory.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Copper_Sulfate_Crystal.jpg/960px-Copper_Sulfate_Crystal.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template>
 <main>
   <h1>Textbook Download</h1>
   <p id="download-status" role="status">Choose a textbook from your course’s Resources page.</p>
   <a id="download-pdf" class="practice-button" hidden>Download PDF manually</a>
 </main>
+<p id="chemistry-credits" hidden>Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
 <script>
 const textbookDownloads = {
   'environmental-science': 'https://github.com/Trevor090611/fivey/releases/download/apes-textbook-2015/Rick-Relyea-Andrew-Friedland-Environmental-Science-for-AP-WH-Freeman-2015.pdf',
@@ -27,6 +95,11 @@ const textbookDownloads = {
 
 const course = new URLSearchParams(location.search).get('course');
 if (Object.hasOwn(textbookDownloads, course)) {
+  const backdrop = document.querySelector('.download-backdrop');
+  backdrop.dataset.course = course;
+  backdrop.append(document.getElementById(course + '-art').content.cloneNode(true));
+  backdrop.hidden = false;
+  document.querySelector('#chemistry-credits').hidden = course !== 'chemistry';
   const url = textbookDownloads[course];
   const status = document.querySelector('#download-status');
   status.textContent = 'By clicking the button below, the PDF version of the textbook will be downloaded to your computer.';
