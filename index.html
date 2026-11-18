@@ -65,11 +65,25 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 @keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
 @keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+.study-planner{padding:26px 0;border-bottom:1px solid var(--line)}
+.study-planner button{padding:10px 16px;border:2px solid #294735;border-radius:6px;background:var(--green);color:var(--ink);font:inherit;font-weight:750;cursor:pointer}
+.study-planner form,.study-results{margin-top:20px;max-width:760px}
+.study-planner fieldset{min-width:0;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
+.study-planner legend{padding-inline:4px;font-weight:750}
+.study-fields{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:8px}
+.study-fields label{display:grid;gap:4px;font-weight:650}
+.study-fields select,.study-fields input{max-width:100%;min-height:40px;padding:5px 8px;border:1px solid #63775e;border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+.study-fields[hidden]{display:none}
+.study-planner input[type="checkbox"]{accent-color:#294735}
+.study-actions{display:flex;gap:10px;flex-wrap:wrap}
+.study-results ul{padding-left:22px;margin-bottom:0}
+.study-results li+li{margin-top:6px}
+.study-status:not(:empty){margin-top:10px;color:var(--muted)}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css">
-<script type="module" src="./auth-gate.js?v=9a3514d"></script>
+<script type="module" src="./auth-gate.js?v=analytics1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -93,6 +107,25 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
   <span class="bill">$</span>
   <span class="bill">$</span>
 </div></div></section>
+<section class="study-planner">
+  <div class="wrap">
+    <button type="button" id="study-toggle" aria-expanded="false" aria-controls="study-form" hidden>Plan My Study</button>
+    <form id="study-form" hidden>
+      <h2>Select your AP subjects</h2>
+      <p>Choose a target score and exam date for each subject you select.</p>
+      <div id="study-subjects"></div>
+      <div class="study-actions">
+        <button type="submit">Save Study Plan</button>
+        <button type="button" id="study-cancel">Cancel</button>
+      </div>
+    </form>
+    <section class="study-results" aria-labelledby="study-results-title" hidden>
+      <h2 id="study-results-title" tabindex="-1">Your AP Targets</h2>
+      <ul id="study-targets"></ul>
+    </section>
+    <p class="study-status" id="study-status" role="status"></p>
+  </div>
+</section>
 <section class="site-intro" aria-labelledby="intro-title">
   <div class="wrap">
     <h2 id="intro-title">What is Fivey?</h2>
@@ -111,6 +144,135 @@ window.addEventListener('scroll', updateHeaderBackdrop, { passive: true });
 window.addEventListener('resize', updateHeaderBackdrop);
 window.addEventListener('pageshow', updateHeaderBackdrop);
 updateHeaderBackdrop();
+</script>
+<script type="module">
+import { analyticsAccount } from './auth-gate.js?v=analytics1';
+
+const subjects = [
+  'AP Biology', 'AP Environmental Science', 'AP Chemistry', 'AP Physics 1',
+  'AP Psychology', 'AP Calculus AB', 'AP Macroeconomics'
+];
+const toggle = document.querySelector('#study-toggle');
+const form = document.querySelector('#study-form');
+const subjectList = document.querySelector('#study-subjects');
+const summary = document.querySelector('.study-results');
+const targets = document.querySelector('#study-targets');
+const status = document.querySelector('#study-status');
+const storageKey = 'fivey-study-plan-v1:' + analyticsAccount;
+const formatDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
+
+function readPlan() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    if (Array.isArray(saved)) return saved.filter(item => item && subjects.includes(item.subject) && /^[1-5]$/.test(item.score) && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isFinite(Date.parse(item.date)));
+  } catch {
+    status.textContent = 'Saved plans are unavailable in this browser.';
+  }
+  return [];
+}
+
+function showTargets(plan) {
+  targets.replaceChildren();
+  for (const { subject, score, date } of plan) {
+    const row = document.createElement('li');
+    const name = document.createElement('strong');
+    name.textContent = subject;
+    row.append(name, ' · Target score: ' + score + ' · Exam date: ' + formatDate.format(new Date(date)));
+    targets.append(row);
+  }
+  summary.hidden = plan.length === 0;
+}
+
+function openForm(plan) {
+  subjectList.replaceChildren();
+  for (const [index, subject] of subjects.entries()) {
+    const saved = plan.find(item => item.subject === subject);
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'subject';
+    checkbox.value = subject;
+    checkbox.checked = Boolean(saved);
+    label.append(checkbox, ' ' + subject);
+    legend.append(label);
+    const fields = document.createElement('div');
+    fields.className = 'study-fields';
+    const scoreLabel = document.createElement('label');
+    scoreLabel.textContent = 'Target score';
+    const score = document.createElement('select');
+    score.name = 'score-' + index;
+    score.setAttribute('aria-label', subject + ' target score');
+    score.required = true;
+    score.add(new Option('Choose a score', ''));
+    for (const value of [1, 2, 3, 4, 5]) score.add(new Option(value, value));
+    score.value = saved?.score ?? '';
+    scoreLabel.append(score);
+    const dateLabel = document.createElement('label');
+    dateLabel.textContent = 'Exam date';
+    const date = document.createElement('input');
+    date.type = 'date';
+    date.name = 'date-' + index;
+    date.setAttribute('aria-label', subject + ' exam date');
+    date.required = true;
+    date.value = saved?.date ?? '';
+    dateLabel.append(date);
+    fields.append(scoreLabel, dateLabel);
+    function updateFields() {
+      fields.hidden = score.disabled = date.disabled = !checkbox.checked;
+      status.textContent = '';
+    }
+    checkbox.addEventListener('change', updateFields);
+    updateFields();
+    fieldset.append(legend, fields);
+    subjectList.append(fieldset);
+  }
+  form.hidden = false;
+  toggle.setAttribute('aria-expanded', 'true');
+  form.querySelector('input').focus();
+}
+
+if (analyticsAccount) {
+  let plan = readPlan();
+  showTargets(plan);
+  toggle.hidden = false;
+  function closeForm() {
+    form.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  toggle.addEventListener('click', () => {
+    if (form.hidden) openForm(plan);
+    else closeForm();
+  });
+  document.querySelector('#study-cancel').addEventListener('click', () => {
+    closeForm();
+    status.textContent = '';
+    toggle.focus();
+  });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const values = new FormData(form);
+    const selected = values.getAll('subject');
+    if (!selected.length) {
+      status.textContent = 'Select at least one AP subject.';
+      form.querySelector('input').focus();
+      return;
+    }
+    plan = subjects.flatMap((subject, index) => selected.includes(subject)
+      ? [{ subject, score: values.get('score-' + index), date: values.get('date-' + index) }]
+      : []);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(plan));
+      status.textContent = 'Study plan saved in this browser.';
+    } catch {
+      status.textContent = 'Your targets are visible below, but this browser could not save the plan.';
+    }
+    showTargets(plan);
+    closeForm();
+    document.querySelector('#study-results-title').focus();
+  });
+}
 </script>
 </body>
 </html>
