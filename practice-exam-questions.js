@@ -445,9 +445,15 @@ function empiricalQuestions(model, trial) {
   const observed = initial + direction * difference;
   const replicate = initial + 2;
   const observedAgain = replicate + direction * (difference + 4);
-  const evidence = context + '\n
-Trial 1 | ' + reference + ': ' + initial + ' · ' + comparison + ': ' + observed
-    + '\nTrial 2 | ' + reference + ': ' + replicate + ' · ' + comparison + ': ' + observedAgain + '\n\n';
+  const lineBreak = String.fromCharCode(10);
+  const evidence = [
+    context,
+    '',
+    'Trial 1 | ' + reference + ': ' + initial + ' · ' + comparison + ': ' + observed,
+    'Trial 2 | ' + reference + ': ' + replicate + ' · ' + comparison + ': ' + observedAgain,
+    '',
+    ''
+  ].join(lineBreak);
   const trend = direction > 0 ? 'higher' : 'lower';
   const opposite = direction > 0 ? 'lower' : 'higher';
   return [
