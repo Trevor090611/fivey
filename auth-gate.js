@@ -45,7 +45,13 @@ function createStreakCounter(user, subjectTrigger) {
   fire.textContent = '🔥';
   fire.setAttribute('aria-hidden', 'true');
   const number = document.createElement('span');
-  counter.append(fire, number);
+  const sparkles = document.createElement('span');
+  sparkles.className = 'fivey-streak-sparkles';
+  sparkles.setAttribute('aria-hidden', 'true');
+  for (let index = 0; index < 6; index++) {
+    sparkles.append(document.createElement('span'));
+  }
+  counter.append(fire, number, sparkles);
 
   const key = 'fivey-sign-in-streak-v2:' + user.id;
   const legacyKey = 'fivey-visit-streak-v1:' + user.id;
@@ -132,9 +138,9 @@ function appendAccountNavigation(nav, signOut, user) {
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
 .fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none}
-.fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;overflow:hidden;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
+.fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
-.fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
+.fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:6px;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
 .fivey-streak.is-burning{--fivey-streak-sweep-time:1800ms;animation:fivey-streak-grow calc(var(--fivey-streak-sweep-time) * 1.25) ease-in-out}
 .fivey-streak.is-burning::before{animation:fivey-streak-sweep var(--fivey-streak-sweep-time) linear}
 .fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn var(--fivey-streak-sweep-time) ease-out}
@@ -154,7 +160,23 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
   63%{transform:rotate(8deg) scale(1.08)}
   76%{transform:translateY(-1px) rotate(-5deg) scale(1.2);filter:drop-shadow(0 0 2px #ffab42)}
 }
-@media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire{animation:none}}
+.fivey-streak-sparkles{position:absolute;inset:0;pointer-events:none}
+.fivey-streak-sparkles span{position:absolute;width:var(--spark-size,10px);height:var(--spark-size,10px);opacity:0;filter:drop-shadow(0 0 2px #f9c53c)}
+.fivey-streak-sparkles span::before{content:"";display:block;width:100%;height:100%;background:radial-gradient(circle,#fff8c9 8%,#ffde59 64%,#efaa19);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.fivey-streak-sparkles span:nth-child(1){top:-8px;left:13%;--spark-delay:120ms}
+.fivey-streak-sparkles span:nth-child(2){bottom:-7px;left:29%;--spark-delay:350ms;--spark-drift:4px;--spark-size:8px}
+.fivey-streak-sparkles span:nth-child(3){top:-9px;left:48%;--spark-delay:610ms;--spark-size:12px}
+.fivey-streak-sparkles span:nth-child(4){bottom:-8px;left:65%;--spark-delay:810ms;--spark-drift:4px}
+.fivey-streak-sparkles span:nth-child(5){top:-8px;right:9%;--spark-delay:970ms;--spark-size:9px}
+.fivey-streak-sparkles span:nth-child(6){bottom:-5px;right:-4px;--spark-delay:1120ms;--spark-drift:4px;--spark-size:8px}
+.fivey-streak.is-burning .fivey-streak-sparkles span{animation:fivey-streak-sparkle 660ms ease-in-out var(--spark-delay)}
+@keyframes fivey-streak-sparkle{
+  0%{opacity:0;transform:scale(.35) rotate(-18deg)}
+  35%{opacity:1;transform:translateY(calc(var(--spark-drift,-4px) * .35)) scale(1.1) rotate(-5deg)}
+  65%{opacity:.85;transform:translateY(calc(var(--spark-drift,-4px) * .65)) scale(.83) rotate(5deg)}
+  100%{opacity:0;transform:translateY(var(--spark-drift,-4px)) scale(.35) rotate(16deg)}
+}
+@media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire,.fivey-streak.is-burning .fivey-streak-sparkles span{animation:none}}
 .fivey-subjects{flex:none}
 .fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
