@@ -7,13 +7,15 @@
 <link rel="stylesheet" href="./auth.css?v=8643d4f">
 <style>
   body{position:relative;isolation:isolate;margin:0;min-height:100vh;display:grid;place-items:center;background:#f8f7ef;color:#19271f;font:16px/1.55 system-ui,sans-serif}
-  main{box-sizing:border-box;width:min(560px,calc(100% - 32px));padding:24px;background:#fffef8;border:1px solid #d4d9cd;border-radius:10px}
+  main{grid-area:1/1;box-sizing:border-box;width:min(560px,calc(100% - 32px));padding:24px;background:#fffef8;border:1px solid #d4d9cd;border-radius:10px}
   [hidden]{display:none!important}
   h1{margin:0;font-size:1.6rem}
   .practice-button{display:inline-block;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
 .download-backdrop{
-  position:absolute;
-  inset:0;
+  position:relative;
+  grid-area:1/1;
+  width:100%;
+  padding:clamp(56px,8vw,104px) 0;
   z-index:-1;
   isolation:isolate;
   overflow:hidden;
@@ -67,12 +69,44 @@
   --hero-texture-size:22px 22px;
 }
 @media(max-width:760px){.hero-art img{width:42%;opacity:.34}}
+body:has(.download-backdrop[data-course="environmental-science"]){background:#142517}
+body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
+.banner-size{visibility:hidden;width:min(1120px,calc(100% - 40px));margin-inline:auto;text-align:center;font:16px/1.55 "DM Sans",system-ui,sans-serif}
+.banner-size span{display:inline-block;margin-bottom:14px;border:1px solid transparent;padding:4px 11px;font:700 13px/1.5 ui-monospace,monospace}
+.banner-size p{max-width:19ch;margin:0 auto;text-wrap:balance;font-size:clamp(42px,8vw,94px);font-weight:700;line-height:1.04;letter-spacing:-.055em}
+.hero-equations{
+  position:absolute;
+  inset:8px clamp(12px,4vw,66px);
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-rows:42px 1fr 42px;
+  align-items:center;
+  justify-items:center;
+  pointer-events:none;
+  user-select:none;
+  color:color-mix(in srgb,var(--hero-accent,#fff) 43%,transparent);
+  font:500 clamp(12px,1.52vw,22px)/1.15 Georgia,serif;
+  white-space:nowrap;
+}
+.hero-equations span{rotate:var(--angle);translate:var(--offset-x) var(--offset-y);scale:var(--size)}
+.hero-equations span:nth-child(n+6){grid-row:3}
+@media(max-width:760px){
+  .download-backdrop[data-course]{padding-block:64px}
+  .hero-equations{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:22px 22px 1fr 22px 22px}
+  .hero-equations span{translate:0 var(--offset-y)}
+  .hero-equations span:nth-child(5),.hero-equations span:nth-child(6){grid-row:4}
+  .hero-equations span:nth-child(7),.hero-equations span:nth-child(8){grid-row:5}
+  .hero-equations span:nth-child(n+9){display:none}
+}
 #chemistry-credits{position:absolute;inset:auto 12px 0;margin:0;padding:8px;text-align:center;color:#fffef8;font-size:12px}
 #chemistry-credits a{color:inherit}
 </style>
 </head>
 <body>
-<div class="download-backdrop" aria-hidden="true" hidden></div>
+<div class="download-backdrop" aria-hidden="true" hidden>
+  <div class="hero-equations"></div>
+  <div class="banner-size"><span>STEM</span><p></p></div>
+</div>
 <template id="environmental-science-art"><div class="hero-art" aria-hidden="true">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Marsh_at_National_wildlife_Refuge.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Mississippi_River_Delta_%28MODIS_2024-04-01%29.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
@@ -93,11 +127,23 @@ const textbookDownloads = {
   chemistry: 'https://github.com/Trevor090611/fivey/releases/download/ap-chemistry-textbook-4e/Chemistry.A.Molecular.Approach.4e.by.Nivaldo.Tro.pdf',
 };
 
+const courseEquations = {
+  "environmental-science": ["NPP = GPP − R","ΔN = B + I − D − E","GPP = NPP + R","P = E / t","E = Pt","D = N / A","η = Eₒᵤₜ / Eᵢₙ","CO₂ + H₂O ⇌ H₂CO₃","ΔT = T₂ − T₁","r = ΔN / Δt"],
+  "chemistry": ["PV = nRT","pH = −log₁₀[H⁺]","pH + pOH = 14 (25 °C)","q = mcΔT","ΔG = ΔH − TΔS","A = εℓc","M = n / V","λν = c","E = hν","ΔG° = −RT ln K"],
+};
+
 const course = new URLSearchParams(location.search).get('course');
 if (Object.hasOwn(textbookDownloads, course)) {
   const backdrop = document.querySelector('.download-backdrop');
   backdrop.dataset.course = course;
-  backdrop.append(document.getElementById(course + '-art').content.cloneNode(true));
+  backdrop.querySelector('.banner-size p').textContent = course === 'chemistry' ? 'AP Chemistry' : 'AP Environmental Science';
+  backdrop.prepend(document.getElementById(course + '-art').content.cloneNode(true));
+  const equationLayer = backdrop.querySelector('.hero-equations');
+  for (const formula of courseEquations[course]) {
+    const equation = document.createElement('span');
+    equation.textContent = formula;
+    equationLayer.append(equation);
+  }
   backdrop.hidden = false;
   document.querySelector('#chemistry-credits').hidden = course !== 'chemistry';
   const url = textbookDownloads[course];
