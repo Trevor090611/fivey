@@ -407,12 +407,12 @@ const quantitativeModels = {
     ],
     [
       (a, b) => {
-        const result = .9*a*b;
-        return quantitative("A bank receives {{ab}} million dollars of new deposits. The required reserve ratio is 10% and the bank initially has no excess reserves. How much of the new deposits in millions is initially available to lend?", [result, 2*result, result/2, result+b], "The bank holds 10% of the new deposits as required reserves.", a, b, 0);
+        const result = a * (100 - b);
+        return quantitative("A bank receives {{ah}} million dollars in new deposits. The required reserve ratio is {{b}}% and the bank initially has no excess reserves. How much of the new deposits, in millions, is initially available to lend?", [result, a*b, 100*a, 100*a+b], "Subtract required reserves, equal to the deposit amount times the reserve ratio, from the new deposits.", a, b, 0);
       },
       (a, b) => {
-        const result = a;
-        return quantitative("An investment pays {{ad}}% nominal interest with expected inflation {{a}}%. Using the approximate Fisher equation, what is the expected real interest rate in percent?", [result, 3*a, 2*a, -a], "Subtract expected inflation from the nominal interest rate.", a, b, 1);
+        const result = a * b - a;
+        return quantitative("An investment pays {{ab}}% nominal interest with expected inflation {{a}}%. Using the approximate Fisher equation, what is the expected real interest rate in percent?", [result, a*b, a*b+a, a], "Subtract expected inflation from the nominal interest rate.", a, b, 1);
       }
     ],
     [
