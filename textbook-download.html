@@ -29,7 +29,7 @@ const course = new URLSearchParams(location.search).get('course');
 if (Object.hasOwn(textbookDownloads, course)) {
   const url = textbookDownloads[course];
   const status = document.querySelector('#download-status');
-  status.textContent = 'Click Download PDF manually to start the download.';
+  status.textContent = 'By clicking the button below, the PDF version of the textbook will be downloaded to your computer.';
   const retry = document.querySelector('#download-pdf');
   retry.href = url;
   retry.hidden = false;
