@@ -183,6 +183,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .panel-description{font-size:.875rem;margin-bottom:12px}
 .practice-button[hidden]{display:none}
 .progress-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.panel #college-board-links{padding:0;margin-top:14px;list-style:none}
+#college-board-links li{min-width:0;margin:0}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 main[data-category="humanities"] .panel{background:#fff}
 main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
@@ -256,7 +258,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 <section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><p class="panel-description" id="article-description" hidden></p><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 <section class="panel" id="college-board-panel" aria-labelledby="college-board-title" hidden>
   <h2 id="college-board-title">College Board Resources</h2>
-  <ul id="college-board-links"></ul>
+  <ul class="progress-actions" id="college-board-links" role="list"></ul>
 </section>
 </div>
 <div class="wrap columns course-actions" id="course-actions" hidden>
@@ -342,7 +344,9 @@ function renderCollegeBoardResources(id) {
   const list = document.querySelector('#college-board-links');
   for (const entry of links) {
     const item = document.createElement('li');
-    item.append(guideLink(entry));
+    const link = guideLink(entry);
+    link.classList.add('practice-button');
+    item.append(link);
     list.append(item);
   }
   document.querySelector('#college-board-panel').hidden = false;
