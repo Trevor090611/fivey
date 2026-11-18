@@ -341,6 +341,12 @@ function renderCollegeBoardResources(id) {
     title: 'College Board Textbook Resources',
     url: collegeBoard + '/courses/' + slug + '/course-audit#:~:text=Example%20Textbook%20List',
   });
+  if (id === 'biology') {
+    links.push({
+      title: 'The Textbook I Used for the Exam',
+      url: 'https://assets.openstax.org/oscms-prodcms/media/documents/Biology-AP-Courses_-_WEB.pdf',
+    });
+  }
   const list = document.querySelector('#college-board-links');
   for (const entry of links) {
     const item = document.createElement('li');
