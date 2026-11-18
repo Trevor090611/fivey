@@ -1,4 +1,4 @@
-import { examQuestions } from './practice-exam-questions.js?v=1';
+import { examQuestions } from './practice-exam-questions.js?v=2';
 
 export const units = {
   "biology": [
