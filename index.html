@@ -77,9 +77,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 .study-result-card li+li{border-top:1px solid var(--line)}
 .study-score-row{display:flex;align-items:center;gap:12px}
 .study-score{display:inline-grid;place-items:center;flex:none;width:58px;height:58px;border-radius:13px;background:rgb(45 50 46 / 70%);color:#79e5a7;font:800 38px/1 "DM Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
-.study-exam-row time,.study-countdown{display:block}
-.study-exam-row time{color:var(--muted);font-size:.875rem}
-.study-countdown{color:#28503b;font-weight:750;font-variant-numeric:tabular-nums}
+.study-exam-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.study-exam-row time{display:block;color:var(--muted);font-size:.875rem}
+.study-countdown{display:block;color:#28503b;font-weight:750;max-width:12ch}
+.study-countdown[data-state="counting"]{display:grid;justify-items:center;align-content:center;gap:3px;min-width:72px;min-height:68px;max-width:none;padding:8px 10px;border-radius:14px;background:#1b1b1b;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.study-countdown-number{font-size:clamp(24px,3vw,34px);font-weight:650}
+.study-countdown-unit{color:#a9a9a9;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
 @media(max-width:520px){.study-results{grid-template-columns:1fr}}
 .study-planner fieldset{min-width:0;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
 .study-planner legend{padding-inline:4px;font-weight:750}
@@ -195,10 +198,29 @@ function updateCountdowns() {
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   for (const label of exams.querySelectorAll('.study-countdown')) {
     const days = (Date.parse(label.dataset.date) - today) / 86400000;
-    const message = days > 0
-      ? days + (days === 1 ? ' day away' : ' days away')
-      : days === 0 ? 'Good Luck with ' + label.dataset.subject + ' TODAY!! :D' : 'Exam date passed';
-    if (label.textContent !== message) label.textContent = message;
+    const hadCountdown = label.dataset.state === 'counting';
+    if (label.dataset.days === String(days)) continue;
+    label.dataset.days = days;
+    label.dataset.state = days > 0 ? 'counting' : 'message';
+    if (days > 0) {
+      const number = document.createElement('span');
+      number.className = 'study-countdown-number';
+      number.textContent = days;
+      const unit = document.createElement('span');
+      unit.className = 'study-countdown-unit';
+      unit.textContent = days === 1 ? 'day' : 'days';
+      label.replaceChildren(number, ' ', unit);
+    } else {
+      label.textContent = days === 0
+        ? 'Good Luck with ' + label.dataset.subject + ' TODAY!! :D'
+        : 'Exam date passed';
+    }
+    if (hadCountdown && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      label.animate([
+        { transform: 'perspective(280px) translateY(45%) rotateX(-85deg)', opacity: 0 },
+        { transform: 'perspective(280px) translateY(0) rotateX(0)', opacity: 1 }
+      ], { duration: 520, easing: 'cubic-bezier(.2,.75,.25,1)' });
+    }
   }
 }
 
@@ -226,7 +248,9 @@ function showTargets(plan) {
     countdown.className = 'study-countdown';
     countdown.dataset.date = date;
     countdown.dataset.subject = subject;
-    examRow.append(examName, examDate, countdown);
+    const examDetails = document.createElement('div');
+    examDetails.append(examName, examDate);
+    examRow.append(examDetails, countdown);
     exams.append(examRow);
   }
   updateCountdowns();
