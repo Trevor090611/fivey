@@ -71,6 +71,19 @@ function showPractice() {
     }
     for (const size of sizes) form.elements.count.add(new Option(size + ' questions', size, false, count === size));
     for (const limit of timeLimits()) form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
+    if (course === 'biology' || course === 'chemistry') {
+      const questionCount = form.elements.count;
+      const updateRecommendation = () => {
+        const recommended = Number(questionCount.value) * 1.5;
+        for (const option of form.elements.minutes.options) {
+          const label = option.value + ' minutes';
+          option.textContent = Number(option.value) === recommended ? label + ' (Recommended)' : label;
+        }
+      };
+      questionCount.addEventListener('change', updateRecommendation);
+      window.addEventListener('pageshow', updateRecommendation);
+      updateRecommendation();
+    }
     form.addEventListener('submit', event => {
       event.preventDefault();
       const values = new FormData(form);
