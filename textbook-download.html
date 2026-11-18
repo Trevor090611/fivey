@@ -12,10 +12,8 @@
   h1{margin:0;font-size:1.6rem}
   .practice-button{display:inline-block;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
 .download-backdrop{
-  position:relative;
-  grid-area:1/1;
-  width:100%;
-  padding:clamp(56px,8vw,104px) 0;
+  position:absolute;
+  inset:0;
   z-index:-1;
   isolation:isolate;
   overflow:hidden;
@@ -71,9 +69,6 @@
 @media(max-width:760px){.hero-art img{width:42%;opacity:.34}}
 body:has(.download-backdrop[data-course="environmental-science"]){background:#142517}
 body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
-.banner-size{visibility:hidden;width:min(1120px,calc(100% - 40px));margin-inline:auto;text-align:center;font:16px/1.55 "DM Sans",system-ui,sans-serif}
-.banner-size span{display:inline-block;margin-bottom:14px;border:1px solid transparent;padding:4px 11px;font:700 13px/1.5 ui-monospace,monospace}
-.banner-size p{max-width:19ch;margin:0 auto;text-wrap:balance;font-size:clamp(42px,8vw,94px);font-weight:700;line-height:1.04;letter-spacing:-.055em}
 .hero-equations{
   position:absolute;
   inset:8px clamp(12px,4vw,66px);
@@ -91,7 +86,6 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
 .hero-equations span{rotate:var(--angle);translate:var(--offset-x) var(--offset-y);scale:var(--size)}
 .hero-equations span:nth-child(n+6){grid-row:3}
 @media(max-width:760px){
-  .download-backdrop[data-course]{padding-block:64px}
   .hero-equations{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:22px 22px 1fr 22px 22px}
   .hero-equations span{translate:0 var(--offset-y)}
   .hero-equations span:nth-child(5),.hero-equations span:nth-child(6){grid-row:4}
@@ -105,7 +99,6 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
 <body>
 <div class="download-backdrop" aria-hidden="true" hidden>
   <div class="hero-equations"></div>
-  <div class="banner-size"><span>STEM</span><p></p></div>
 </div>
 <template id="environmental-science-art"><div class="hero-art" aria-hidden="true">
   <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Marsh_at_National_wildlife_Refuge.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
@@ -136,7 +129,6 @@ const course = new URLSearchParams(location.search).get('course');
 if (Object.hasOwn(textbookDownloads, course)) {
   const backdrop = document.querySelector('.download-backdrop');
   backdrop.dataset.course = course;
-  backdrop.querySelector('.banner-size p').textContent = course === 'chemistry' ? 'AP Chemistry' : 'AP Environmental Science';
   backdrop.prepend(document.getElementById(course + '-art').content.cloneNode(true));
   const equationLayer = backdrop.querySelector('.hero-equations');
   for (const formula of courseEquations[course]) {
