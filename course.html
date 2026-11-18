@@ -347,6 +347,12 @@ function renderCollegeBoardResources(id) {
       url: 'https://assets.openstax.org/oscms-prodcms/media/documents/Biology-AP-Courses_-_WEB.pdf',
     });
   }
+  if (id === 'environmental-science') {
+    links.push({
+      title: 'The textbook I Used for the Exam',
+      url: 'https://github.com/Trevor090611/fivey/releases/download/apes-textbook-2015/Rick-Relyea-Andrew-Friedland-Environmental-Science-for-AP-WH-Freeman-2015.pdf',
+    });
+  }
   const list = document.querySelector('#college-board-links');
   for (const entry of links) {
     const item = document.createElement('li');
