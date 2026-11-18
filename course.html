@@ -212,11 +212,15 @@ body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;paddin
 @media(max-width:760px){.macro-graphs{width:42%;gap:4px;padding-inline-end:4px}}
 .macro-credits{display:none}
 body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;padding-bottom:12px;font-size:12px}
+#analytics-panel dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;margin:16px 0}
+#analytics-panel dl div{padding:16px;border:1px solid var(--line);border-radius:6px}
+#analytics-panel dd{margin:0;font-size:32px;font-weight:750;font-variant-numeric:tabular-nums}
+#analytics-status:empty{display:none}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css?v=8643d4f">
-<script type="module" src="./auth-gate.js?v=9a3514d"></script>
+<script type="module" src="./auth-gate.js?v=analytics1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -260,6 +264,15 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
   <h2 id="college-board-title">College Board Resources</h2>
   <ul class="progress-actions" id="college-board-links" role="list"></ul>
 </section>
+<section class="panel" id="analytics-panel" aria-labelledby="analytics-title" hidden>
+  <h2 id="analytics-title">Practice Analytics</h2>
+  <p>Results from submitted Check my Progress!! sets on this browser.</p>
+  <dl>
+    <div><dt>Total Questions Attempted</dt><dd id="analytics-attempted">—</dd></div>
+    <div><dt>Current Accuracy</dt><dd id="analytics-accuracy">—</dd></div>
+  </dl>
+  <p id="analytics-status" role="status"></p>
+</section>
 </div>
 <div class="wrap columns course-actions" id="course-actions" hidden>
 <section class="panel" id="progress-link" aria-labelledby="progress-title">
@@ -268,6 +281,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
   <div class="progress-actions">
     <a class="practice-button" id="practice-button" href="./courses.html">Check my Progress!!</a>
     <a class="practice-button" id="full-length-button" href="./courses.html">Full Length Practice Test</a>
+    <a class="practice-button" id="analytics-button">Analytics</a>
   </div>
 </section>
 <section class="panel" id="course-resources" aria-labelledby="course-resources-title">
@@ -424,6 +438,7 @@ const params = new URLSearchParams(location.search);
 const id = params.get('course');
 const guideView = params.get('view') === 'guides';
 const resourcesView = params.get('view') === 'resources';
+const analyticsView = params.get('view') === 'analytics';
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
@@ -447,6 +462,7 @@ if (selected) {
   if (guideView) title = name + ' Study Guides';
   if (articleView) title = articleTitle;
   if (resourcesView) title = name + ' Resources';
+  if (analyticsView) title = name + ' Analytics';
   document.title = title + ' | Fivey';
   document.querySelector('#title').textContent = title;
   const tag = document.querySelector('#tag');
@@ -456,13 +472,13 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  const showArticles = !guideView && !resourcesView && hasArticleSection;
+  const showArticles = !guideView && !resourcesView && !analyticsView && hasArticleSection;
   if (showArticles) {
     document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
   const courseHref = './course.html?course=' + encodeURIComponent(id);
-  if (guideView || articleView || resourcesView) {
+  if (guideView || articleView || resourcesView || analyticsView) {
     document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
     back.href = courseHref;
@@ -470,6 +486,13 @@ if (selected) {
     if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides';
     else document.querySelector('#guides-panel').hidden = true;
     if (resourcesView) renderCollegeBoardResources(id);
+    if (analyticsView) {
+      const panel = document.querySelector('#analytics-panel');
+      panel.hidden = false;
+      import('./progress.js?v=analytics1')
+        .then(({ renderAnalytics }) => renderAnalytics(panel))
+        .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
+    }
   } else {
     const button = document.querySelector('#view-guides');
     button.href = courseHref + '&view=guides';
@@ -485,6 +508,7 @@ if (selected) {
     }
     document.querySelector('#resources-description').textContent = `All the resources you need to prepare for ${name}`;
     document.querySelector('#view-resources').href = courseHref + '&view=resources';
+    document.querySelector('#analytics-button').href = courseHref + '&view=analytics';
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
