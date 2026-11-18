@@ -1,5 +1,5 @@
 import { analyticsAccount } from './auth-gate.js?v=analytics1';
-import { units, unitPool } from './practice-units.js?v=2';
+import { units, unitPool } from './practice-units.js?v=3';
 
 
 const params = new URLSearchParams(location.search);
@@ -161,15 +161,32 @@ function shuffle(values) {
   return result;
 }
 
+function spreadQuestionTypes(questions) {
+  const families = new Map();
+  for (const question of shuffle(questions)) {
+    const family = question.family ?? 'default';
+    if (!families.has(family)) families.set(family, []);
+    families.get(family).push(question);
+  }
+  const groups = [...families.values()];
+  const ordered = [];
+  while (groups.some(group => group.length)) {
+    for (const group of groups) {
+      if (group.length) ordered.push(group.pop());
+    }
+  }
+  return ordered.reverse();
+}
+
 function reserveQuestions(bank, selected, count) {
   const key = 'fivey-progress-seen-v1:' + course;
   const saved = JSON.parse(localStorage.getItem(key) ?? '{"seen":[],"offset":0}');
   const seen = new Set(saved.seen);
   const pools = shuffle(selected).map(unit => {
     const pool = unitPool(course, unit, bank);
-    const original = new Set(bank);
+    const used = pool.filter(item => seen.has(item.prompt));
     const fresh = pool.filter(item => !seen.has(item.prompt));
-    return [...shuffle(pool), ...shuffle(fresh.filter(item => !original.has(item))), ...shuffle(fresh.filter(item => original.has(item)))];
+    return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)];
   });
   const set = [];
   const used = new Set();
