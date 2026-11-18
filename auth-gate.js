@@ -92,6 +92,13 @@ function createStreakCounter(user, subjectTrigger) {
     }
     number.textContent = format.format(state.count);
     counter.setAttribute('aria-label', 'Daily streak: ' + number.textContent);
+    // The account overview uses the same recorded streak as the header.
+    for (const value of document.querySelectorAll('[data-fivey-streak-count]')) {
+      value.textContent = number.textContent;
+    }
+    for (const unit of document.querySelectorAll('[data-fivey-streak-unit]')) {
+      unit.textContent = state.count === 1 ? 'day' : 'days';
+    }
     if (!state.increased) return;
     counter.classList.remove('is-burning');
     // Measure the badge at its resting size before starting the sweep.
@@ -139,8 +146,8 @@ function appendAccountNavigation(nav, signOut, user) {
 
   const styles = document.createElement('style');
   styles.textContent = `
-header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px}
-.fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none}
+header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px;min-width:0}
+.fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
 .fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
 .fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:6px;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
@@ -202,6 +209,7 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 @media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire,.fivey-streak.is-burning .fivey-streak-sparkle-trail,.fivey-streak.is-burning .fivey-streak-sparkle-trail span{animation:none}}
 .fivey-subjects{flex:none}
 .fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
+.fivey-my-account{display:inline-block;padding:8px 10px;border-radius:6px;font:inherit;font-weight:700;line-height:normal;text-decoration:none;white-space:nowrap}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
 .fivey-subjects ul[hidden]{display:none}
 .fivey-subjects ul{position:absolute;z-index:10;inset-inline-end:0;inset-block-start:calc(100% + 6px);width:max-content;max-width:calc(100vw - 32px);max-height:65vh;overflow:auto;margin:0;padding:6px;list-style:none;background:#fff;border:2px solid #294735;border-radius:8px;box-shadow:0 8px 22px #19271f30}
@@ -210,9 +218,16 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
 .fivey-subjects a[data-category="humanities"]{--subject-hover:#fff1b8}
 `;
   document.head.append(styles);
+  const myAccount = document.createElement('a');
+  myAccount.className = 'fivey-my-account practice-button';
+  myAccount.href = new URL('./account.html', import.meta.url).href;
+  myAccount.textContent = 'My Account';
+  if (location.pathname === new URL(myAccount.href).pathname) {
+    myAccount.setAttribute('aria-current', 'page');
+  }
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(user, trigger), dropdown, signOut);
+  accountActions.append(createStreakCounter(user, trigger), dropdown, myAccount, signOut);
   nav.append(accountActions);
 
   function setExpanded(expanded) {

@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="View your Fivey streak, plan your AP study goals, and track your exam dates.">
+<title>My Account | Fivey</title>
+<link rel="stylesheet" href="./brand.css">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--green:#d9f783;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+main{flex:1}
+h1,h2,p{margin:0}
+h1,h2{line-height:1.1;letter-spacing:-.04em}
+h1{font-size:clamp(36px,6vw,64px)}
+.hero{padding:clamp(32px,5vw,60px) 0;background:var(--ink);color:var(--white)}
+.account-overview{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px}
+.account-streak{display:flex;align-items:center;gap:16px;min-width:220px;padding:20px 24px;border:1px solid #e8d2b4;border-radius:16px;background:#fff9ef;color:var(--ink)}
+.account-streak-fire{font-size:48px;line-height:1}
+.account-streak-label{font-size:16px;font-weight:650;color:#65503c}
+.account-streak-value{display:flex;align-items:baseline;gap:8px;font-weight:750}
+.account-streak-count{color:#a34313;font:800 clamp(36px,5vw,48px)/1.15 "DM Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
+@media(max-width:520px){.account-streak{width:100%}footer .bar{flex-wrap:wrap}}
+.study-planner{padding:26px 0;border-bottom:1px solid var(--line)}
+.study-planner button{padding:10px 16px;border:2px solid #294735;border-radius:6px;background:var(--green);color:var(--ink);font:inherit;font-weight:750;cursor:pointer}
+.study-planner form{margin-top:20px;max-width:760px}
+.study-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}
+.study-results[hidden]{display:none}
+.study-result-card{min-width:0;padding:clamp(16px,3vw,26px);border:1px solid var(--line);border-radius:16px;background:var(--white)}
+.study-result-card h2{font-size:clamp(22px,3vw,30px)}
+.study-result-card ul{list-style:none;padding:0;margin:14px 0 0}
+.study-result-card li{min-height:82px;padding:10px 0;overflow-wrap:anywhere}
+.study-result-card li+li{border-top:1px solid var(--line)}
+.study-score-row{display:flex;align-items:center;gap:12px}
+.study-score{display:inline-grid;place-items:center;flex:none;width:58px;height:58px;border-radius:13px;background:rgb(45 50 46 / 70%);color:#79e5a7;font:800 38px/1 "DM Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.study-exam-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.study-exam-row time{display:block;color:var(--muted);font-size:.875rem}
+.study-countdown{display:block;color:#28503b;font-weight:750;max-width:12ch}
+.study-countdown[data-state="counting"]{display:grid;justify-items:center;align-content:center;gap:3px;min-width:72px;min-height:68px;max-width:none;padding:8px 10px;border-radius:14px;background:#e5e5e5;color:#000;font-variant-numeric:tabular-nums;line-height:1.1;white-space:nowrap}
+.study-countdown[data-state="counting"].is-near-exam{background:#f9cece}
+.study-countdown-number{font-size:clamp(24px,3vw,34px);font-weight:650}
+.study-countdown-unit{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+@media(max-width:520px){.study-results{grid-template-columns:1fr}}
+.study-planner fieldset{min-width:0;margin:0 0 12px;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--white)}
+.study-planner legend{padding-inline:4px;font-weight:750}
+.study-fields{display:flex;flex-wrap:wrap;gap:12px 18px;margin-top:8px}
+.study-fields label{display:grid;gap:4px;font-weight:650}
+.study-fields select,.study-fields input{max-width:100%;min-height:40px;padding:5px 8px;border:1px solid #63775e;border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+.study-fields[hidden]{display:none}
+.study-planner input[type="checkbox"]{accent-color:#294735}
+.study-actions{display:flex;gap:10px;flex-wrap:wrap}
+.study-status:not(:empty){margin-top:10px;color:var(--muted)}
+</style>
+<link rel="stylesheet" href="./fivey-chat.css">
+<script type="module" src="./fivey-chat.js?v=6"></script>
+<link rel="stylesheet" href="./auth.css">
+<script type="module" src="./auth-gate.js?v=account1"></script>
+</head>
+<body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"></nav></div></header>
+<main>
+  <section class="hero" aria-labelledby="account-title">
+    <div class="wrap account-overview">
+      <h1 id="account-title">My Account</h1>
+      <div class="account-streak" role="status" aria-live="polite">
+        <span class="account-streak-fire" aria-hidden="true">🔥</span>
+        <div>
+          <p class="account-streak-label">Current streak</p>
+          <p class="account-streak-value"><span class="account-streak-count" data-fivey-streak-count>…</span> <span data-fivey-streak-unit>days</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+<section class="study-planner" aria-label="Study plan">
+  <div class="wrap">
+    <button type="button" id="study-toggle" aria-expanded="false" aria-controls="study-form" hidden>Plan My Study</button>
+    <form id="study-form" hidden>
+      <h2>Select your AP subjects</h2>
+      <p>Choose a target score and exam date for each subject you select.</p>
+      <div id="study-subjects"></div>
+      <div class="study-actions">
+        <button type="submit">Save Study Plan</button>
+        <button type="button" id="study-cancel">Cancel</button>
+      </div>
+    </form>
+    <div class="study-results" hidden>
+      <section class="study-result-card" aria-labelledby="study-results-title">
+        <h2 id="study-results-title" tabindex="-1">My Target Score</h2>
+        <ul id="study-targets" role="list"></ul>
+      </section>
+      <section class="study-result-card" aria-labelledby="study-exam-title">
+        <h2 id="study-exam-title">My Exam Date</h2>
+        <ul id="study-exams" role="list"></ul>
+      </section>
+    </div>
+    <p class="study-status" id="study-status" role="status"></p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<script type="module">
+import { analyticsAccount } from './auth-gate.js?v=account1';
+
+const subjects = [
+  'AP Biology', 'AP Environmental Science', 'AP Chemistry', 'AP Physics 1',
+  'AP Psychology', 'AP Calculus AB', 'AP Macroeconomics'
+];
+const toggle = document.querySelector('#study-toggle');
+const form = document.querySelector('#study-form');
+const subjectList = document.querySelector('#study-subjects');
+const summary = document.querySelector('.study-results');
+const targets = document.querySelector('#study-targets');
+const exams = document.querySelector('#study-exams');
+const status = document.querySelector('#study-status');
+const storageKey = 'fivey-study-plan-v1:' + analyticsAccount;
+const formatDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
+
+function readPlan() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    if (Array.isArray(saved)) return saved.filter(item => item && subjects.includes(item.subject) && /^[1-5]$/.test(item.score) && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isFinite(Date.parse(item.date)));
+  } catch {
+    status.textContent = 'Saved plans are unavailable in this browser.';
+  }
+  return [];
+}
+
+function updateCountdowns() {
+  const now = new Date();
+  // Compare calendar days in UTC to avoid daylight-saving differences in day length.
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  for (const label of exams.querySelectorAll('.study-countdown')) {
+    const days = (Date.parse(label.dataset.date) - today) / 86400000;
+    const hadCountdown = label.dataset.state === 'counting';
+    if (label.dataset.days === String(days)) continue;
+    label.dataset.days = days;
+    label.dataset.state = days > 0 ? 'counting' : 'message';
+    label.classList.toggle('is-near-exam', days > 0 && days <= 10);
+    if (days > 0) {
+      const number = document.createElement('span');
+      number.className = 'study-countdown-number';
+      number.textContent = days;
+      const unit = document.createElement('span');
+      unit.className = 'study-countdown-unit';
+      unit.textContent = days === 1 ? 'day' : 'days';
+      label.replaceChildren(number, ' ', unit);
+    } else {
+      label.textContent = days === 0
+        ? 'Good Luck with ' + label.dataset.subject + ' TODAY!! :D'
+        : 'Exam date passed';
+    }
+    if (hadCountdown && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      label.animate([
+        { transform: 'perspective(280px) translateY(45%) rotateX(-85deg)', opacity: 0 },
+        { transform: 'perspective(280px) translateY(0) rotateX(0)', opacity: 1 }
+      ], { duration: 520, easing: 'cubic-bezier(.2,.75,.25,1)' });
+    }
+  }
+}
+
+function showTargets(plan) {
+  targets.replaceChildren();
+  exams.replaceChildren();
+  for (const { subject, score, date } of plan) {
+    const scoreRow = document.createElement('li');
+    scoreRow.className = 'study-score-row';
+    const name = document.createElement('strong');
+    name.textContent = subject;
+    const badge = document.createElement('span');
+    badge.className = 'study-score';
+    badge.textContent = score;
+    scoreRow.append(name, badge);
+    targets.append(scoreRow);
+
+    const examRow = document.createElement('li');
+    examRow.className = 'study-exam-row';
+    const examName = name.cloneNode(true);
+    const examDate = document.createElement('time');
+    examDate.dateTime = date;
+    examDate.textContent = formatDate.format(new Date(date));
+    const countdown = document.createElement('span');
+    countdown.className = 'study-countdown';
+    countdown.dataset.date = date;
+    countdown.dataset.subject = subject;
+    const examDetails = document.createElement('div');
+    examDetails.append(examName, examDate);
+    examRow.append(examDetails, countdown);
+    exams.append(examRow);
+  }
+  updateCountdowns();
+  summary.hidden = plan.length === 0;
+}
+
+function openForm(plan) {
+  subjectList.replaceChildren();
+  for (const [index, subject] of subjects.entries()) {
+    const saved = plan.find(item => item.subject === subject);
+    const fieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.name = 'subject';
+    checkbox.value = subject;
+    checkbox.checked = Boolean(saved);
+    label.append(checkbox, ' ' + subject);
+    legend.append(label);
+    const fields = document.createElement('div');
+    fields.className = 'study-fields';
+    const scoreLabel = document.createElement('label');
+    scoreLabel.textContent = 'Target score';
+    const score = document.createElement('select');
+    score.name = 'score-' + index;
+    score.setAttribute('aria-label', subject + ' target score');
+    score.required = true;
+    score.add(new Option('Choose a score', ''));
+    for (const value of [1, 2, 3, 4, 5]) score.add(new Option(value, value));
+    score.value = saved?.score ?? '';
+    scoreLabel.append(score);
+    const dateLabel = document.createElement('label');
+    dateLabel.textContent = 'Exam date';
+    const date = document.createElement('input');
+    date.type = 'date';
+    date.name = 'date-' + index;
+    date.setAttribute('aria-label', subject + ' exam date');
+    date.required = true;
+    date.value = saved?.date ?? '';
+    dateLabel.append(date);
+    fields.append(scoreLabel, dateLabel);
+    function updateFields() {
+      fields.hidden = score.disabled = date.disabled = !checkbox.checked;
+      status.textContent = '';
+    }
+    checkbox.addEventListener('change', updateFields);
+    updateFields();
+    fieldset.append(legend, fields);
+    subjectList.append(fieldset);
+  }
+  form.hidden = false;
+  toggle.setAttribute('aria-expanded', 'true');
+  form.querySelector('input').focus();
+}
+
+if (analyticsAccount) {
+  let plan = readPlan();
+  showTargets(plan);
+  setInterval(updateCountdowns, 1000);
+  window.addEventListener('pageshow', updateCountdowns);
+  document.addEventListener('visibilitychange', updateCountdowns);
+  toggle.hidden = false;
+  function closeForm() {
+    form.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+  }
+  toggle.addEventListener('click', () => {
+    if (form.hidden) openForm(plan);
+    else closeForm();
+  });
+  document.querySelector('#study-cancel').addEventListener('click', () => {
+    closeForm();
+    status.textContent = '';
+    toggle.focus();
+  });
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const values = new FormData(form);
+    const selected = values.getAll('subject');
+    if (!selected.length) {
+      status.textContent = 'Select at least one AP subject.';
+      form.querySelector('input').focus();
+      return;
+    }
+    plan = subjects.flatMap((subject, index) => selected.includes(subject)
+      ? [{ subject, score: values.get('score-' + index), date: values.get('date-' + index) }]
+      : []);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(plan));
+      status.textContent = 'Study plan saved in this browser.';
+    } catch {
+      status.textContent = 'Your targets are visible below, but this browser could not save the plan.';
+    }
+    showTargets(plan);
+    closeForm();
+    document.querySelector('#study-results-title').focus();
+  });
+}
+</script>
+</body>
+</html>
