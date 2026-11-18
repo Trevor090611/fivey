@@ -1,6 +1,8 @@
 import { authConfig } from './auth-config.js?v=2';
 import { completed, connect, login, rememberDestination } from './auth-client.js';
 
+export let analyticsAccount = null;
+
 const subjects = [
   ['biology', 'AP Biology'],
   ['environmental-science', 'AP Environmental Science'],
@@ -83,6 +85,7 @@ try {
       rememberDestination();
       location.replace(login.href);
     } else {
+      analyticsAccount = data.user.id;
       const signOut = document.createElement('button');
       signOut.className = 'fivey-sign-out';
       signOut.textContent = 'Sign out';
@@ -107,6 +110,7 @@ try {
   } else if (authConfig.enabled) {
     throw new Error('Missing authentication configuration');
   } else {
+    analyticsAccount = 'guest';
     document.documentElement.classList.remove('fivey-auth-pending');
   }
 } catch {
