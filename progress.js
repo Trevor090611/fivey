@@ -1,10 +1,54 @@
+import { analyticsAccount } from './auth-gate.js?v=analytics1';
 import { variantAt } from './progress-variants.js?v=4';
 
 const course = new URLSearchParams(location.search).get('course');
 const section = document.querySelector('#progress-check');
 const supported = new Set(['biology', 'environmental-science', 'chemistry', 'physics-1', 'psychology', 'calculus-ab', 'macroeconomics']);
 
-if (supported.has(course)) setupPractice();
+if (section && supported.has(course)) setupPractice();
+
+function analyticsKey() {
+  return analyticsAccount && 'fivey-practice-analytics-v1:' + analyticsAccount + ':' + course;
+}
+
+function readTotals(key) {
+  return JSON.parse(localStorage.getItem(key) ?? '{"attempted":0,"correct":0}');
+}
+
+async function recordSet(attempted, correct) {
+  const key = analyticsKey();
+  if (!key) throw new Error('Account unavailable');
+  const update = () => {
+    const totals = readTotals(key);
+    totals.attempted += attempted;
+    totals.correct += correct;
+    localStorage.setItem(key, JSON.stringify(totals));
+  };
+  if (navigator.locks) await navigator.locks.request(key, update);
+  else update();
+}
+
+export function renderAnalytics(panel) {
+  const key = analyticsKey();
+  if (!key || !supported.has(course)) return;
+  const update = () => {
+    try {
+      const { attempted, correct } = readTotals(key);
+      panel.querySelector('#analytics-attempted').textContent = attempted.toLocaleString();
+      panel.querySelector('#analytics-accuracy').textContent = attempted
+        ? new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 1 }).format(correct / attempted)
+        : '—';
+      panel.querySelector('#analytics-status').textContent = attempted ? '' : 'Submit a practice set to see your accuracy.';
+    } catch {
+      panel.querySelector('#analytics-status').textContent = 'Practice totals are unavailable in this browser.';
+    }
+  };
+  update();
+  window.addEventListener('pageshow', update);
+  window.addEventListener('storage', event => {
+    if (event.key === key || event.key === null) update();
+  });
+}
 
 function shuffle(values) {
   const result = [...values];
@@ -165,6 +209,9 @@ function setupPractice() {
       active = false;
       submit.hidden = true;
       status.textContent = 'Set submitted.';
+      recordSet(set.length, score).catch(() => {
+        status.textContent = 'Set submitted. Your analytics could not be saved.';
+      });
       summary.textContent = 'Score: ' + score + ' of ' + set.length + ' (' + Math.round(score / set.length * 100) + '%).';
       summary.hidden = false;
       summary.focus();
