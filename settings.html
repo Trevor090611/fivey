@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Manage your Fivey username and account role.">
+<title>Settings | Fivey</title>
+<link rel="stylesheet" href="./brand.css">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--green:#d9f783;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #467335;outline-offset:4px}
+.wrap{width:min(1120px,calc(100% - 40px));margin:auto}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+main{flex:1}
+h1,h2,p{margin:0}
+h1,h2{line-height:1.1;letter-spacing:-.04em}
+h1{font-size:clamp(36px,6vw,64px)}
+.hero{padding:clamp(32px,5vw,60px) 0;background:var(--ink);color:var(--white)}
+.hero p{margin-top:12px;color:#d6e0d7}
+.profile-section{padding:32px 0}
+.profile-card{width:min(100%,560px);padding:clamp(20px,4vw,32px);border:1px solid var(--line);border-radius:16px;background:var(--white)}
+.profile-card form{display:grid;gap:16px}
+.profile-card label{display:grid;gap:6px;font-weight:700}
+.profile-card input,.profile-card select{min-height:44px;padding:8px 10px;border:1px solid #63775e;border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+.profile-card button{justify-self:start;padding:10px 16px;border-radius:6px;font:inherit;font-weight:750;cursor:pointer}
+.profile-status:not(:empty){margin-top:14px;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
+@media(max-width:520px){footer .bar{flex-wrap:wrap}}
+</style>
+<link rel="stylesheet" href="./auth.css">
+<script type="module" src="./auth-gate.js?v=welcome2"></script>
+</head>
+<body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"></nav></div></header>
+<main>
+  <section class="hero" aria-labelledby="settings-title">
+    <div class="wrap"><h1 id="settings-title">Settings</h1><p>Update your Fivey username and account role.</p></div>
+  </section>
+  <section class="profile-section" aria-label="Account settings">
+    <div class="wrap">
+      <div class="profile-card">
+        <form id="profile-form">
+          <label for="profile-username">Username<input id="profile-username" name="username" type="text" autocomplete="nickname" required></label>
+          <label for="profile-role">I am a<select id="profile-role" name="role" required><option value="" disabled>Select student or teacher</option><option value="student">Student</option><option value="teacher">Teacher</option></select></label>
+          <button class="practice-button" type="submit">Save Settings</button>
+        </form>
+        <p class="profile-status" id="profile-status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="./account.html">My Account</a></div></footer>
+<script type="module" src="./settings.js"></script>
+</body>
+</html>
