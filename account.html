@@ -60,7 +60,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css">
-<script type="module" src="./auth-gate.js?v=orbies2"></script>
+<script type="module" src="./auth-gate.js?v=orbies3"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -112,12 +112,25 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
 <script type="module">
-import { analyticsAccount } from './auth-gate.js?v=orbies2';
+import { analyticsAccount } from './auth-gate.js?v=orbies3';
 
 const subjects = [
   'AP Biology', 'AP Environmental Science', 'AP Chemistry', 'AP Physics 1',
   'AP Psychology', 'AP Calculus AB', 'AP Macroeconomics'
 ];
+const examSchedules = {
+  2027: {
+    'AP Biology': { normal: { date: '2027-05-03' }, late: { date: '2027-05-19' } },
+    'AP Environmental Science': { normal: { date: '2027-05-13' }, late: { date: '2027-05-20' } },
+    'AP Chemistry': { normal: { date: '2027-05-06' }, late: { date: '2027-05-20' } },
+    'AP Physics 1': { normal: { date: '2027-05-05' }, late: { date: '2027-05-19' } },
+    'AP Psychology': { normal: { date: '2027-05-14' }, late: { date: '2027-05-21' } },
+    'AP Calculus AB': { normal: { date: '2027-05-10' }, late: { date: '2027-05-20' } },
+    'AP Macroeconomics': { normal: { date: '2027-05-07' }, late: { date: '2027-05-21' } }
+  }
+};
+const examYears = Object.keys(examSchedules).map(Number).sort((a, b) => a - b);
+const defaultExamYear = examYears[examYears.length - 1];
 const toggle = document.querySelector('#study-toggle');
 const form = document.querySelector('#study-form');
 const subjectList = document.querySelector('#study-subjects');
@@ -127,11 +140,29 @@ const exams = document.querySelector('#study-exams');
 const status = document.querySelector('#study-status');
 const storageKey = 'fivey-study-plan-v1:' + analyticsAccount;
 const formatDate = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeZone: 'UTC' });
+const formatExamOptionDate = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+function getExamDate(year, subject, examType) {
+  return examSchedules[year]?.[subject]?.[examType]?.date || '';
+}
 
 function readPlan() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    if (Array.isArray(saved)) return saved.filter(item => item && subjects.includes(item.subject) && /^[1-5]$/.test(item.score) && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isFinite(Date.parse(item.date)));
+    if (!Array.isArray(saved)) return [];
+    return saved.flatMap(item => {
+      if (!item || !subjects.includes(item.subject) || !/^[1-5]$/.test(item.score)) return [];
+      const legacyMatch = Object.entries(examSchedules).find(([, schedule]) =>
+        schedule[item.subject]?.normal.date === item.date || schedule[item.subject]?.late.date === item.date
+      );
+      let examYear = Number(item.examYear);
+      if (!examSchedules[examYear]?.[item.subject]) examYear = legacyMatch ? Number(legacyMatch[0]) : defaultExamYear;
+      let examType = item.examType;
+      if (examType !== 'normal' && examType !== 'late') {
+        examType = legacyMatch && examSchedules[legacyMatch[0]][item.subject].late.date === item.date ? 'late' : 'normal';
+      }
+      return [{ subject: item.subject, score: item.score, examYear, examType, date: getExamDate(examYear, item.subject, examType) }];
+    });
   } catch {
     status.textContent = 'Saved plans are unavailable in this browser.';
   }
@@ -140,7 +171,6 @@ function readPlan() {
 
 function updateCountdowns() {
   const now = new Date();
-  // Compare calendar days in UTC to avoid daylight-saving differences in day length.
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   for (const label of exams.querySelectorAll('.study-countdown')) {
     const days = (Date.parse(label.dataset.date) - today) / 86400000;
@@ -174,7 +204,7 @@ function updateCountdowns() {
 function showTargets(plan) {
   targets.replaceChildren();
   exams.replaceChildren();
-  for (const { subject, score, date } of plan) {
+  for (const { subject, score, date, examType = 'normal' } of plan) {
     const scoreRow = document.createElement('li');
     scoreRow.className = 'study-score-row';
     const name = document.createElement('strong');
@@ -190,7 +220,7 @@ function showTargets(plan) {
     const examName = name.cloneNode(true);
     const examDate = document.createElement('time');
     examDate.dateTime = date;
-    examDate.textContent = formatDate.format(new Date(date));
+    examDate.textContent = formatDate.format(new Date(date)) + (examType === 'late' ? ' · Late exam' : ' · Normal exam');
     const countdown = document.createElement('span');
     countdown.className = 'study-countdown';
     countdown.dataset.date = date;
@@ -206,6 +236,38 @@ function showTargets(plan) {
 
 function openForm(plan) {
   subjectList.replaceChildren();
+  const savedYear = plan.find(item => examSchedules[item.examYear])?.examYear ?? defaultExamYear;
+  const yearFields = document.createElement('div');
+  yearFields.className = 'study-fields';
+  const yearLabel = document.createElement('label');
+  yearLabel.textContent = 'Exam year';
+  const yearSelect = document.createElement('select');
+  yearSelect.name = 'exam-year';
+  yearSelect.setAttribute('aria-label', 'Exam year');
+  for (const year of examYears) yearSelect.add(new Option(year, year));
+  yearSelect.value = String(savedYear);
+  yearLabel.append(yearSelect);
+  yearFields.append(yearLabel);
+  const scheduleNote = document.createElement('p');
+  scheduleNote.textContent = 'Dates are from the College Board schedule. New years are added when their schedule is published.';
+  scheduleNote.style.cssText = 'align-self:end;color:var(--muted);font-size:.9rem';
+  yearFields.append(scheduleNote);
+  subjectList.append(yearFields);
+
+  const examFields = [];
+  function fillExamOptions(select, subject, year, preferredType = 'normal') {
+    const schedule = examSchedules[year]?.[subject];
+    select.replaceChildren();
+    if (!schedule) {
+      select.add(new Option('Exam dates not published yet', ''));
+      select.disabled = true;
+      return;
+    }
+    select.add(new Option('Normal exam — ' + formatExamOptionDate.format(new Date(schedule.normal.date)), 'normal'));
+    select.add(new Option('Late exam — ' + formatExamOptionDate.format(new Date(schedule.late.date)), 'late'));
+    select.value = preferredType;
+  }
+
   for (const [index, subject] of subjects.entries()) {
     const saved = plan.find(item => item.subject === subject);
     const fieldset = document.createElement('fieldset');
@@ -230,25 +292,30 @@ function openForm(plan) {
     for (const value of [1, 2, 3, 4, 5]) score.add(new Option(value, value));
     score.value = saved?.score ?? '';
     scoreLabel.append(score);
-    const dateLabel = document.createElement('label');
-    dateLabel.textContent = 'Exam date';
-    const date = document.createElement('input');
-    date.type = 'date';
-    date.name = 'date-' + index;
-    date.setAttribute('aria-label', subject + ' exam date');
-    date.required = true;
-    date.value = saved?.date ?? '';
-    dateLabel.append(date);
-    fields.append(scoreLabel, dateLabel);
+    const examLabel = document.createElement('label');
+    examLabel.textContent = 'Exam date';
+    const exam = document.createElement('select');
+    exam.name = 'exam-' + index;
+    exam.setAttribute('aria-label', subject + ' exam date');
+    exam.required = true;
+    fillExamOptions(exam, subject, Number(yearSelect.value), saved?.examType ?? 'normal');
+    examLabel.append(exam);
+    fields.append(scoreLabel, examLabel);
     function updateFields() {
-      fields.hidden = score.disabled = date.disabled = !checkbox.checked;
+      fields.hidden = !checkbox.checked;
+      score.disabled = exam.disabled = !checkbox.checked;
       status.textContent = '';
     }
     checkbox.addEventListener('change', updateFields);
     updateFields();
     fieldset.append(legend, fields);
     subjectList.append(fieldset);
+    examFields.push({ subject, exam });
   }
+  yearSelect.addEventListener('change', () => {
+    const year = Number(yearSelect.value);
+    for (const { subject, exam } of examFields) fillExamOptions(exam, subject, year, exam.value || 'normal');
+  });
   form.hidden = false;
   toggle.setAttribute('aria-expanded', 'true');
   form.querySelector('input').focus();
@@ -282,14 +349,19 @@ if (analyticsAccount) {
     event.preventDefault();
     const values = new FormData(form);
     const selected = values.getAll('subject');
+    const examYear = Number(values.get('exam-year'));
     if (!selected.length) {
       status.textContent = 'Select at least one AP subject.';
       form.querySelector('input').focus();
       return;
     }
-    plan = subjects.flatMap((subject, index) => selected.includes(subject)
-      ? [{ subject, score: values.get('score-' + index), date: values.get('date-' + index) }]
-      : []);
+    plan = subjects.flatMap((subject, index) => {
+      if (!selected.includes(subject)) return [];
+      const examType = values.get('exam-' + index);
+      const date = getExamDate(examYear, subject, examType);
+      if (!date) return [];
+      return [{ subject, score: values.get('score-' + index), examYear, examType, date }];
+    });
     try {
       localStorage.setItem(storageKey, JSON.stringify(plan));
       window.dispatchEvent(new Event('fivey:study-plan-updated'));
@@ -303,6 +375,6 @@ if (analyticsAccount) {
   });
 }
 </script>
-<script type="module" src="./account-analytics.js?v=5"></script>
+<script type="module" src="./account-analytics.js?v=6"></script>
 </body>
 </html>
