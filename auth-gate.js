@@ -273,6 +273,12 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   }
   userDropdown.append(myAccount, settings);
   userMenu.append(userLabel, userDropdown);
+  window.addEventListener('fivey:profile-updated', event => {
+    const updatedUsername = String(event.detail?.username || '');
+    if (!updatedUsername) return;
+    userLabel.textContent = 'Welcome ' + updatedUsername + '!';
+    userMenu.setAttribute('aria-label', 'Account menu for ' + updatedUsername);
+  });
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
   accountActions.append(createStreakCounter(user, trigger), dropdown, userMenu, signOut);
