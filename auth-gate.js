@@ -277,6 +277,73 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   });
 }
 
+function showWelcomeDialog(user) {
+  const seenKey = 'fivey-welcome-seen-v1:' + user.id;
+  try {
+    if (localStorage.getItem(seenKey) === '1') return;
+    localStorage.setItem(seenKey, '1');
+  } catch {
+    // The dialog can still be shown for this visit if storage is unavailable.
+  }
+
+  const dialog = document.createElement('dialog');
+  dialog.className = 'fivey-welcome-dialog';
+  dialog.setAttribute('aria-labelledby', 'fivey-welcome-title');
+  const title = document.createElement('h2');
+  title.id = 'fivey-welcome-title';
+  title.textContent = 'Welcome to Fivey!';
+  const message = document.createElement('p');
+  message.className = 'fivey-welcome-message';
+  message.append(
+    'Welcome to Fivey! Here, you will find original Study Guides created by the developer and practice questions for review AP subjects.',
+    document.createElement('br'),
+    document.createElement('br'),
+    'Feel free to explore around! :)'
+  );
+  const actions = document.createElement('div');
+  actions.className = 'fivey-welcome-actions';
+  const exit = document.createElement('button');
+  exit.type = 'button';
+  exit.className = 'practice-button fivey-welcome-button fivey-welcome-exit';
+  exit.textContent = 'Exit';
+  const about = document.createElement('button');
+  about.type = 'button';
+  about.className = 'practice-button fivey-welcome-button';
+  about.textContent = 'What is Fivey?';
+  const plan = document.createElement('button');
+  plan.type = 'button';
+  plan.className = 'practice-button fivey-welcome-button';
+  plan.textContent = 'Plan My Study Now!!';
+
+  const styles = document.createElement('style');
+  styles.textContent =     '.fivey-welcome-dialog{box-sizing:border-box;width:min(600px,calc(100vw - 32px));max-width:600px;padding:clamp(22px,5vw,36px);border:2px solid #204b34;border-radius:16px;background:#fffef8;color:#19271f;box-shadow:0 18px 60px #0004;font:16px/1.55 "DM Sans",system-ui,sans-serif;text-align:center}' +
+    '.fivey-welcome-dialog::backdrop{background:rgb(15 28 20 / 68%)}' +
+    '.fivey-welcome-dialog h2{margin:0 0 16px;font-size:clamp(24px,5vw,32px);line-height:1.2;letter-spacing:-.03em}' +
+    '.fivey-welcome-message{margin:0;line-height:1.7}' +
+    '.fivey-welcome-actions{display:flex;align-items:stretch;gap:12px;margin-top:26px}' +
+    '.fivey-welcome-button{flex:1;min-width:0;min-height:48px;padding:9px 10px;border-radius:6px;font:inherit;font-size:clamp(12px,2.5vw,16px);font-weight:700;line-height:1.25;cursor:pointer}' +
+    '.fivey-welcome-exit{--button-fill:#ff4d4d!important}' +
+    '@media(max-width:420px){.fivey-welcome-actions{gap:7px}.fivey-welcome-button{padding-inline:5px}}';
+  document.head.append(styles);
+  actions.append(exit, about, plan);
+  dialog.append(title, message, actions);
+  document.body.append(dialog);
+
+  function navigate(target) {
+    dialog.close();
+    location.assign(target);
+  }
+  exit.addEventListener('click', () => navigate(new URL('./', import.meta.url).href));
+  about.addEventListener('click', () => navigate(new URL('./#intro-title', import.meta.url).href));
+  plan.addEventListener('click', () => {
+    const target = new URL('./account.html', import.meta.url);
+    target.searchParams.set('welcome', 'plan');
+    navigate(target.href);
+  });
+  dialog.showModal();
+  exit.focus();
+}
+
 function addSignOutConfirmation(auth, signOut) {
   const dialog = document.createElement('dialog');
   dialog.id = 'fivey-sign-out-dialog';
@@ -352,6 +419,7 @@ try {
       const nav = document.querySelector('header nav');
       if (nav) appendAccountNavigation(nav, signOut, data.user);
       document.documentElement.classList.remove('fivey-auth-pending');
+      showWelcomeDialog(data.user);
       auth.onAuthStateChange(event => {
         if (event === 'SIGNED_OUT') location.replace(login.href);
       });
