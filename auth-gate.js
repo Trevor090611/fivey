@@ -163,6 +163,9 @@ async function appendAccountNavigation(nav, signOut, user, client) {
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px;min-width:0}
 .fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
+.fivey-orbies{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:3px 8px;border:2px solid #7a4a0b;border-radius:8px;background:#fff8df;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fivey-orbies-icon{display:block;width:29px;height:29px;flex:none;object-fit:contain}
+
 .fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
 .fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:6px;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
@@ -303,9 +306,40 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
     if (event.detail?.avatarUrl) { avatar.src = event.detail.avatarUrl; avatar.hidden = false; }
     else if (event.detail?.avatarUrl === '') { avatar.src = fallbackAvatar; avatar.hidden = false; }
   });
+  const orbiesBalance = document.createElement('span');
+  orbiesBalance.className = 'fivey-orbies';
+  orbiesBalance.setAttribute('role', 'status');
+  orbiesBalance.setAttribute('aria-live', 'polite');
+  const orbiesIcon = document.createElement('img');
+  orbiesIcon.className = 'fivey-orbies-icon';
+  orbiesIcon.src = new URL('./orbies-coin.png?v=1', import.meta.url).href;
+  orbiesIcon.alt = '';
+  orbiesIcon.setAttribute('aria-hidden', 'true');
+  const orbiesCount = document.createElement('span');
+  const orbiesKey = 'fivey-orbies-v1:' + user.id;
+  const orbiesFormat = new Intl.NumberFormat();
+  function refreshOrbies() {
+    let amount = 0;
+    try {
+      const saved = localStorage.getItem(orbiesKey);
+      const parsed = saved === null ? 0 : Number(saved);
+      if (Number.isSafeInteger(parsed) && parsed >= 0) amount = parsed;
+    } catch {
+      // Keep the display at zero when local storage is unavailable.
+    }
+    orbiesCount.textContent = orbiesFormat.format(amount);
+    orbiesBalance.title = orbiesFormat.format(amount) + ' Orbies';
+    orbiesBalance.setAttribute('aria-label', 'Orbies: ' + orbiesCount.textContent);
+  }
+  refreshOrbies();
+  orbiesBalance.append(orbiesIcon, orbiesCount);
+  window.addEventListener('storage', event => {
+    if (event.key === null || event.key === orbiesKey) refreshOrbies();
+  });
+  window.addEventListener('fivey:orbies-updated', refreshOrbies);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(user, trigger), dropdown, userMenu);
+  accountActions.append(orbiesBalance, createStreakCounter(user, trigger), dropdown, userMenu);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
