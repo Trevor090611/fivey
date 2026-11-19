@@ -262,8 +262,9 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   const googleIdentity = user.identities?.find(identity => identity.provider === 'google')?.identity_data || {};
   const defaultAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture ||
     googleIdentity.avatar_url || googleIdentity.picture || '';
-  avatar.hidden = !defaultAvatar;
-  if (defaultAvatar) avatar.src = defaultAvatar;
+  const fallbackAvatar = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="32" fill="#d9f783"/><circle cx="32" cy="23" r="12" fill="#294735"/><path d="M9 59c1-13 10-21 23-21s22 8 23 21" fill="#294735"/></svg>');
+  avatar.src = defaultAvatar || fallbackAvatar;
+  avatar.hidden = false;
   userLabel.append(avatar, document.createTextNode('Welcome ' + username + '!'));
   const avatarPath = user.user_metadata?.fivey_avatar_path;
   if (avatarPath && client?.storage) {
@@ -300,7 +301,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
     userLabel.replaceChildren(avatar, document.createTextNode('Welcome ' + updatedUsername + '!'));
     userMenu.setAttribute('aria-label', 'Account menu for ' + updatedUsername);
     if (event.detail?.avatarUrl) { avatar.src = event.detail.avatarUrl; avatar.hidden = false; }
-    else if (event.detail?.avatarUrl === '') avatar.hidden = true;
+    else if (event.detail?.avatarUrl === '') { avatar.src = fallbackAvatar; avatar.hidden = false; }
   });
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
