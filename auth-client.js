@@ -27,7 +27,7 @@ export function continueToSite() {
   location.replace(destination.href);
 }
 
-export async function connect() {
+export async function connectClient() {
   if (!authConfig.url || !authConfig.key) return null;
   const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.95.3');
   const storage = window.sessionStorage;
@@ -44,7 +44,12 @@ export async function connect() {
       storage,
       storageKey: `fivey-auth-${tabId}`
     }
-  }).auth;
+  });
+}
+
+export async function connect() {
+  const client = await connectClient();
+  return client?.auth ?? null;
 }
 
 export function completed(user) {
