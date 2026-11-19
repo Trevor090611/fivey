@@ -53,7 +53,7 @@ function showPractice() {
     for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
   } else if (mode === 'unit' && available.includes(unit)) {
     heading.textContent = unitLabel(unit);
-    setupPractice([unit]);
+    setupPractice([unit]); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount);
   } else if (mode === 'mixed') {
     heading.textContent = 'Practice All Units';
     description.textContent = 'Select one or more units, a question count, and a time limit.';
@@ -114,33 +114,22 @@ function analyticsKey() {
 }
 
 function readTotals(key) {
-  return JSON.parse(localStorage.getItem(key) ?? '{"attempted":0,"correct":0}');
+  const totals = JSON.parse(localStorage.getItem(key) ?? '{"attempted":0,"correct":0,"units":{}}'); totals.units ??= {}; return totals;
 }
 
-async function recordSet(attempted, correct) {
-  const key = analyticsKey();
-  if (!key) throw new Error('Account unavailable');
-  const update = () => {
-    const totals = readTotals(key);
-    totals.attempted += attempted;
-    totals.correct += correct;
-    localStorage.setItem(key, JSON.stringify(totals));
-  };
-  if (navigator.locks) await navigator.locks.request(key, update);
-  else update();
-}
+async function recordSet(results) { const key = analyticsKey(); if (!key) throw new Error('Account unavailable'); const update = () => { const totals = readTotals(key); totals.attempted += results.length; totals.correct += results.filter(result => result.correct).length; for (const result of results) { const unit = String(result.unit); const stats = totals.units[unit] ??= { attempted: 0, correct: 0 }; stats.attempted++; if (result.correct) stats.correct++; } localStorage.setItem(key, JSON.stringify(totals)); }; if (navigator.locks) await navigator.locks.request(key, update); else update(); }
 
 export function renderAnalytics(panel) {
   const key = analyticsKey();
   if (!key || !supported.has(course)) return;
   const update = () => {
     try {
-      const { attempted, correct } = readTotals(key);
+      const totals = readTotals(key); const { attempted, correct } = totals;
       panel.querySelector('#analytics-attempted').textContent = attempted.toLocaleString();
       panel.querySelector('#analytics-accuracy').textContent = attempted
         ? new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 1 }).format(correct / attempted)
         : '—';
-      panel.querySelector('#analytics-status').textContent = attempted ? '' : 'Submit a practice set to see your accuracy.';
+      const ranked = Object.entries(totals.units ?? {}).filter(([u,s]) => units[course][Number(u)-1] && Number(s.attempted)>0).sort((a,b) => b[1].correct/b[1].attempted-a[1].correct/a[1].attempted || b[1].attempted-a[1].attempted); const weak = ranked.slice().sort((a,b) => a[1].correct/a[1].attempted-b[1].correct/b[1].attempted || b[1].attempted-a[1].attempted).slice(0,2); const fill = (selector,rows) => panel.querySelector(selector).replaceChildren(...rows.map(([u,s]) => { const li = document.createElement('li'); li.textContent = 'Unit '+u+': '+units[course][Number(u)-1]+' — '+new Intl.NumberFormat(undefined,{style:'percent',maximumFractionDigits:1}).format(s.correct/s.attempted)+' accuracy ('+s.correct+'/'+s.attempted+')'; return li; })); fill('#analytics-strength-list',ranked.slice(0,2)); fill('#analytics-weakness-list',weak); const more = panel.querySelector('#practice-more-button'); more.href='./practice-more.html?'+new URLSearchParams({course,units:weak.map(([u])=>u).join(',')}); more.hidden=!weak.length; panel.querySelector('#analytics-status').textContent=!attempted?'Submit a practice set to see your accuracy.':ranked.length<2?'Complete practice in at least two units to compare.':'';
     } catch {
       panel.querySelector('#analytics-status').textContent = 'Practice totals are unavailable in this browser.';
     }
@@ -186,7 +175,7 @@ function reserveQuestions(bank, selected, count) {
     const pool = unitPool(course, unit, bank);
     const used = pool.filter(item => seen.has(item.prompt));
     const fresh = pool.filter(item => !seen.has(item.prompt));
-    return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)];
+    return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)].map(item => ({ ...item, unit }));
   });
   const set = [];
   const used = new Set();
@@ -386,7 +375,7 @@ function setupPractice(selected, timed) {
         save();
       }
       const attempted = set.length - unanswered.length;
-      if (!restoring && attempted) recordSet(attempted, score).catch(() => {
+      if (!restoring && attempted) recordSet(reviews.flatMap(({ field, item }) => { const checked = field.querySelector(':checked'); return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : []; })).catch(() => {
         status.textContent = message + ' Your analytics could not be saved.';
       });
       summary.textContent = 'Score: ' + score + ' of ' + set.length + ' (' + Math.round(score / set.length * 100) + '%).';
