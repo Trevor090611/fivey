@@ -261,7 +261,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div class="study-guide-actions" id="study-guide-actions" hidden><a class="practice-button" href="#guides">Detailed Study Guide</a><a class="practice-button" href="#guides">Cheatsheet :0</a></div><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div class="study-guide-actions" id="study-guide-actions" hidden><a class="practice-button" id="detailed-guide-link" href="#guides">Detailed Study Guide</a><a class="practice-button" id="cheatsheet-link" href="#guides">Cheatsheet :0</a></div><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
 <section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><p class="panel-description" id="article-description" hidden></p><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 <section class="panel" id="college-board-panel" aria-labelledby="college-board-title" hidden>
   <h2 id="college-board-title">College Board Resources</h2>
@@ -398,7 +398,7 @@ function guideLink(entry) {
 function renderGuides(course) {
   const guides = document.querySelector('#guides');
   guides.hidden = false;
-  const links = (course.guides ?? []).map(guideLink).filter(Boolean);
+  const source = cheatsheetView ? course.cheatsheets : course.guides; const links = (source ?? []).map(guideLink).filter(Boolean);
   if (links.length) {
     const list = document.createElement('ul');
     for (const link of links) {
@@ -408,7 +408,7 @@ function renderGuides(course) {
     }
     guides.append(list);
   } else {
-    guides.append(element('p', 'No study guides posted yet.'));
+    guides.append(element('p', cheatsheetView ? 'No cheatsheet uploaded yet.' : detailedGuideView ? 'No detailed study guides uploaded yet.' : 'No study guides posted yet.'));
   }
 }
 
@@ -432,13 +432,13 @@ async function loadResources(id, guideView) {
   if (!response.ok) throw new Error('Could not load the resource library');
   const library = await response.json();
   const course = library[id] ?? {};
-  if (guideView) renderGuides(course);
+  if (guideView || detailedGuideView || cheatsheetView) renderGuides(course);
   else renderArticles(course);
 }
 
 const params = new URLSearchParams(location.search);
 const id = params.get('course');
-const guideView = params.get('view') === 'guides';
+const guideView = params.get('view') === 'guides'; const detailedGuideView = params.get('view') === 'detailed-guide'; const cheatsheetView = params.get('view') === 'cheatsheet';
 const resourcesView = params.get('view') === 'resources';
 const analyticsView = params.get('view') === 'analytics';
 const selected = courses.find(([courseId]) => courseId === id);
@@ -461,7 +461,7 @@ if (selected) {
   const articleView = hasArticleSection && params.get('view') === 'article';
   const articleTitle = 'How I got a ' + (['biology','psychology','macroeconomics'].includes(id) ? '4' : '5') + ' on ' + name;
   let title = name;
-  if (guideView) title = name + ' Study Guides';
+  if (guideView) title = name + ' Study Guides'; if (detailedGuideView) title = name + ' Detailed Study Guide'; if (cheatsheetView) title = name + ' Cheatsheet';
   if (articleView) title = articleTitle;
   if (resourcesView) title = name + ' Resources';
   if (analyticsView) title = name + ' Analytics';
@@ -475,18 +475,18 @@ if (selected) {
   tag.hidden = false;
   document.querySelector('#practice-button').href = './practice.html?course=' + encodeURIComponent(id);
   document.querySelector('#full-length-button').href = './full-length.html?course=' + encodeURIComponent(id);
-  const showArticles = !guideView && !resourcesView && !analyticsView && hasArticleSection;
+  const showArticles = !guideView && !detailedGuideView && !cheatsheetView && !resourcesView && !analyticsView && hasArticleSection;
   if (showArticles) {
     document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
-  const courseHref = './course.html?course=' + encodeURIComponent(id);
-  if (guideView || articleView || resourcesView || analyticsView) {
+  const courseHref = './course.html?course=' + encodeURIComponent(id); if (guideView) { const actions = document.querySelectorAll('#study-guide-actions a'); actions[0].href = courseHref + '&view=detailed-guide'; actions[1].href = courseHref + '&view=cheatsheet'; }
+  if (guideView || detailedGuideView || cheatsheetView || articleView || resourcesView || analyticsView) {
     document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
-    back.href = courseHref;
-    back.textContent = '← Back to ' + name;
-    if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides';
+    back.href = detailedGuideView || cheatsheetView ? courseHref + '&view=guides' : courseHref;
+    back.textContent = detailedGuideView || cheatsheetView ? '← Back to Study Guides' : '← Back to ' + name;
+    if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides'; else if (detailedGuideView || cheatsheetView) { document.querySelector('#guides-title').textContent = detailedGuideView ? 'Detailed Study Guide' : 'Cheatsheet :0'; }
     else document.querySelector('#guides-panel').hidden = true;
     if (resourcesView) renderCollegeBoardResources(id);
     if (analyticsView) {
@@ -515,7 +515,7 @@ if (selected) {
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
-  if (guideView || articleView) {
+  if (guideView || detailedGuideView || cheatsheetView || articleView) {
     loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
   }
 } else {
