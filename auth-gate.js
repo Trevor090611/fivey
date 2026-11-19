@@ -223,7 +223,12 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 }
 @media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire,.fivey-streak.is-burning .fivey-streak-sparkle-trail,.fivey-streak.is-burning .fivey-streak-sparkle-trail span{animation:none}}
 .fivey-subjects{position:relative;flex:none}
-.fivey-subjects-trigger,.fivey-my-account{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
+.fivey-subjects-trigger{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
+.fivey-user-menu{position:relative;z-index:12;display:inline-flex;align-items:center;flex:none}
+.fivey-user-label{display:inline-flex;align-items:center;min-height:44px;padding:8px 10px;font-weight:700;white-space:nowrap;cursor:default}
+.fivey-user-dropdown{display:none;position:absolute;z-index:20;inset-block-start:100%;inset-inline-end:0;min-width:170px;gap:6px;padding:8px;border:2px solid #294735;border-radius:8px;background:#fff;box-shadow:0 8px 22px #19271f30}
+.fivey-user-menu:hover .fivey-user-dropdown,.fivey-user-menu:focus-within .fivey-user-dropdown{display:grid}
+.fivey-user-option{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 10px;border-radius:6px;font:inherit;font-weight:700;text-align:center;text-decoration:none;white-space:nowrap}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
 .fivey-subjects ul[hidden]{display:none}
 .fivey-subjects ul{position:absolute;z-index:10;inset-inline-end:0;inset-block-start:calc(100% + 6px);width:max-content;max-width:calc(100vw - 32px);max-height:65vh;overflow:auto;margin:0;padding:6px;list-style:none;background:#fff;border:2px solid #294735;border-radius:8px;box-shadow:0 8px 22px #19271f30}
@@ -240,16 +245,37 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
 .fivey-sign-out-dialog [role="alert"]{margin:16px 0 0;color:#8d2f24}
 `;
   document.head.append(styles);
+  const username = String(user.user_metadata?.fivey_username || user.email?.split('@')[0] || 'there');
+  const userMenu = document.createElement('div');
+  userMenu.className = 'fivey-user-menu';
+  userMenu.tabIndex = 0;
+  userMenu.setAttribute('role', 'group');
+  userMenu.setAttribute('aria-label', 'Account menu for ' + username);
+  const userLabel = document.createElement('span');
+  userLabel.className = 'fivey-user-label';
+  userLabel.textContent = 'Welcome ' + username + '!';
+  const userDropdown = document.createElement('div');
+  userDropdown.className = 'fivey-user-dropdown';
+  userDropdown.setAttribute('aria-label', 'Account options');
   const myAccount = document.createElement('a');
-  myAccount.className = 'fivey-my-account practice-button';
+  myAccount.className = 'practice-button fivey-user-option';
   myAccount.href = new URL('./account.html', import.meta.url).href;
   myAccount.textContent = 'My Account';
   if (location.pathname === new URL(myAccount.href).pathname) {
     myAccount.setAttribute('aria-current', 'page');
   }
+  const settings = document.createElement('a');
+  settings.className = 'practice-button fivey-user-option';
+  settings.href = new URL('./settings.html', import.meta.url).href;
+  settings.textContent = 'Settings';
+  if (location.pathname === new URL(settings.href).pathname) {
+    settings.setAttribute('aria-current', 'page');
+  }
+  userDropdown.append(myAccount, settings);
+  userMenu.append(userLabel, userDropdown);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(user, trigger), dropdown, myAccount, signOut);
+  accountActions.append(createStreakCounter(user, trigger), dropdown, userMenu, signOut);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
