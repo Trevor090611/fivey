@@ -62,3 +62,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 @media (prefers-reduced-motion: reduce) {
   :is(button, input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, .home-main .hero a, a.card) { transition: none; }
 }
+/* Keep the destructive confirmation red, including older cached dialog markup. */
+#fivey-sign-out-dialog .fivey-sign-out-options > button:first-child {
+  --button-fill: #ff4d4d !important;
+}
