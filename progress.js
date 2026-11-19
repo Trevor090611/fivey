@@ -53,7 +53,7 @@ function showPractice() {
     for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
   } else if (mode === 'unit' && available.includes(unit)) {
     heading.textContent = unitLabel(unit);
-    setupPractice([unit]); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount);
+    setupPractice([unit]); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount);
   } else if (mode === 'mixed') {
     heading.textContent = 'Practice All Units';
     description.textContent = 'Select one or more units, a question count, and a time limit.';
