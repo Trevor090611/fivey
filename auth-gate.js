@@ -163,7 +163,7 @@ async function appendAccountNavigation(nav, signOut, user, client) {
   styles.textContent = `
 header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 10px;min-width:0}
 .fivey-account-actions{position:relative;display:inline-flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
-.fivey-orbies{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:3px 8px;border:2px solid #7a4a0b;border-radius:8px;background:#fff8df;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.fivey-orbies{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:3px 8px;border:2px solid #7a4a0b;border-radius:8px;background:#fff3c4;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
 .fivey-orbies-icon{display:block;width:29px;height:29px;flex:none;object-fit:contain}
 
 .fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
