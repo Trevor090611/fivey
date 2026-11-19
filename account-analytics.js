@@ -1,4 +1,4 @@
-import { analyticsAccount } from './auth-gate.js?v=welcome2';
+import { analyticsAccount } from './auth-gate.js?v=welcome4';
 import { units } from './practice-units.js?v=5';
 
 const subjects = [
@@ -73,7 +73,7 @@ function readAnalytics(id) {
   const weakness = rows.slice().sort((a, b) => a[2].accuracy - b[2].accuracy || b[2].observations - a[2].observations).slice(0, 2);
   return { attempted, correct, accuracy: attempted ? correct / attempted : null, strength, weakness };
 }
-
+import { analyticsAccount } from './auth-gate.js?v=welcome4';
 function addUnitList(parent, title, rows, id) {
   const group = document.createElement('div');
   const heading = document.createElement('h4');
