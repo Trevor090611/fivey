@@ -18,6 +18,11 @@ let removePhoto = false;
 let previewObjectUrl = '';
 let googlePhoto = '';
 
+function defaultGooglePhoto() {
+  const identity = user?.identities?.find(entry => entry.provider === 'google')?.identity_data || {};
+  return user?.user_metadata?.avatar_url || user?.user_metadata?.picture || identity.avatar_url || identity.picture || '';
+}
+
 function setPreview(url) {
   if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
   previewObjectUrl = url?.startsWith('blob:') ? url : '';
@@ -26,7 +31,7 @@ function setPreview(url) {
 }
 
 async function loadSavedPhoto() {
-  googlePhoto = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+  googlePhoto = defaultGooglePhoto();
   const path = user.user_metadata?.fivey_avatar_path;
   if (path) {
     const { data, error } = await client.storage.from(bucket).createSignedUrl(path, 3600);
@@ -55,7 +60,7 @@ try {
   try {
     await loadSavedPhoto();
   } catch {
-    googlePhoto = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+    googlePhoto = defaultGooglePhoto();
     setPreview(googlePhoto);
   }
 
