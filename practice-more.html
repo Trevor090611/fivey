@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice More | Fivey</title>
+<link rel="stylesheet" href="./brand.css?v=fb47b45">
+<link rel="stylesheet" href="./auth.css?v=8643d4f">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+.wrap{width:min(960px,calc(100% - 40px));margin-inline:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+nav a{font-size:14px;font-weight:700}
+main{flex:1;padding-block:clamp(44px,8vw,90px)}
+.card{max-width:620px;margin:auto;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:clamp(22px,5vw,40px)}
+h1{font-size:clamp(34px,7vw,56px);line-height:1.08;letter-spacing:-.045em;margin:0 0 10px}
+p{color:var(--muted);margin:0 0 24px}
+label{display:block;font-weight:700;margin:18px 0 7px}
+select{width:100%;min-height:48px;padding:10px 12px;border:1px solid #9ba697;border-radius:6px;background:#fff;color:var(--ink);font:inherit}
+.practice-button{display:inline-block;margin-top:24px;padding:10px 16px;border:2px solid #34573a;border-radius:6px;background:#fff;color:var(--ink);font:inherit;font-weight:750;text-decoration:none;cursor:pointer;transition:background .22s,color .22s,transform .22s}
+.practice-button:hover{background:#d9f783;color:var(--ink);transform:translateY(-5px)}
+#status{margin-top:18px;color:#8a3428}
+footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
+[hidden]{display:none!important}
+</style>
+<script type="module" src="./auth-gate.js?v=streak1"></script>
+</head>
+<body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav><a id="back-link" href="./courses.html">← Back to analytics</a></nav></div></header>
+<main class="wrap"><section class="card" aria-labelledby="title"><h1 id="title">Practice More</h1><p id="description">Choose a unit from your Weakness list and set the number of questions.</p><form id="practice-form"><label for="unit-select">Weakness unit</label><select id="unit-select" required></select><label for="count-select">Questions per set</label><select id="count-select"><option value="5">5 questions</option><option value="10">10 questions</option><option value="15">15 questions</option><option value="20">20 questions</option></select><button class="practice-button" type="submit">Start practice</button></form><p id="status" role="status" hidden></p></section></main>
+<footer><div class="wrap">Fivey · AP study guides and practice</div></footer>
+<script type="module">
+import { units } from './practice-units.js?v=5';
+const courses={biology:'AP Biology','environmental-science':'AP Environmental Science',chemistry:'AP Chemistry','physics-1':'AP Physics 1',psychology:'AP Psychology','calculus-ab':'AP Calculus AB',macroeconomics:'AP Macroeconomics'};
+const params=new URLSearchParams(location.search);
+const course=params.get('course');
+const allowed=Array.isArray(units?.[course])?units[course]:[];
+const requested=[...new Set((params.get('units')||'').split(',').map(Number).filter(Number.isInteger))].filter(id=>id>0&&id<=allowed.length);
+const unitSelect=document.querySelector('#unit-select');
+const status=document.querySelector('#status');
+const name=courses[course];
+if(!name||!requested.length){status.textContent='No weakness units are available. Return to analytics after completing practice in multiple units.';status.hidden=false;document.querySelector('#practice-form').hidden=true;}
+else{
+ document.title='Practice More · '+name+' | Fivey';
+ document.querySelector('#title').textContent='Practice More';
+ document.querySelector('#description').textContent='Choose a unit from your '+name+' Weakness list and set the number of questions.';
+ document.querySelector('#back-link').href='./course.html?'+new URLSearchParams({course,view:'analytics'});
+ for(const id of requested){const option=document.createElement('option');option.value=String(id);option.textContent='Unit '+id+': '+allowed[id-1];unitSelect.append(option);}
+}
+document.querySelector('#practice-form').addEventListener('submit',event=>{event.preventDefault();if(!unitSelect.value)return;location.assign('./practice.html?'+new URLSearchParams({course,mode:'unit',unit:unitSelect.value,count:document.querySelector('#count-select').value}));});
+</script>
+</body>
+</html>
