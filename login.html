@@ -34,6 +34,17 @@
     <button type="button" id="resend">Resend code</button>
   </form>
   <form data-stage="password" hidden>
+    <section class="profile-setup" aria-labelledby="profile-setup-title">
+      <h2 id="profile-setup-title">Set up your profile</h2>
+      <label>Username<input name="username" type="text" autocomplete="nickname" required></label>
+      <fieldset class="role-choice">
+        <legend>I am a</legend>
+        <div class="role-options">
+          <label><input name="role" type="radio" value="student" required> Student</label>
+          <label><input name="role" type="radio" value="teacher" required> Teacher</label>
+        </div>
+      </fieldset>
+    </section>
     <h2>Create your password</h2>
     <label>Create New Password<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
     <label>Confirm Password<input name="confirm" type="password" autocomplete="new-password" minlength="8" required></label>
