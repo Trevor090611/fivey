@@ -225,7 +225,7 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 .fivey-subjects{position:relative;flex:none}
 .fivey-subjects-trigger{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
 .fivey-user-menu{position:relative;z-index:12;display:inline-flex;align-items:center;flex:none}
-.fivey-user-label{box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:2px solid #204b34;border-radius:6px;background:#fff;font-weight:700;white-space:nowrap;cursor:default}
+.fivey-user-label{box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:2px solid #204b34;border-radius:6px;background:#fff;color:#19271f;font-weight:700;white-space:nowrap;cursor:default}
 .fivey-user-avatar{width:28px;height:28px;flex:none;border:1px solid #d4d9cd;border-radius:50%;object-fit:cover;background:#f8f7ef}
 .fivey-user-dropdown .fivey-sign-out{width:100%;margin:0}
 .fivey-user-dropdown{display:none;position:absolute;z-index:20;inset-block-start:100%;inset-inline-end:0;min-width:170px;gap:6px;padding:8px;border:2px solid #294735;border-radius:8px;background:#fff;box-shadow:0 8px 22px #19271f30}
@@ -259,14 +259,17 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   avatar.className = 'fivey-user-avatar';
   avatar.alt = '';
   avatar.setAttribute('aria-hidden', 'true');
-  const defaultAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+  const googleIdentity = user.identities?.find(identity => identity.provider === 'google')?.identity_data || {};
+  const defaultAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture ||
+    googleIdentity.avatar_url || googleIdentity.picture || '';
+  avatar.hidden = !defaultAvatar;
   if (defaultAvatar) avatar.src = defaultAvatar;
   userLabel.append(avatar, document.createTextNode('Welcome ' + username + '!'));
   const avatarPath = user.user_metadata?.fivey_avatar_path;
   if (avatarPath && client?.storage) {
     try {
       const { data } = await client.storage.from('profile-pictures').createSignedUrl(avatarPath, 3600);
-      if (data?.signedUrl) avatar.src = data.signedUrl;
+      if (data?.signedUrl) { avatar.src = data.signedUrl; avatar.hidden = false; }
     } catch {
       // Keep the Google account picture when private photo storage is unavailable.
     }
@@ -296,7 +299,8 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
     if (!updatedUsername) return;
     userLabel.replaceChildren(avatar, document.createTextNode('Welcome ' + updatedUsername + '!'));
     userMenu.setAttribute('aria-label', 'Account menu for ' + updatedUsername);
-    if (event.detail?.avatarUrl) avatar.src = event.detail.avatarUrl;
+    if (event.detail?.avatarUrl) { avatar.src = event.detail.avatarUrl; avatar.hidden = false; }
+    else if (event.detail?.avatarUrl === '') avatar.hidden = true;
   });
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
