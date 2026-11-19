@@ -133,15 +133,30 @@ function appendAccountNavigation(nav, signOut, user) {
   links.id = 'fivey-subject-links';
   links.hidden = true;
   links.setAttribute('aria-label', 'AP subjects');
-  for (const [id, name, category] of subjects) {
-    const item = document.createElement('li');
-    const link = document.createElement('a');
-    link.href = new URL('./course.html?course=' + id, import.meta.url).href;
-    link.textContent = name;
-    if (category) link.dataset.category = category;
-    item.append(link);
-    links.append(item);
+  const studyPlanKey = 'fivey-study-plan-v1:' + user.id;
+  function renderSubjectLinks() {
+    let planned = new Set();
+    try {
+      const saved = JSON.parse(localStorage.getItem(studyPlanKey) || '[]');
+      if (Array.isArray(saved)) {
+        planned = new Set(saved.map(item => item?.subject).filter(name => subjects.some(([, subjectName]) => subjectName === name)));
+      }
+    } catch {
+      // Keep the dropdown empty when the saved plan is unavailable.
+    }
+    links.replaceChildren();
+    for (const [id, name, category] of subjects) {
+      if (!planned.has(name)) continue;
+      const item = document.createElement('li');
+      const link = document.createElement('a');
+      link.href = new URL('./course.html?course=' + id, import.meta.url).href;
+      link.textContent = name;
+      if (category) link.dataset.category = category;
+      item.append(link);
+      links.append(item);
+    }
   }
+  renderSubjectLinks();
   dropdown.append(links);
 
   const styles = document.createElement('style');
@@ -242,13 +257,20 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
     trigger.setAttribute('aria-expanded', String(expanded));
   }
 
-  trigger.addEventListener('click', () => setExpanded(links.hidden));
+  trigger.addEventListener('click', () => {
+    renderSubjectLinks();
+    setExpanded(links.hidden);
+  });
   dropdown.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !links.hidden) {
       event.preventDefault();
       setExpanded(false);
       trigger.focus();
     }
+  });
+  window.addEventListener('fivey:study-plan-updated', renderSubjectLinks);
+  window.addEventListener('storage', event => {
+    if (event.key === studyPlanKey || event.key === null) renderSubjectLinks();
   });
   document.addEventListener('click', event => {
     if (!dropdown.contains(event.target)) setExpanded(false);
