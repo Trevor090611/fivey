@@ -220,6 +220,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
 .fivey-sign-out-dialog h2{margin:0;font-size:24px;line-height:1.25;letter-spacing:-.03em;text-align:center}
 .fivey-sign-out-options{display:flex;gap:12px;margin-top:24px}
 .fivey-sign-out-options button{flex:1;min-height:44px;padding:10px 16px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer}
+.fivey-sign-out-confirm{--button-fill:#ff4d4d}
 .fivey-sign-out-options button:focus-visible{outline:3px solid #467335;outline-offset:4px}
 .fivey-sign-out-dialog [role="alert"]{margin:16px 0 0;color:#8d2f24}
 `;
@@ -266,6 +267,7 @@ function addSignOutConfirmation(auth, signOut) {
   options.className = 'fivey-sign-out-options';
   const yes = document.createElement('button');
   yes.type = 'button';
+  yes.className = 'fivey-sign-out-confirm';
   yes.textContent = 'Yes';
   const no = document.createElement('button');
   no.type = 'button';
