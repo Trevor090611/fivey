@@ -2,7 +2,7 @@ import { authConfig } from './auth-config.js';
 
 export const root = new URL('./', import.meta.url);
 export const login = new URL('login.html', root);
-const pages = new Set(['', 'index.html', 'about.html', 'courses.html', 'course.html', 'practice.html', 'full-length.html']);
+const pages = new Set(['', 'index.html', 'about.html', 'courses.html', 'course.html', 'practice.html', 'full-length.html', 'settings.html']);
 const returnKey = 'fivey-auth-return';
 const tabKey = 'fivey-auth-tab';
 
