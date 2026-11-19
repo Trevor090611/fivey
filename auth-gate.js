@@ -166,15 +166,15 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 .fivey-orbies{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:36px;padding:3px 8px;border:2px solid #7a4a0b;border-radius:8px;background:#fff3c4;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
 .fivey-orbies-icon{display:block;width:29px;height:29px;flex:none;object-fit:contain}
 
-.fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;gap:4px;min-height:36px;padding:4px 9px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
+.fivey-streak{--fivey-streak-width-growth:min(var(--fivey-streak-extra-width,0px),clamp(0px,calc(100vw - 345px),100vw));position:relative;isolation:isolate;display:inline-flex;flex:none;align-items:center;justify-content:center;gap:5px;min-height:39px;padding:3px 13px;border:2px solid #294735;border-radius:8px;background:#fff9ef;color:#412414;font:750 14px/1 system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
 .fivey-streak-fire{display:inline-block;font:400 19px/1.15 system-ui,sans-serif;transform-origin:center 80%}
 .fivey-streak::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:6px;background:linear-gradient(90deg,#ffbf54,#ff853b);opacity:0;clip-path:inset(0 100% 0 0)}
 .fivey-streak.is-burning{--fivey-streak-sweep-time:1800ms;--fivey-streak-flame-edge:calc(11px + var(--fivey-streak-width-growth) / 2);animation:fivey-streak-grow calc(var(--fivey-streak-sweep-time) * 1.25) ease-in-out}
 .fivey-streak.is-burning::before{animation:fivey-streak-sweep var(--fivey-streak-sweep-time) linear}
 .fivey-streak.is-burning .fivey-streak-fire{animation:fivey-streak-burn var(--fivey-streak-sweep-time) ease-out}
 @keyframes fivey-streak-grow{
-  0%,100%{transform:scale(1);min-height:36px;padding-inline:9px;margin-inline-start:0}
-  16%,80%{transform:scale(var(--fivey-streak-scale,1.24));min-height:calc(36px + var(--fivey-streak-extra-height,0px));padding-inline:calc(9px + var(--fivey-streak-width-growth) / 2);margin-inline-start:calc(0px - var(--fivey-streak-width-growth))}
+  0%,100%{transform:scale(1);min-height:39px;padding-inline:13px;margin-inline-start:0}
+  16%,80%{transform:scale(var(--fivey-streak-scale,1.24));min-height:calc(39px + var(--fivey-streak-extra-height,0px));padding-inline:calc(13px + var(--fivey-streak-width-growth) / 2);margin-inline-start:calc(0px - var(--fivey-streak-width-growth))}
 }
 @keyframes fivey-streak-sweep{
   0%{opacity:.85;clip-path:inset(0 100% 0 0);animation-timing-function:cubic-bezier(.45,0,.8,.32)}
