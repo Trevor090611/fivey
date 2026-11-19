@@ -89,10 +89,19 @@ try {
       });
       bind('password', async values => {
         const password = values.get('password');
+        const username = String(values.get('username') || '').trim();
+        const role = values.get('role');
+        if (!username) throw new Error('Enter a username to continue.');
+        if (!['student', 'teacher'].includes(role)) throw new Error('Choose whether you are a student or teacher.');
         if (password !== values.get('confirm')) throw new Error('Your passwords must match.');
         const user = checked(await auth.getUser()).user;
         if (!user?.email_confirmed_at || completed(user)) throw new Error('Verify your email before creating a password.');
-        checked(await auth.updateUser({ password, data: { fivey_password_ready: true } }));
+        checked(await auth.updateUser({ password, data: {
+          ...user.user_metadata,
+          fivey_password_ready: true,
+          fivey_username: username,
+          fivey_role: role
+        } }));
         continueToSite();
       });
     }
