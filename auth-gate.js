@@ -208,14 +208,20 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 }
 @media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire,.fivey-streak.is-burning .fivey-streak-sparkle-trail,.fivey-streak.is-burning .fivey-streak-sparkle-trail span{animation:none}}
 .fivey-subjects{flex:none}
-.fivey-subjects-trigger{cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;border-radius:6px;padding:8px 10px}
-.fivey-my-account{display:inline-block;padding:8px 10px;border-radius:6px;font:inherit;font-weight:700;line-height:normal;text-decoration:none;white-space:nowrap}
+.fivey-subjects-trigger,.fivey-my-account{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
 .fivey-subjects ul[hidden]{display:none}
 .fivey-subjects ul{position:absolute;z-index:10;inset-inline-end:0;inset-block-start:calc(100% + 6px);width:max-content;max-width:calc(100vw - 32px);max-height:65vh;overflow:auto;margin:0;padding:6px;list-style:none;background:#fff;border:2px solid #294735;border-radius:8px;box-shadow:0 8px 22px #19271f30}
 header nav .fivey-subjects li a{display:block;padding:8px 10px;border-radius:4px;color:#19271f;background:#fff;text-decoration:none;white-space:normal}
 header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visible{color:#19271f;background:var(--subject-hover,#d9f783)}
 .fivey-subjects a[data-category="humanities"]{--subject-hover:#fff1b8}
+.fivey-sign-out-dialog{position:fixed;inset:0;margin:auto;box-sizing:border-box;width:420px;max-width:calc(100vw - 40px);max-height:calc(100svh - 40px);overflow:auto;padding:28px;border:2px solid #204b34;border-radius:16px;background:#fffef8;color:#19271f;box-shadow:0 18px 60px #0004;font:16px/1.55 "DM Sans",system-ui,sans-serif}
+.fivey-sign-out-dialog::backdrop{background:rgb(15 28 20 / 60%)}
+.fivey-sign-out-dialog h2{margin:0;font-size:24px;line-height:1.25;letter-spacing:-.03em;text-align:center}
+.fivey-sign-out-options{display:flex;gap:12px;margin-top:24px}
+.fivey-sign-out-options button{flex:1;min-height:44px;padding:10px 16px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer}
+.fivey-sign-out-options button:focus-visible{outline:3px solid #467335;outline-offset:4px}
+.fivey-sign-out-dialog [role="alert"]{margin:16px 0 0;color:#8d2f24}
 `;
   document.head.append(styles);
   const myAccount = document.createElement('a');
@@ -248,6 +254,63 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   });
 }
 
+function addSignOutConfirmation(auth, signOut) {
+  const dialog = document.createElement('dialog');
+  dialog.id = 'fivey-sign-out-dialog';
+  dialog.className = 'fivey-sign-out-dialog';
+  dialog.setAttribute('aria-labelledby', 'fivey-sign-out-question');
+  const question = document.createElement('h2');
+  question.id = 'fivey-sign-out-question';
+  question.textContent = 'Are you sure you want to log out?';
+  const options = document.createElement('div');
+  options.className = 'fivey-sign-out-options';
+  const yes = document.createElement('button');
+  yes.type = 'button';
+  yes.textContent = 'Yes';
+  const no = document.createElement('button');
+  no.type = 'button';
+  no.textContent = 'No';
+  const status = document.createElement('p');
+  status.setAttribute('role', 'alert');
+  status.hidden = true;
+  options.append(yes, no);
+  dialog.append(question, options, status);
+  document.body.append(dialog);
+  signOut.type = 'button';
+  signOut.setAttribute('aria-haspopup', 'dialog');
+  signOut.setAttribute('aria-controls', dialog.id);
+  let signingOut = false;
+
+  signOut.addEventListener('click', () => {
+    if (dialog.open) return;
+    status.hidden = true;
+    dialog.showModal();
+    no.focus();
+  });
+  no.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => signOut.focus());
+  dialog.addEventListener('cancel', event => {
+    if (signingOut) event.preventDefault();
+  });
+  yes.addEventListener('click', async () => {
+    if (signingOut) return;
+    signingOut = true;
+    signOut.disabled = yes.disabled = no.disabled = true;
+    status.hidden = true;
+    try {
+      const { error: failure } = await auth.signOut({ scope: 'local' });
+      if (failure) throw failure;
+      location.replace(login.href);
+    } catch {
+      signingOut = false;
+      signOut.disabled = yes.disabled = no.disabled = false;
+      status.textContent = 'Could not sign out. Please try again.';
+      status.hidden = false;
+      yes.focus();
+    }
+  });
+}
+
 try {
   const auth = authConfig.enabled ? await connect() : null;
   if (auth) {
@@ -261,17 +324,7 @@ try {
       const signOut = document.createElement('button');
       signOut.className = 'fivey-sign-out';
       signOut.textContent = 'Sign out';
-      signOut.addEventListener('click', async () => {
-        signOut.disabled = true;
-        try {
-          const { error: failure } = await auth.signOut({ scope: 'local' });
-          if (failure) throw failure;
-          location.replace(login.href);
-        } catch {
-          signOut.textContent = 'Retry sign out';
-          signOut.disabled = false;
-        }
-      });
+      addSignOutConfirmation(auth, signOut);
       const nav = document.querySelector('header nav');
       if (nav) appendAccountNavigation(nav, signOut, data.user);
       document.documentElement.classList.remove('fivey-auth-pending');
