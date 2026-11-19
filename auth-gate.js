@@ -222,7 +222,7 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
   75%{opacity:.75;transform:translateY(var(--spark-drift,-4px)) scale(.85) rotate(12deg)}
 }
 @media(prefers-reduced-motion:reduce){.fivey-streak.is-burning,.fivey-streak.is-burning::before,.fivey-streak.is-burning .fivey-streak-fire,.fivey-streak.is-burning .fivey-streak-sparkle-trail,.fivey-streak.is-burning .fivey-streak-sparkle-trail span{animation:none}}
-.fivey-subjects{flex:none}
+.fivey-subjects{position:relative;flex:none}
 .fivey-subjects-trigger,.fivey-my-account{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
 .fivey-account-actions .fivey-sign-out{margin-inline-start:0}
 .fivey-subjects ul[hidden]{display:none}
