@@ -215,8 +215,8 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 #analytics-panel dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px;margin:16px 0}
 #analytics-panel dl div{padding:16px;border:1px solid var(--line);border-radius:6px}
 #analytics-panel dd{margin:0;font-size:32px;font-weight:750;font-variant-numeric:tabular-nums}
-#analytics-status:empty{display:none}
-</style>
+#analytics-status:empty{display:none}.analytics-insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.analytics-insight{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--white)}.analytics-insight h3{margin:0 0 8px;font-size:18px}.analytics-insight ul{margin:0;padding-left:20px}.analytics-insight li+li{margin-top:8px}.analytics-insight .practice-button{display:inline-block;margin-top:14px}@media(max-width:620px){.analytics-insights{grid-template-columns:1fr}}
+.analytics-insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.analytics-insight{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--white)}.analytics-insight h3{margin:0 0 8px;font-size:18px}.analytics-insight ul{margin:0;padding-left:20px}.analytics-insight li+li{margin-top:8px}.analytics-insight .practice-button{display:inline-block;margin-top:14px}@media(max-width:620px){.analytics-insights{grid-template-columns:1fr}}</style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css?v=8643d4f">
@@ -269,7 +269,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
   <dl>
     <div><dt>Total Questions Attempted</dt><dd id="analytics-attempted">—</dd></div>
     <div><dt>Current Accuracy</dt><dd id="analytics-accuracy">—</dd></div>
-  </dl>
+  </dl><div class="analytics-insights" id="analytics-unit-insights"><section class="analytics-insight" aria-labelledby="analytics-strength-title"><h3 id="analytics-strength-title">Strength</h3><ul id="analytics-strength-list"></ul></section><section class="analytics-insight" aria-labelledby="analytics-weakness-title"><h3 id="analytics-weakness-title">Weakness</h3><ul id="analytics-weakness-list"></ul><a class="practice-button" id="practice-more-button" hidden>Practice More</a></section></div>
   <p id="analytics-status" role="status"></p>
 </section>
 </div>
