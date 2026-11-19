@@ -291,7 +291,7 @@ function showWelcomeDialog(user) {
   dialog.setAttribute('aria-labelledby', 'fivey-welcome-title');
   const title = document.createElement('h2');
   title.id = 'fivey-welcome-title';
-  title.textContent = 'Getting Started';
+  title.textContent = 'Start Your AP Review Journey!';
   const message = document.createElement('p');
   message.className = 'fivey-welcome-message';
   message.append(
@@ -331,7 +331,7 @@ function showWelcomeDialog(user) {
     '.fivey-welcome-exit{--button-fill:#ff4d4d!important}' +
     '@media(max-width:420px){.fivey-welcome-actions{gap:7px}.fivey-welcome-button{padding-inline:5px}}';
   document.head.append(styles);
-  actions.append(exit, about, plan);
+  actions.append(plan, about, exit);
   dialog.append(title, message, actions);
   document.body.append(dialog);
   dialog.showModal();
