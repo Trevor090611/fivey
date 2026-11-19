@@ -456,7 +456,7 @@ if (selected) {
   }
   const hasArticleSection = id !== 'environmental-science';
   const articleView = hasArticleSection && params.get('view') === 'article';
-  const articleTitle = 'How I got a 5 on ' + name;
+  const articleTitle = 'How I got a ' + (['biology','psychology','macroeconomics'].includes(id) ? '4' : '5') + ' on ' + name;
   let title = name;
   if (guideView) title = name + ' Study Guides';
   if (articleView) title = articleTitle;
