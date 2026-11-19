@@ -60,7 +60,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css">
-<script type="module" src="./auth-gate.js?v=subjects2"></script>
+<script type="module" src="./auth-gate.js?v=welcome1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -112,7 +112,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
 <script type="module">
-import { analyticsAccount } from './auth-gate.js?v=subjects2';
+import { analyticsAccount } from './auth-gate.js?v=welcome1';
 
 const subjects = [
   'AP Biology', 'AP Environmental Science', 'AP Chemistry', 'AP Physics 1',
@@ -261,6 +261,10 @@ if (analyticsAccount) {
   window.addEventListener('pageshow', updateCountdowns);
   document.addEventListener('visibilitychange', updateCountdowns);
   toggle.hidden = false;
+  if (new URLSearchParams(location.search).get('welcome') === 'plan') {
+    history.replaceState(null, '', location.pathname + location.hash);
+    openForm(plan);
+  }
   function closeForm() {
     form.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
