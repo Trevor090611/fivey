@@ -1,4 +1,4 @@
-import { analyticsAccount } from './auth-gate.js?v=account1';
+import { analyticsAccount } from './auth-gate.js?v=account2';
 import { units } from './practice-units.js?v=5';
 
 const subjects = [
