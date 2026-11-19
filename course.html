@@ -488,7 +488,7 @@ if (selected) {
     if (analyticsView) {
       const panel = document.querySelector('#analytics-panel');
       panel.hidden = false;
-      import('./progress.js?v=analytics2')
+      import('./progress.js?v=analytics3')
         .then(({ renderAnalytics }) => renderAnalytics(panel))
         .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
     }
