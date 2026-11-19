@@ -1,5 +1,5 @@
 import { authConfig } from './auth-config.js?v=2';
-import { completed, connect, login, rememberDestination } from './auth-client.js';
+import { completed, connectClient, login, rememberDestination } from './auth-client.js';
 
 export let analyticsAccount = null;
 
@@ -118,7 +118,7 @@ function createStreakCounter(user, subjectTrigger) {
   return counter;
 }
 
-function appendAccountNavigation(nav, signOut, user) {
+async function appendAccountNavigation(nav, signOut, user, client) {
   const dropdown = document.createElement('div');
   dropdown.className = 'fivey-subjects';
   const trigger = document.createElement('button');
@@ -225,7 +225,9 @@ header nav:has(.fivey-subjects){display:flex;flex-direction:row;flex-wrap:wrap;a
 .fivey-subjects{position:relative;flex:none}
 .fivey-subjects-trigger{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;inline-size:7.5rem;min-block-size:44px;flex:none;cursor:pointer;white-space:nowrap;font:inherit;font-weight:700;line-height:1.55;border-radius:6px;padding:8px 10px;text-decoration:none}
 .fivey-user-menu{position:relative;z-index:12;display:inline-flex;align-items:center;flex:none}
-.fivey-user-label{display:inline-flex;align-items:center;min-height:44px;padding:8px 10px;font-weight:700;white-space:nowrap;cursor:default}
+.fivey-user-label{box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border:2px solid #204b34;border-radius:6px;background:#fff;font-weight:700;white-space:nowrap;cursor:default}
+.fivey-user-avatar{width:28px;height:28px;flex:none;border:1px solid #d4d9cd;border-radius:50%;object-fit:cover;background:#f8f7ef}
+.fivey-user-dropdown .fivey-sign-out{width:100%;margin:0}
 .fivey-user-dropdown{display:none;position:absolute;z-index:20;inset-block-start:100%;inset-inline-end:0;min-width:170px;gap:6px;padding:8px;border:2px solid #294735;border-radius:8px;background:#fff;box-shadow:0 8px 22px #19271f30}
 .fivey-user-menu:hover .fivey-user-dropdown,.fivey-user-menu:focus-within .fivey-user-dropdown{display:grid}
 .fivey-user-option{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 10px;border-radius:6px;font:inherit;font-weight:700;text-align:center;text-decoration:none;white-space:nowrap}
@@ -253,7 +255,22 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   userMenu.setAttribute('aria-label', 'Account menu for ' + username);
   const userLabel = document.createElement('span');
   userLabel.className = 'fivey-user-label';
-  userLabel.textContent = 'Welcome ' + username + '!';
+  const avatar = document.createElement('img');
+  avatar.className = 'fivey-user-avatar';
+  avatar.alt = '';
+  avatar.setAttribute('aria-hidden', 'true');
+  const defaultAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || '';
+  if (defaultAvatar) avatar.src = defaultAvatar;
+  userLabel.append(avatar, document.createTextNode('Welcome ' + username + '!'));
+  const avatarPath = user.user_metadata?.fivey_avatar_path;
+  if (avatarPath && client?.storage) {
+    try {
+      const { data } = await client.storage.from('profile-pictures').createSignedUrl(avatarPath, 3600);
+      if (data?.signedUrl) avatar.src = data.signedUrl;
+    } catch {
+      // Keep the Google account picture when private photo storage is unavailable.
+    }
+  }
   const userDropdown = document.createElement('div');
   userDropdown.className = 'fivey-user-dropdown';
   userDropdown.setAttribute('aria-label', 'Account options');
@@ -271,17 +288,19 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   if (location.pathname === new URL(settings.href).pathname) {
     settings.setAttribute('aria-current', 'page');
   }
-  userDropdown.append(myAccount, settings);
+  signOut.classList.add('practice-button', 'fivey-user-option');
+  userDropdown.append(myAccount, settings, signOut);
   userMenu.append(userLabel, userDropdown);
   window.addEventListener('fivey:profile-updated', event => {
     const updatedUsername = String(event.detail?.username || '');
     if (!updatedUsername) return;
-    userLabel.textContent = 'Welcome ' + updatedUsername + '!';
+    userLabel.replaceChildren(avatar, document.createTextNode('Welcome ' + updatedUsername + '!'));
     userMenu.setAttribute('aria-label', 'Account menu for ' + updatedUsername);
+    if (event.detail?.avatarUrl) avatar.src = event.detail.avatarUrl;
   });
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(createStreakCounter(user, trigger), dropdown, userMenu, signOut);
+  accountActions.append(createStreakCounter(user, trigger), dropdown, userMenu);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
@@ -429,7 +448,8 @@ function addSignOutConfirmation(auth, signOut) {
 }
 
 try {
-  const auth = authConfig.enabled ? await connect() : null;
+  const client = authConfig.enabled ? await connectClient() : null;
+  const auth = client?.auth ?? null;
   if (auth) {
     const { data, error } = await auth.getUser();
     if (error && error.name !== 'AuthSessionMissingError' && error.status !== 401 && error.status !== 403) throw error;
@@ -443,7 +463,7 @@ try {
       signOut.textContent = 'Sign out';
       addSignOutConfirmation(auth, signOut);
       const nav = document.querySelector('header nav');
-      if (nav) appendAccountNavigation(nav, signOut, data.user);
+      if (nav) await appendAccountNavigation(nav, signOut, data.user, client);
       document.documentElement.classList.remove('fivey-auth-pending');
       showWelcomeDialog(data.user);
       auth.onAuthStateChange(event => {
