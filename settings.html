@@ -32,6 +32,7 @@ h1{font-size:clamp(36px,6vw,64px)}
 .profile-card .profile-picture-upload input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .profile-picture-reset{min-height:40px;padding:8px 12px;border-radius:6px;font:inherit;font-weight:700;cursor:pointer}
 .profile-picture-reset:disabled{opacity:.55;cursor:not-allowed}
+.profile-card .profile-picture-actions .profile-picture-upload,.profile-card .profile-picture-actions .profile-picture-reset{display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:175px;height:49px;min-height:0;padding:8px 12px;text-align:center}
 .profile-card label{display:grid;gap:6px;font-weight:700}
 .profile-card input,.profile-card select{min-height:44px;padding:8px 10px;border:1px solid #63775e;border-radius:6px;background:#fff;color:var(--ink);font:inherit}
 .profile-card button{justify-self:start;padding:10px 16px;border-radius:6px;font:inherit;font-weight:750;cursor:pointer}
@@ -40,7 +41,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 @media(max-width:520px){footer .bar{flex-wrap:wrap}.profile-picture{align-items:flex-start}.profile-picture img{width:64px;height:64px}}
 </style>
 <link rel="stylesheet" href="./auth.css">
-<script type="module" src="./auth-gate.js?v=welcome4"></script>
+<script type="module" src="./auth-gate.js?v=welcome5"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -74,6 +75,6 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
   </section>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="./account.html">My Account</a></div></footer>
-<script type="module" src="./settings.js?v=profile2"></script>
+<script type="module" src="./settings.js?v=profile3"></script>
 </body>
 </html>
