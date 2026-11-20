@@ -167,9 +167,9 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   --fivey-navy: #081831;
   --paper: #000;
   --white: #000;
-  --ink: var(--fivey-cyan);
+  --ink: #fff;
   --green: var(--fivey-cyan);
-  --muted: #ace2ec;
+  --muted: #fff;
   --line: #315f71;
   background: var(--paper);
 }
@@ -190,7 +190,9 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 
 :root[data-fivey-dark] main > .hero { color: var(--ink); }
 :root[data-fivey-dark] main > .hero:not([data-course]) { background: var(--fivey-navy); }
-:root[data-fivey-dark] .hero p { color: var(--muted); }
+:root[data-fivey-dark] .hero p { color: #fff; }
+:root[data-fivey-dark] :is(h1,h2,h3,h4,h5,h6) { color: var(--fivey-cyan) !important; }
+:root[data-fivey-dark] :is(input,textarea)::placeholder { color: #fff; opacity: 1; }
 :root[data-fivey-dark] :is(.hero, .download-backdrop):is([data-course="biology"], [data-course="environmental-science"]) {
   --hero-base: var(--fivey-navy);
   --hero-glow: #17547a;
@@ -199,8 +201,8 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   --hero-texture-size: 22px 22px;
 }
 :root[data-fivey-dark] .home-main .mark { --green: #d9f783; }
-:root[data-fivey-dark] .tag { background: var(--fivey-cyan); color: var(--paper); }
-:root[data-fivey-dark] .hero .tag { background: var(--fivey-cyan); border-color: var(--fivey-cyan); color: var(--paper); }
+:root[data-fivey-dark] .tag { background: var(--fivey-cyan); color: #fff; }
+:root[data-fivey-dark] .hero .tag { background: var(--fivey-cyan); border-color: var(--fivey-cyan); color: #fff; }
 
 :root[data-fivey-dark] :is(.auth-card, .fivey-welcome-dialog, .fivey-sign-out-dialog, .fivey-user-label,
     .fivey-user-dropdown, .fivey-subjects ul, .fivey-user-avatar, .profile-picture img,
@@ -224,7 +226,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 :root[data-fivey-dark] :is(.role-options input, .study-planner input[type="checkbox"], .progress-quiz input) {
   accent-color: var(--fivey-cyan);
 }
-:root[data-fivey-dark] .progress-quiz label[data-result="correct"] { color: var(--fivey-cyan); }
+:root[data-fivey-dark] .progress-quiz label[data-result="correct"] { color: #fff; }
 :root[data-fivey-dark] :is(.progress-quiz label[data-result="incorrect"], #fivey-sign-out-dialog [role="alert"], .card #status) { color: #ffacb5; }
 :root[data-fivey-dark] :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea, option, optgroup) {
   background-color: var(--paper);
@@ -240,7 +242,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   background-position: right center !important;
   background-repeat: no-repeat !important;
   background-size: 0% 100% !important;
-  color: var(--fivey-cyan) !important;
+  color: #fff !important;
   transition: background-size 260ms ease-out, translate 160ms ease-out;
 }
 
