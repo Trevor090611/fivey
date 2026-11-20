@@ -144,12 +144,11 @@ function formatPhoneInput(digits, country) {
   return chunks.join(separator);
 }
 
-function countryOptions(select) {
+function countryOptions(list) {
   const sorted = [...recoveryCountries].sort((a, b) => a.name.localeCompare(b.name));
-  select.replaceChildren(...sorted.map(country => {
+  list.replaceChildren(...sorted.map(country => {
     const option = document.createElement('option');
-    option.value = country.iso;
-    option.textContent = country.name + ' (+' + country.dial + ')';
+    option.value = country.name + ' (+' + country.dial + ')';
     return option;
   }));
 }
@@ -184,14 +183,26 @@ async function initRecoveryPhone(client, userId) {
   const saveRegion = iso => {
     try { if (iso) localStorage.setItem(regionKey, iso); else localStorage.removeItem(regionKey); } catch { /* Storage is optional. */ }
   };
-  const selectedCountry = () => recoveryCountries.find(country => country.iso === countryField.value) || recoveryCountries.find(country => country.iso === 'US');
+  const labelCountry = country => country.name + ' (+' + country.dial + ')';
+  const selectedCountry = () => {
+    const value = countryField.value.trim().toLocaleLowerCase();
+    if (!value) return null;
+    return recoveryCountries.find(country => country.name.toLocaleLowerCase() === value
+      || country.iso.toLocaleLowerCase() === value
+      || labelCountry(country).toLocaleLowerCase() === value) || null;
+  };
   const updateHelp = () => {
     const country = selectedCountry();
+    if (!country) {
+      phoneField.placeholder = 'Enter a number after selecting a country';
+      phoneHelp.textContent = 'Type a country or region name and choose a matching suggestion. To remove a saved number, clear the phone field and save. A number must be verified before it can be used for recovery.';
+      return;
+    }
     phoneField.placeholder = country.example;
     phoneHelp.textContent = 'Choose ' + country.name + ' (+' + country.dial + ') and enter the number in this local format: ' + country.example + '. To remove a saved number, clear the field and save. A number must be verified before it can be used for recovery.';
   };
-  const formatCurrentValue = () => {
-    const country = selectedCountry();
+  const formatCurrentValue = (country = selectedCountry()) => {
+    if (!country) return;
     const raw = phoneField.value;
     let digits = raw.replace(/\D/g, '');
     if (raw.trim().startsWith('+') && digits.startsWith(country.dial)) digits = digits.slice(country.dial.length);
@@ -199,22 +210,36 @@ async function initRecoveryPhone(client, userId) {
     phoneField.value = formatPhoneInput(digits, country);
   };
 
-  countryOptions(countryField);
+  countryOptions(document.querySelector('#recovery-phone-country-options'));
   const savedRegion = rememberedRegion();
-  countryField.value = recoveryCountries.some(country => country.iso === savedRegion) ? savedRegion : 'US';
+  const initialRegion = recoveryCountries.some(country => country.iso === savedRegion) ? savedRegion : 'US';
+  countryField.value = labelCountry(recoveryCountries.find(country => country.iso === initialRegion));
+  let activeCountryIso = initialRegion;
   updateHelp();
-  countryField.addEventListener('change', () => {
-    formatCurrentValue();
+  const handleCountryEntry = () => {
+    const country = selectedCountry();
+    if (!country) {
+      activeCountryIso = '';
+      updateHelp();
+      return;
+    }
+    if (country.iso !== activeCountryIso) {
+      activeCountryIso = country.iso;
+      formatCurrentValue(country);
+    }
     updateHelp();
-  });
-  phoneField.addEventListener('input', formatCurrentValue);
+  };
+  countryField.addEventListener('input', handleCountryEntry);
+  countryField.addEventListener('change', handleCountryEntry);
+  phoneField.addEventListener('input', () => formatCurrentValue());
   try {
     const { data, error } = await phones.select('phone').eq('user_id', userId).maybeSingle();
     if (error) throw error;
     if (data?.phone) {
       const stored = countryForStoredPhone(data.phone, rememberedRegion());
       if (stored) {
-        countryField.value = stored.country.iso;
+        countryField.value = labelCountry(stored.country);
+        activeCountryIso = stored.country.iso;
         phoneField.value = formatPhoneInput(stored.digits, stored.country);
       } else {
         unparsedSavedPhone = data.phone;
@@ -234,6 +259,11 @@ async function initRecoveryPhone(client, userId) {
     event.preventDefault();
     const country = selectedCountry();
     const nationalDigits = phoneField.value.replace(/\D/g, '');
+    if (!country) {
+      phoneStatus.textContent = 'Type a country or region and choose a matching suggestion.';
+      countryField.focus();
+      return;
+    }
     if (!nationalDigits && unparsedSavedPhone) {
       phoneStatus.textContent = 'Your saved number was kept. Choose a country or region and enter a new number to replace it.';
       return;
