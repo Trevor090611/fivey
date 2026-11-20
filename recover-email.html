@@ -30,8 +30,7 @@
     border-radius: 50%;
     overflow: hidden;
   }
-  .recovery-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .recovery-account-email { display: block; font-weight: 400; }
+  .recovery-account-caption { display: block; font-weight: 400; }
   .auth-card #recovery-forgot-password {
     justify-self: start;
     width: fit-content;
@@ -56,33 +55,25 @@
     <label>Username<input name="username" type="text" autocomplete="username" autocapitalize="none" required maxlength="200"></label>
     <button type="submit">Enter</button>
   </form>
-  <form id="verify-account" class="recovery-step" hidden>
-    <h2>Verify your account</h2>
-    <p>If that username matches a Fivey account, a code will be sent to its email address. Check any inbox you might have used to sign up.</p>
-    <label>Verification code<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" required pattern="[0-9]{6,8}" maxlength="8"></label>
-    <div class="recovery-actions">
-      <button type="submit">Verify code</button>
-      <button type="button" id="different-username">Change username</button>
-    </div>
-  </form>
   <section id="select-account" class="recovery-step" hidden>
     <h2>Select your account</h2>
     <button type="button" class="recovery-account" id="account-card">
-      <span><strong id="account-username"></strong><span class="recovery-account-email" id="account-email"></span></span>
-      <span class="recovery-avatar" aria-hidden="true"><span id="account-initial"></span><img id="account-photo" alt="" referrerpolicy="no-referrer" hidden></span>
+      <span><strong id="account-username"></strong><span class="recovery-account-caption">Use this username</span></span>
+      <span class="recovery-avatar" id="account-initial" aria-hidden="true"></span>
     </button>
+    <button type="button" id="different-username">Change username</button>
   </section>
   <form id="recovery-login" class="recovery-step" hidden>
-    <h2>Log in to Fivey</h2>
-    <p id="selected-email"></p>
-    <input name="email" type="hidden" autocomplete="username">
+    <h2>Enter your password again</h2>
+    <p id="selected-username"></p>
+    <input name="username" type="hidden" autocomplete="username">
     <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
     <button type="button" id="recovery-forgot-password">Forgot Password?</button>
     <button type="submit">Log in</button>
   </form>
   <form id="recovery-reset" class="recovery-step" hidden>
     <h2>Reset your password</h2>
-    <p>Send a password reset link to <strong id="reset-email"></strong>.</p>
+    <p>If this username matches a Fivey account, we can send a reset link to the email on that account.</p>
     <div class="recovery-actions">
       <button type="submit">Send reset link</button>
       <button type="button" id="back-to-password">Back to password</button>
@@ -94,26 +85,23 @@
 </main>
 <script type="module">
 import { authConfig } from './auth-config.js';
-import { completed, connect, continueToSite, login } from './auth-client.js';
+import { completed, connect, continueToSite, login } from './auth-client.js?v=username-login1';
 
 const findForm = document.querySelector('#find-account');
-const verifyForm = document.querySelector('#verify-account');
 const selectSection = document.querySelector('#select-account');
 const loginForm = document.querySelector('#recovery-login');
 const resetForm = document.querySelector('#recovery-reset');
 const card = document.querySelector('#account-card');
-const photo = document.querySelector('#account-photo');
-const initial = document.querySelector('#account-initial');
+const forgotPassword = document.querySelector('#recovery-forgot-password');
 const status = document.querySelector('#recovery-status');
-const changeUsername = document.querySelector('#different-username');
 let username = '';
-let account;
 let busy = false;
 
 function show(step) {
-  for (const section of [findForm, verifyForm, selectSection, loginForm, resetForm]) section.hidden = section !== step;
+  for (const section of [findForm, selectSection, loginForm, resetForm]) section.hidden = section !== step;
   status.textContent = '';
-  step.querySelector('input:not([type="hidden"]), #account-card, #recovery-reset button[type="submit"]')?.focus();
+  const field = step.querySelector('input:not([type="hidden"])') || step.querySelector('button');
+  field?.focus();
 }
 
 function submit(form, action) {
@@ -121,98 +109,91 @@ function submit(form, action) {
     event.preventDefault();
     if (busy) return;
     busy = true;
-    const button = form.querySelector('[type="submit"]');
-    button.disabled = true;
-    changeUsername.disabled = true;
+    const controls = [...form.querySelectorAll('button')];
+    for (const control of controls) control.disabled = true;
     status.textContent = '';
     try {
       await action(new FormData(form));
     } catch (error) {
       status.textContent = error.message || 'Something went wrong. Please try again.';
     } finally {
-      button.disabled = false;
-      changeUsername.disabled = false;
+      for (const control of controls) control.disabled = false;
       busy = false;
     }
   });
 }
 
-async function recover(phase, token) {
-  const response = await fetch(new URL('/functions/v1/recover-fivey-email', authConfig.url), {
+function recoveryRequest(phase, details) {
+  return fetch(new URL('/functions/v1/recover-fivey-email', authConfig.url), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', apikey: authConfig.key },
-    body: JSON.stringify({ phase, username, token }),
+    cache: 'no-store',
+    redirect: 'error',
+    body: JSON.stringify({ phase, username, ...details }),
   });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.error || 'Account recovery is unavailable. Please try again.');
-  return data;
 }
 
-submit(findForm, async fields => {
+submit(findForm, fields => {
   username = fields.get('username').trim();
   if (!username) throw new Error('Enter your username.');
-  await recover('send');
-  show(verifyForm);
-});
-
-changeUsername.addEventListener('click', () => {
-  verifyForm.reset();
-  show(findForm);
-});
-
-submit(verifyForm, async fields => {
-  const result = await recover('verify', fields.get('code'));
-  account = result.account;
-  if (!account?.email) throw new Error('That code could not be verified.');
-  verifyForm.reset();
-  const accountName = account.username || username;
-  document.querySelector('#account-username').textContent = accountName;
-  document.querySelector('#account-email').textContent = account.email;
-  initial.textContent = accountName.slice(0, 1).toUpperCase();
-  if (account.avatar) photo.src = account.avatar;
+  document.querySelector('#account-username').textContent = username;
+  document.querySelector('#account-initial').textContent = username.slice(0, 1).toUpperCase();
   show(selectSection);
 });
 
-photo.addEventListener('load', () => {
-  photo.hidden = false;
-  initial.hidden = true;
-});
-photo.addEventListener('error', () => {
-  photo.hidden = true;
-  initial.hidden = false;
-});
+document.querySelector('#different-username').addEventListener('click', () => show(findForm));
 
 card.addEventListener('click', () => {
-  document.querySelector('#selected-email').textContent = account.email;
-  loginForm.elements.email.value = account.email;
+  document.querySelector('#selected-username').textContent = username;
+  loginForm.elements.username.value = username;
   show(loginForm);
 });
 
-document.querySelector('#recovery-forgot-password').addEventListener('click', () => {
-  if (busy || !account?.email) return;
+forgotPassword.addEventListener('click', () => {
   loginForm.elements.password.value = '';
-  document.querySelector('#reset-email').textContent = account.email;
   show(resetForm);
 });
 
-document.querySelector('#back-to-password').addEventListener('click', () => {
-  if (!busy) show(loginForm);
-});
+document.querySelector('#back-to-password').addEventListener('click', () => show(loginForm));
+
+async function resetTransport(input, init) {
+  const request = new Request(input, init);
+  const resetEndpoint = new URL('/auth/v1/recover', authConfig.url);
+  const requested = new URL(request.url);
+  if (request.method !== 'POST' || requested.origin !== resetEndpoint.origin || requested.pathname !== resetEndpoint.pathname) {
+    return fetch(request);
+  }
+  // Supabase writes the verifier in this tab. The server adds the private account email.
+  const body = await request.json();
+  return recoveryRequest('reset', { challenge: body.code_challenge });
+}
 
 submit(resetForm, async () => {
-  const auth = await connect();
-  if (!auth || !account?.email) throw new Error('Password reset is unavailable. Please try again.');
-  const { error } = await auth.resetPasswordForEmail(account.email, { redirectTo: login.href });
-  if (error) throw new Error('Could not send a reset link. Please wait a moment and try again.');
-  status.textContent = 'Check your inbox for the reset link. Open it in this same browser tab.';
+  const auth = await connect({ fetch: resetTransport });
+  if (!auth) throw new Error('Password reset is unavailable. Please try again.');
+  const { error } = await auth.resetPasswordForEmail('recovery@example.invalid', { redirectTo: login.href });
+  if (error) throw new Error('Could not request a reset link. Please wait a moment and try again.');
+  status.textContent = 'If the username matches an account, check its inbox for a reset link. Open it in this same browser tab.';
 });
 
 submit(loginForm, async fields => {
   const auth = await connect();
   if (!auth) throw new Error('Fivey sign-in is unavailable. Please try again.');
-  const { data, error } = await auth.signInWithPassword({ email: account.email, password: fields.get('password') });
-  if (error?.code === 'invalid_credentials') throw new Error('Incorrect password. Please try again.');
-  if (error) throw new Error('Fivey could not log you in. Please try again.');
+  let response;
+  try {
+    response = await recoveryRequest('password', { password: fields.get('password') });
+  } catch {
+    throw new Error('Fivey could not connect. Please try again.');
+  } finally {
+    loginForm.elements.password.value = '';
+  }
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.session) {
+    if (response.status === 400) throw new Error('Incorrect username or password. Please try again.');
+    throw new Error('Fivey could not log you in. Please try again.');
+  }
+  const { data, error } = await auth.setSession(result.session);
+  if (error || !data.user) throw new Error('Fivey could not open your session. Please try again.');
   if (completed(data.user)) continueToSite();
   else location.replace(login.href);
 });
