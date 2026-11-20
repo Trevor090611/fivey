@@ -45,6 +45,50 @@ async function loadSavedPhoto() {
   return googlePhoto;
 }
 
+async function initRecoveryPhone(client, userId) {
+  const phoneForm = document.querySelector('#recovery-phone-form');
+  if (!phoneForm) return;
+  const phoneField = phoneForm.querySelector('input');
+  const submit = phoneForm.querySelector('button[type="submit"]');
+  const phoneStatus = document.querySelector('#recovery-phone-status');
+  const phones = client.from('fivey_recovery_phones');
+  try {
+    const { data, error } = await phones.select('phone').eq('user_id', userId).maybeSingle();
+    if (error) throw error;
+    phoneField.value = data?.phone || '';
+    phoneField.disabled = false;
+    submit.disabled = false;
+  } catch {
+    phoneStatus.textContent = 'Could not load your recovery phone. Refresh the page to try again.';
+    return;
+  }
+
+  phoneForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    const phone = phoneField.value.trim().replace(/[\s().-]/g, '');
+    if (phone && !/^[+][1-9][0-9]{7,14}$/.test(phone)) {
+      phoneStatus.textContent = 'Enter a phone number with its country code, starting with +.';
+      phoneField.focus();
+      return;
+    }
+
+    phoneStatus.textContent = '';
+    phoneField.disabled = submit.disabled = true;
+    try {
+      const { error } = phone
+        ? await phones.upsert({ user_id: userId, phone })
+        : await phones.delete().eq('user_id', userId);
+      if (error) throw error;
+      phoneField.value = phone;
+      phoneStatus.textContent = phone ? 'Recovery phone saved. Verification pending.' : 'Recovery phone removed.';
+    } catch {
+      phoneStatus.textContent = 'Could not save your recovery phone. Please try again.';
+    } finally {
+      phoneField.disabled = submit.disabled = false;
+    }
+  });
+}
+
 try {
   client = await connectClient();
   auth = client?.auth;
@@ -53,6 +97,7 @@ try {
   if (error) throw error;
   user = data.user;
   if (!user) throw new Error('Sign in to update your settings.');
+  void initRecoveryPhone(client, user.id);
   usernameField.value = user.user_metadata?.fivey_username || user.email?.split('@')[0] || '';
   roleField.value = ['student', 'teacher'].includes(user.user_metadata?.fivey_role)
     ? user.user_metadata.fivey_role
