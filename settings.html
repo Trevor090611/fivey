@@ -24,6 +24,8 @@ h1{font-size:clamp(36px,6vw,64px)}
 .hero p{margin-top:12px;color:#d6e0d7}
 .profile-section{padding:32px 0}
 .profile-card{width:min(100%,560px);padding:clamp(20px,4vw,32px);border:1px solid var(--line);border-radius:16px;background:var(--white)}
+.recovery-phone-card{margin-top:20px}
+#recovery-phone-help{font-size:14px;color:var(--muted)}
 .profile-card form{display:grid;gap:16px}
 .profile-picture{display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
 .profile-picture img{width:76px;height:76px;flex:none;border:1px solid var(--line);border-radius:50%;object-fit:cover;background:#f8f7ef}
@@ -74,10 +76,21 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
         </form>
         <p class="profile-status" id="profile-status" role="status" aria-live="polite"></p>
       </div>
+      <section class="profile-card recovery-phone-card" aria-labelledby="recovery-phone-title">
+        <form id="recovery-phone-form">
+          <h2 id="recovery-phone-title">Account recovery</h2>
+          <label for="recovery-phone">Recovery phone number (optional)
+            <input id="recovery-phone" name="recovery-phone" type="tel" autocomplete="tel" placeholder="+1 202 555 0148" maxlength="32" aria-describedby="recovery-phone-help" disabled>
+          </label>
+          <p id="recovery-phone-help">Include your country code. To remove a saved number, clear the field and save. A number must be verified before it can be used for recovery.</p>
+          <button class="practice-button" type="submit" disabled>Save recovery phone</button>
+        </form>
+        <p class="profile-status" id="recovery-phone-status" role="status" aria-live="polite"></p>
+      </section>
     </div>
   </section>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="./account.html">My Account</a></div></footer>
-<script type="module" src="./settings.js?v=profile3"></script>
+<script type="module" src="./settings.js?v=recovery-phone1"></script>
 </body>
 </html>
