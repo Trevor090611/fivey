@@ -14,7 +14,7 @@
   .auth-card .recovery-actions { display: flex; flex-wrap: wrap; gap: .65rem; }
   .auth-card .recovery-account {
     display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 3rem;
     align-items: center;
     gap: .75rem;
     text-align: left;
@@ -32,6 +32,21 @@
   }
   .recovery-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .recovery-account-email { display: block; font-weight: 400; }
+  .auth-card #recovery-forgot-password {
+    justify-self: start;
+    width: fit-content;
+    padding: .25rem 0;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none;
+    color: inherit !important;
+    font: inherit;
+    font-size: .85rem;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .auth-card #recovery-forgot-password:hover { text-decoration-thickness: 2px; }
+  .auth-card #recovery-forgot-password:focus-visible { text-decoration-thickness: 3px; }
 </style>
 </head>
 <body class="fivey-login">
@@ -53,8 +68,8 @@
   <section id="select-account" class="recovery-step" hidden>
     <h2>Select your account</h2>
     <button type="button" class="recovery-account" id="account-card">
-      <span class="recovery-avatar" aria-hidden="true"><span id="account-initial"></span><img id="account-photo" alt="" referrerpolicy="no-referrer" hidden></span>
       <span><strong id="account-username"></strong><span class="recovery-account-email" id="account-email"></span></span>
+      <span class="recovery-avatar" aria-hidden="true"><span id="account-initial"></span><img id="account-photo" alt="" referrerpolicy="no-referrer" hidden></span>
     </button>
   </section>
   <form id="recovery-login" class="recovery-step" hidden>
@@ -62,7 +77,16 @@
     <p id="selected-email"></p>
     <input name="email" type="hidden" autocomplete="username">
     <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+    <button type="button" id="recovery-forgot-password">Forgot Password?</button>
     <button type="submit">Log in</button>
+  </form>
+  <form id="recovery-reset" class="recovery-step" hidden>
+    <h2>Reset your password</h2>
+    <p>Send a password reset link to <strong id="reset-email"></strong>.</p>
+    <div class="recovery-actions">
+      <button type="submit">Send reset link</button>
+      <button type="button" id="back-to-password">Back to password</button>
+    </div>
   </form>
   <p id="recovery-status" role="status" aria-live="polite"></p>
   <a class="recovery-back" href="./login.html">Back to log in</a>
@@ -76,6 +100,7 @@ const findForm = document.querySelector('#find-account');
 const verifyForm = document.querySelector('#verify-account');
 const selectSection = document.querySelector('#select-account');
 const loginForm = document.querySelector('#recovery-login');
+const resetForm = document.querySelector('#recovery-reset');
 const card = document.querySelector('#account-card');
 const photo = document.querySelector('#account-photo');
 const initial = document.querySelector('#account-initial');
@@ -86,9 +111,9 @@ let account;
 let busy = false;
 
 function show(step) {
-  for (const section of [findForm, verifyForm, selectSection, loginForm]) section.hidden = section !== step;
+  for (const section of [findForm, verifyForm, selectSection, loginForm, resetForm]) section.hidden = section !== step;
   status.textContent = '';
-  step.querySelector('input:not([type="hidden"]), #account-card')?.focus();
+  step.querySelector('input:not([type="hidden"]), #account-card, #recovery-reset button[type="submit"]')?.focus();
 }
 
 function submit(form, action) {
@@ -161,6 +186,25 @@ card.addEventListener('click', () => {
   document.querySelector('#selected-email').textContent = account.email;
   loginForm.elements.email.value = account.email;
   show(loginForm);
+});
+
+document.querySelector('#recovery-forgot-password').addEventListener('click', () => {
+  if (busy || !account?.email) return;
+  loginForm.elements.password.value = '';
+  document.querySelector('#reset-email').textContent = account.email;
+  show(resetForm);
+});
+
+document.querySelector('#back-to-password').addEventListener('click', () => {
+  if (!busy) show(loginForm);
+});
+
+submit(resetForm, async () => {
+  const auth = await connect();
+  if (!auth || !account?.email) throw new Error('Password reset is unavailable. Please try again.');
+  const { error } = await auth.resetPasswordForEmail(account.email, { redirectTo: login.href });
+  if (error) throw new Error('Could not send a reset link. Please wait a moment and try again.');
+  status.textContent = 'Check your inbox for the reset link. Open it in this same browser tab.';
 });
 
 submit(loginForm, async fields => {
