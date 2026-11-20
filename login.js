@@ -10,7 +10,7 @@ let busy = false;
 
 function show(stage) {
   for (const form of forms) form.hidden = form.dataset.stage !== stage;
-  modes.hidden = stage === 'password';
+  modes.hidden = ['password', 'reset-password'].includes(stage);
   forms.find(form => form.dataset.stage === stage)?.querySelector('input')?.focus();
 }
 
@@ -50,12 +50,48 @@ try {
   if (!auth) {
     status.textContent = 'Fivey sign-in is being set up.';
   } else {
+    let recoverySession = false;
+    const { data: { subscription } } = auth.onAuthStateChange(event => {
+      if (event !== 'PASSWORD_RECOVERY' || !forms.some(form => form.dataset.stage === 'reset-password')) return;
+      recoverySession = true;
+      status.textContent = '';
+      show('reset-password');
+    });
     const { data } = await auth.getUser();
-    if (completed(data.user)) {
+    if (completed(data.user) && !recoverySession) {
+      subscription.unsubscribe();
       continueToSite();
     } else {
       status.textContent = '';
-      show(data.user?.email_confirmed_at ? 'password' : 'login');
+      show(recoverySession ? 'reset-password' : data.user?.email_confirmed_at ? 'password' : 'login');
+      const forgotPassword = document.querySelector('#forgot-password');
+      if (forgotPassword) {
+        const loginEmail = document.querySelector('[data-stage="login"] input[name="email"]');
+        const recoveryEmail = document.querySelector('[data-stage="recover-email"] input[name="email"]');
+        forgotPassword.addEventListener('click', () => {
+          if (busy) return;
+          recoveryEmail.value = loginEmail.value;
+          status.textContent = '';
+          show('recover-email');
+        });
+        document.querySelector('#cancel-recovery').addEventListener('click', () => {
+          if (busy) return;
+          status.textContent = '';
+          show('login');
+        });
+        bind('recover-email', async values => {
+          checked(await auth.resetPasswordForEmail(values.get('email').trim(), { redirectTo: login.href }));
+          status.textContent = 'If a Fivey account uses that email, a reset link will arrive shortly. Open it in this same browser tab.';
+        });
+        bind('reset-password', async values => {
+          if (!recoverySession) throw new Error('Request a new password reset link to continue.');
+          const password = values.get('password');
+          if (password !== values.get('confirm')) throw new Error('Your passwords must match.');
+          checked(await auth.updateUser({ password }));
+          recoverySession = false;
+          continueToSite();
+        });
+      }
       document.querySelector('#show-signup').addEventListener('click', () => show('email'));
       document.querySelector('#show-login').addEventListener('click', () => show('login'));
       document.querySelector('#resend').addEventListener('click', () => run(sendCode));
@@ -63,9 +99,13 @@ try {
         checked(await auth.signInWithOAuth({ provider: 'google', options: { redirectTo: login.href } }));
       }));
       bind('login', async values => {
-        const result = checked(await auth.signInWithPassword({
+        const response = await auth.signInWithPassword({
           email: values.get('email').trim(), password: values.get('password')
-        }));
+        });
+        if (response.error?.code === 'invalid_credentials') {
+          throw new Error('Incorrect email address or password. Please try again.');
+        }
+        const result = checked(response);
         if (completed(result.user)) continueToSite();
         else show('password');
       });
