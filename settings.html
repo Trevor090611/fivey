@@ -83,8 +83,9 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
           <h2 id="recovery-phone-title">Account recovery</h2>
           <div class="recovery-phone-fields">
             <label for="recovery-phone-country">Country or region
-              <select id="recovery-phone-country" name="recovery-phone-country" autocomplete="tel-country-code" aria-describedby="recovery-phone-help" disabled></select>
+              <input id="recovery-phone-country" name="recovery-phone-country" type="text" list="recovery-phone-country-options" autocomplete="country-name" autocapitalize="words" aria-autocomplete="list" placeholder="Search country or region" aria-describedby="recovery-phone-help" required disabled>
             </label>
+            <datalist id="recovery-phone-country-options"></datalist>
             <label for="recovery-phone">Phone number
               <input id="recovery-phone" name="recovery-phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(202) 555-0148" maxlength="32" aria-describedby="recovery-phone-help" disabled>
             </label>
@@ -98,6 +99,6 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
   </section>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="./account.html">My Account</a></div></footer>
-<script type="module" src="./settings.js?v=country-phone1"></script>
+<script type="module" src="./settings.js?v=country-search1"></script>
 </body>
 </html>
