@@ -27,7 +27,7 @@ export function continueToSite() {
   location.replace(destination.href);
 }
 
-export async function connectClient() {
+export async function connectClient({ fetch: customFetch } = {}) {
   if (!authConfig.url || !authConfig.key) return null;
   const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.95.3');
   const storage = window.sessionStorage;
@@ -38,6 +38,7 @@ export async function connectClient() {
   }
 
   return createClient(authConfig.url, authConfig.key, {
+    ...(customFetch ? { global: { fetch: customFetch } } : {}),
     auth: {
       flowType: 'pkce',
       detectSessionInUrl: true,
@@ -47,8 +48,8 @@ export async function connectClient() {
   });
 }
 
-export async function connect() {
-  const client = await connectClient();
+export async function connect(options) {
+  const client = await connectClient(options);
   return client?.auth ?? null;
 }
 
