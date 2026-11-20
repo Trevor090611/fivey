@@ -286,7 +286,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 :root[data-fivey-dark] main[data-category="humanities"] :is(h1,h2,h3,h4,h5,h6) { color: #ff4fd8 !important; }
 
 /* Highlight Humanities course cards with a magenta outline. */
-:root[data-fivey-dark] .directory .card[data-category="humanities"] { border-color: #ff4fd8 !important; }
+:root[data-fivey-dark] .directory .card[data-category="humanities"] { border-color: #ff4fd8 !important; background-image: linear-gradient(#ff4fd8,#ff4fd8) !important; }
 
 /* Use the same magenta sweep on Humanities items in AP Subjects. */
 :root[data-fivey-dark] header nav .fivey-subjects a[data-category="humanities"] {
