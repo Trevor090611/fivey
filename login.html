@@ -7,7 +7,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Log in | Fivey</title>
 <link rel="stylesheet" href="./auth.css?v=motion5">
-<script type="module" src="./login.js?v=3"></script>
+<script type="module" src="./login.js?v=recovery1"></script>
+<style>
+  .auth-card .recovery-links { display: grid; justify-items: start; gap: .35rem; }
+  .auth-card .recovery-links .recovery-link {
+    all: unset;
+    display: block;
+    padding-block: .25rem;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  .auth-card .recovery-links .recovery-link:hover { text-decoration: underline; }
+  .auth-card .recovery-links .recovery-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  .auth-card .recovery-links .recovery-link::before,
+  .auth-card .recovery-links .recovery-link::after,
+  .auth-card .recovery-links .recovery-link::-webkit-details-marker { display: none; }
+  .auth-card .recovery-links p { margin: .25rem 0 .5rem; }
+</style>
 </head>
 <body class="fivey-login">
 <main class="auth-card">
@@ -22,7 +39,26 @@
     <h2>Log in with email</h2>
     <label>Email address<input name="email" type="email" autocomplete="username" required></label>
     <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+    <div class="recovery-links">
+      <details>
+        <summary class="recovery-link">Forgot Email Address?</summary>
+        <p>Check your password manager for a saved Fivey login, or search your inboxes for the Fivey verification email.</p>
+      </details>
+      <button type="button" class="recovery-link" id="forgot-password">Forgot Password?</button>
+    </div>
     <button type="submit">Log in</button>
+  </form>
+  <form data-stage="recover-email" hidden>
+    <h2>Reset your password</h2>
+    <label>Email address<input name="email" type="email" autocomplete="email" required></label>
+    <button type="submit">Send reset link</button>
+    <button type="button" id="cancel-recovery">Back to log in</button>
+  </form>
+  <form data-stage="reset-password" hidden>
+    <h2>Choose a new password</h2>
+    <label>New password<input name="password" type="password" autocomplete="new-password" minlength="8" required></label>
+    <label>Confirm password<input name="confirm" type="password" autocomplete="new-password" minlength="8" required></label>
+    <button type="submit">Save new password</button>
   </form>
   <form data-stage="email" hidden>
     <h2>Create an account</h2>
