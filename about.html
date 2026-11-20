@@ -18,7 +18,6 @@ a:focus-visible{outline:3px solid #467335;outline-offset:5px}
 header{border-bottom:1px solid var(--line)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 nav a{font-size:14px;font-weight:700}
-
 main{flex:1;text-align:center}
 .hero{background:var(--ink);color:var(--white);padding:clamp(40px,8vw,92px) 0}
 h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em;margin:0}
@@ -29,6 +28,11 @@ h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em;margin
 .bio p{font-size:18px;color:var(--muted);margin-bottom:18px}
 .bio ul{padding-left:24px;margin-top:0;margin-bottom:20px;color:var(--muted);font-size:18px}
 .bio li{padding-block:3px}
+.intro-layout{width:min(100%,1000px);margin:0 auto 24px;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,340px);gap:clamp(24px,4vw,48px);align-items:start}
+.intro-copy p{width:100%;margin-inline:0}
+.intro-photo{margin:4px 0 0}
+.intro-photo img{display:block;width:100%;aspect-ratio:1.1/1;object-fit:cover;object-position:center;border-radius:24px;box-shadow:0 16px 40px rgba(0,0,0,.2)}
+@media(max-width:760px){.intro-layout{grid-template-columns:1fr;gap:4px}.intro-photo{width:min(100%,420px);justify-self:center;margin-top:4px}}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
 @view-transition{navigation:auto}
 ::view-transition-group(root){background:#f8f7ef}
@@ -49,9 +53,14 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <main>
   <section class="hero" aria-labelledby="title"><div class="wrap"><h1 id="title">About Me :D</h1></div></section>
   <div class="wrap bio">
-    <p>Dear Users,</p>
-    <p>Yo! This is Kayden Cheung here, the developer of Fivey. I’m an international student from Hong Kong. I moved to New Jersey for high school, and have just graduated. In the fall of 2027, I’ll start college as a freshman, majoring in Molecular and Cellular Biology on a pre-med track.</p>
-    <p>Chemistry and biology are my favorite subjects. I’m very passionate about oncology. Fascinated by the potential of genetically engineering CAR-T cells to fight cancer, my long-term goal in medicine is to bridge the communication and knowledge gap between clinical cancer department operations, and the technological advances happening in laboratory oncology research. Patients benefit most when breakthroughs in the lab and care in the clinic work closely together.</p>
+    <div class="intro-layout">
+      <div class="intro-copy">
+        <p>Dear Users,</p>
+        <p>Yo! This is Kayden Cheung here, the developer of Fivey. I’m an international student from Hong Kong. I moved to New Jersey for high school, and have just graduated. In the fall of 2027, I’ll start college as a freshman, majoring in Molecular and Cellular Biology on a pre-med track.</p>
+        <p>Chemistry and biology are my favorite subjects. I’m very passionate about oncology. Fascinated by the potential of genetically engineering CAR-T cells to fight cancer, my long-term goal in medicine is to bridge the communication and knowledge gap between clinical cancer department operations, and the technological advances happening in laboratory oncology research. Patients benefit most when breakthroughs in the lab and care in the clinic work closely together.</p>
+      </div>
+      <figure class="intro-photo"><img src="./me.jpeg" alt="Kayden Cheung" loading="lazy"></figure>
+    </div>
     <p>Outside of academics, I play a lot of basketball as a shooting guard. It’s taught me discipline and resilience, all of which help during AP exam season.</p>
 
     <h2>Why I Built This Website</h2>
