@@ -73,3 +73,55 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 .auth-card .role-options { display: flex; flex-wrap: wrap; gap: 12px; }
 .auth-card .role-options label { display: flex; align-items: center; gap: 6px; }
 .auth-card .role-options input { width: auto; padding: 0; accent-color: #294735; }
+
+/* Page entrances begin when the sign-in gate reveals the content. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Overlap the incoming page fade with the existing outgoing fade. */
+  :root::view-transition-new(root) {
+    animation-delay: 100ms;
+    animation-duration: 480ms;
+  }
+
+  body > header :where(.brand, nav > a, .fivey-orbies, .fivey-user-label),
+  body > footer > .wrap,
+  body > :where(#macro-credits, #chemistry-credits),
+  main :where(h1, h2, h3, h4, h5, h6, p, dt, dd, figcaption, label, legend, .hero .tag, li:not(:has(p, button, a.practice-button))):not(:where(.progress-quiz *)),
+  .fivey-welcome-dialog :where(h2, p) {
+    animation: fivey-text-enter 560ms cubic-bezier(.2, .65, .3, 1) backwards;
+  }
+
+  main :where(p, dd, figcaption, label):not(:where(.progress-quiz *)) {
+    animation-delay: 65ms;
+  }
+
+  main :where(img, svg[role="img"], .mark, .hero-equations):not(:where(.progress-quiz *)),
+  .download-backdrop :where(img, .hero-equations) {
+    animation: fivey-art-enter 720ms cubic-bezier(.2, .65, .3, 1) 35ms backwards;
+  }
+
+  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, a.card, .home-main .hero a):not(:where(.progress-quiz *)),
+  body > header .fivey-subjects-trigger {
+    --fivey-button-enter-delay: 100ms;
+    animation: fivey-button-enter 510ms cubic-bezier(.2, .65, .3, 1) var(--fivey-button-enter-delay) backwards;
+  }
+
+  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(2) {
+    --fivey-button-enter-delay: 145ms;
+  }
+
+  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(n + 3) {
+    --fivey-button-enter-delay: 190ms;
+  }
+
+  @keyframes fivey-text-enter {
+    from { opacity: .15; translate: 0 12px; }
+  }
+
+  @keyframes fivey-art-enter {
+    from { opacity: 0; scale: .975; }
+  }
+
+  @keyframes fivey-button-enter {
+    from { opacity: .35; transform: translateY(8px); }
+  }
+}
