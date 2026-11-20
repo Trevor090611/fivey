@@ -2,6 +2,7 @@
 <html lang="en" class="fivey-auth-pending">
 <head>
 <meta charset="utf-8">
+<script src="./theme.js?v=1"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Manage your Fivey username, account role, and profile picture.">
 <title>Settings | Fivey</title>
@@ -40,7 +41,7 @@ h1{font-size:clamp(36px,6vw,64px)}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
 @media(max-width:520px){footer .bar{flex-wrap:wrap}.profile-picture{align-items:flex-start}.profile-picture img{width:64px;height:64px}}
 </style>
-<link rel="stylesheet" href="./auth.css">
+<link rel="stylesheet" href="./auth.css?v=theme1">
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
 </head>
 <body>
@@ -67,6 +68,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
           </div>
           <label for="profile-username">Username<input id="profile-username" name="username" type="text" autocomplete="nickname" required></label>
           <label for="profile-role">I am a<select id="profile-role" name="role" required><option value="" disabled>Select student or teacher</option><option value="student">Student</option><option value="teacher">Teacher</option></select></label>
+          <button class="practice-button" id="fivey-theme-toggle" type="button">Turn on Dark Theme 🌙</button>
           <button class="practice-button" type="submit">Save Settings</button>
         </form>
         <p class="profile-status" id="profile-status" role="status" aria-live="polite"></p>
