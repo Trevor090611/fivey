@@ -13,10 +13,21 @@
   .auth-card .recovery-links .recovery-link {
     all: unset;
     display: block;
-    padding-block: .25rem;
+    width: fit-content;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
     color: inherit;
     font: inherit;
+    font-size: .85rem;
+    line-height: 1.35;
+    text-decoration: underline;
+    text-underline-offset: 2px;
     cursor: pointer;
+  }
+  .auth-card .recovery-links button.recovery-link {
+    appearance: none;
+    background: transparent;
   }
   .auth-card .recovery-links .recovery-link:hover { text-decoration: underline; }
   .auth-card .recovery-links .recovery-link:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
