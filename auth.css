@@ -268,3 +268,16 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
     transition: none;
   }
 }
+
+/* Keep every dark-mode top-bar control box outlined in cyan. */
+:root[data-fivey-dark] header nav .fivey-account-actions :is(.fivey-orbies,.fivey-streak,.fivey-subjects-trigger,.fivey-user-label,.fivey-user-dropdown,.fivey-subjects ul,.fivey-user-avatar) { border-color: var(--fivey-cyan) !important; }
+
+/* Course category pills use black text for clear contrast. */
+.directory .card[data-category="stem"] .tag { color: #000 !important; }
+.directory .card[data-category="humanities"] .tag { background: #ff4fd8 !important; color: #000 !important; }
+
+/* Humanities course buttons use a magenta sweep in dark mode. */
+:root[data-fivey-dark] main[data-category="humanities"] :is(button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],a.practice-button,a.intro-link,a.card,.profile-picture-upload) {
+  border-color: #ff4fd8 !important;
+  background-image: linear-gradient(#ff4fd8,#ff4fd8) !important;
+}
