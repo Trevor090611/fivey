@@ -13,6 +13,26 @@
     }
   }
 
+  function turnOffDarkThemeSmoothly() {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion || !document.startViewTransition) {
+      applyTheme(false);
+      return;
+    }
+
+    root.classList.add('fivey-theme-transition');
+    const transitionStyle = document.createElement('style');
+    transitionStyle.textContent = '@media (prefers-reduced-motion: no-preference) { :root.fivey-theme-transition::view-transition-new(root) { animation-duration: 1200ms; animation-delay: 0ms; } }';
+    document.head.append(transitionStyle);
+
+    const transition = document.startViewTransition(() => applyTheme(false));
+    const cleanup = () => {
+      root.classList.remove('fivey-theme-transition');
+      transitionStyle.remove();
+    };
+    transition.finished.then(cleanup, cleanup);
+  }
+
   function saveTheme(enabled) {
     try {
       localStorage.setItem(storageKey, enabled ? 'dark' : 'light');
@@ -39,7 +59,7 @@
     toggle.disabled = true;
 
     const style = document.createElement('style');
-    style.textContent =       '.fivey-theme-countdown{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;width:100vw;height:100vh;height:100dvh;margin:0;background:rgba(255,255,255,.7);color:#d9f783;font:900 clamp(12rem,52vmin,70vh)/.85 system-ui,sans-serif;transition:background-color 1000ms ease,color 1000ms ease;pointer-events:all}' +
+    style.textContent = '.fivey-theme-countdown{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;width:100vw;height:100vh;height:100dvh;margin:0;background:rgba(255,255,255,.7);color:#d9f783;font:900 clamp(12rem,52vmin,70vh)/.85 system-ui,sans-serif;transition:background-color 1000ms ease,color 1000ms ease;pointer-events:all}' +
       '.fivey-theme-countdown.is-darkening{background:rgba(0,0,0,.7);color:#62e7ff}' +
       '.fivey-theme-countdown-number{display:block;text-align:center;line-height:.85}' +
       '@media(prefers-reduced-motion:reduce){.fivey-theme-countdown{transition:none}}';
@@ -80,7 +100,7 @@
         void enableDarkThemeWithCountdown();
         return;
       }
-      applyTheme(false);
+      turnOffDarkThemeSmoothly();
       saveTheme(false);
     });
   });
