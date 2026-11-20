@@ -35,6 +35,13 @@
         courseAnimation = undefined;
         playNextCourseGroup();
       };
+      const midpoint = animation.effect.getComputedTiming().activeDuration / 2;
+      const waitForMidpoint = () => {
+        if (courseAnimation !== animation) return;
+        if (animation.currentTime >= midpoint) advance();
+        else window.requestAnimationFrame(waitForMidpoint);
+      };
+      window.requestAnimationFrame(waitForMidpoint);
       animation.finished.then(advance, advance);
       break;
     }
@@ -81,7 +88,7 @@
         else if (target.dataset.fiveyEntrance !== 'course') reveal(target, 'load');
       }
       playNextCourseGroup();
-    }, 1000);
+    }, 500);
   }
 
   // Watch both the original markup and sections inserted by the course scripts.
