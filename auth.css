@@ -76,52 +76,189 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 
 /* Page entrances begin when the sign-in gate reveals the content. */
 @media (prefers-reduced-motion: no-preference) {
-  /* Overlap the incoming page fade with the existing outgoing fade. */
   :root::view-transition-new(root) {
     animation-delay: 100ms;
-    animation-duration: 480ms;
+    animation-duration: 680ms;
   }
+
+  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :where(.panel, .study-result-card, .account-analytics-card):not([hidden]) {
+    --fivey-section-delay: 220ms;
+  }
+  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(2 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
+    --fivey-section-delay: 740ms;
+  }
+  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(n + 3 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
+    --fivey-section-delay: 1260ms;
+  }
+
+  #course-actions { --fivey-first-action-delay: 740ms; }
+  #resources:has(> :nth-child(2 of .panel:not([hidden]))) ~ #course-actions {
+    --fivey-first-action-delay: 1260ms;
+  }
+  #course-actions > .panel { --fivey-section-delay: var(--fivey-first-action-delay); }
+  #course-actions > :nth-child(2 of .panel:not([hidden])) {
+    --fivey-section-delay: calc(var(--fivey-first-action-delay) + 520ms);
+  }
+  .analytics-insights > .analytics-insight:first-child { --fivey-section-delay: 480ms; }
+  .analytics-insights > .analytics-insight:nth-child(2) { --fivey-section-delay: 1000ms; }
 
   body > header :where(.brand, nav > a, .fivey-orbies, .fivey-user-label),
   body > footer > .wrap,
   body > :where(#macro-credits, #chemistry-credits),
   main :where(h1, h2, h3, h4, h5, h6, p, dt, dd, figcaption, label, legend, .hero .tag, li:not(:has(p, button, a.practice-button))):not(:where(.progress-quiz *)),
   .fivey-welcome-dialog :where(h2, p) {
-    animation: fivey-text-enter 560ms cubic-bezier(.2, .65, .3, 1) backwards;
+    animation: fivey-text-enter 900ms cubic-bezier(.22, .61, .36, 1) var(--fivey-section-delay, 0ms) backwards;
   }
 
   main :where(p, dd, figcaption, label):not(:where(.progress-quiz *)) {
-    animation-delay: 65ms;
+    animation-delay: calc(var(--fivey-section-delay, 0ms) + 85ms);
   }
 
   main :where(img, svg[role="img"], .mark, .hero-equations):not(:where(.progress-quiz *)),
   .download-backdrop :where(img, .hero-equations) {
-    animation: fivey-art-enter 720ms cubic-bezier(.2, .65, .3, 1) 35ms backwards;
+    animation: fivey-art-enter 1080ms cubic-bezier(.22, .61, .36, 1) calc(var(--fivey-section-delay, 0ms) + 50ms) backwards;
   }
 
   :is(main, .fivey-welcome-dialog) :where(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, a.card, .home-main .hero a):not(:where(.progress-quiz *)),
   body > header .fivey-subjects-trigger {
-    --fivey-button-enter-delay: 100ms;
-    animation: fivey-button-enter 510ms cubic-bezier(.2, .65, .3, 1) var(--fivey-button-enter-delay) backwards;
+    --fivey-button-enter-delay: 130ms;
+    animation: fivey-button-enter 840ms cubic-bezier(.22, .61, .36, 1) calc(var(--fivey-section-delay, 0ms) + var(--fivey-button-enter-delay)) backwards;
   }
 
   :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(2) {
-    --fivey-button-enter-delay: 145ms;
+    --fivey-button-enter-delay: 185ms;
+  }
+  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(n + 3) {
+    --fivey-button-enter-delay: 240ms;
   }
 
-  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(n + 3) {
-    --fivey-button-enter-delay: 190ms;
-  }
+  .directory .grid > a.card:nth-child(2) { --fivey-section-delay: 145ms; }
+  .directory .grid > a.card:nth-child(3) { --fivey-section-delay: 300ms; }
+  .directory .grid > a.card:nth-child(4) { --fivey-section-delay: 500ms; }
+  .directory .grid > a.card:nth-child(5) { --fivey-section-delay: 700ms; }
+  .directory .grid > a.card:nth-child(6) { --fivey-section-delay: 900ms; }
+  .directory .grid > a.card:nth-child(n + 7) { --fivey-section-delay: 1100ms; }
 
   @keyframes fivey-text-enter {
-    from { opacity: .15; translate: 0 12px; }
+    from { opacity: .15; translate: 0 14px; }
   }
-
   @keyframes fivey-art-enter {
     from { opacity: 0; scale: .975; }
   }
-
   @keyframes fivey-button-enter {
-    from { opacity: .35; transform: translateY(8px); }
+    from { opacity: .35; transform: translateY(10px); }
+  }
+}
+
+/* Dark colors are opt-in and leave the Fivey logo artwork intact. */
+:root[data-fivey-dark] {
+  color-scheme: dark;
+  --fivey-cyan: #62e7ff;
+  --fivey-navy: #081831;
+  --paper: #000;
+  --white: #000;
+  --ink: var(--fivey-cyan);
+  --green: var(--fivey-cyan);
+  --muted: #ace2ec;
+  --line: #315f71;
+  background: var(--paper);
+}
+
+:root[data-fivey-dark] body,
+:root[data-fivey-dark] body:has(.download-backdrop) { background: var(--paper); color: var(--ink); }
+:root[data-fivey-dark]::view-transition-group(root) { background: var(--paper); }
+:root[data-fivey-dark] .fivey-login { background: var(--fivey-navy); }
+:root[data-fivey-dark] :where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--fivey-cyan);
+  outline-offset: 4px;
+}
+
+:root[data-fivey-dark] body > header:has(.brand) {
+  background: rgb(8 24 49 / 90%);
+  color: var(--ink);
+}
+
+:root[data-fivey-dark] body > header.over-dark-hero,
+:root[data-fivey-dark] body:has(.home-main) > header:not(.over-content) {
+  background: rgb(98 231 255 / 88%);
+  color: var(--paper);
+}
+
+:root[data-fivey-dark] main > .hero { color: var(--ink); }
+:root[data-fivey-dark] main > .hero:not([data-course]) { background: var(--fivey-navy); }
+:root[data-fivey-dark] .hero p { color: var(--muted); }
+:root[data-fivey-dark] :is(.hero, .download-backdrop):is([data-course="biology"], [data-course="environmental-science"]) {
+  --hero-base: var(--fivey-navy);
+  --hero-glow: #17547a;
+  --hero-accent: var(--fivey-cyan);
+  --hero-texture: radial-gradient(ellipse, #62e7ff38 1px, transparent 2px);
+  --hero-texture-size: 22px 22px;
+}
+:root[data-fivey-dark] .home-main .mark { --green: #d9f783; }
+:root[data-fivey-dark] .tag { background: var(--fivey-cyan); color: var(--paper); }
+:root[data-fivey-dark] .hero .tag { background: var(--fivey-cyan); border-color: var(--fivey-cyan); color: var(--paper); }
+
+:root[data-fivey-dark] :is(.auth-card, .fivey-welcome-dialog, .fivey-sign-out-dialog, .fivey-user-label,
+    .fivey-user-dropdown, .fivey-subjects ul, .fivey-user-avatar, .profile-picture img,
+    .fivey-orbies, .fivey-streak, .account-streak, main[data-category="humanities"] .panel,
+    .fivey-chat .chat-panel, .fivey-chat .chat-log, .fivey-chat .chat-message,
+    .fivey-chat .chat-message[data-speaker="You"]),
+:root[data-fivey-dark] body:has(.download-backdrop) > main {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-fivey-dark] :is(.fivey-chat .chat-header, .study-score, .study-countdown[data-state="counting"]) {
+  background: var(--fivey-navy);
+  color: var(--ink);
+}
+:root[data-fivey-dark] .study-countdown[data-state="counting"].is-near-exam { color: #ffacb5; }
+:root[data-fivey-dark] :is(.study-countdown, .account-streak-label, .account-streak-count, .fivey-chat .chat-status) {
+  color: var(--muted);
+}
+:root[data-fivey-dark] :is(.role-options input, .study-planner input[type="checkbox"], .progress-quiz input) {
+  accent-color: var(--fivey-cyan);
+}
+:root[data-fivey-dark] .progress-quiz label[data-result="correct"] { color: var(--fivey-cyan); }
+:root[data-fivey-dark] :is(.progress-quiz label[data-result="incorrect"], #fivey-sign-out-dialog [role="alert"], .card #status) { color: #ffacb5; }
+:root[data-fivey-dark] :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea, option, optgroup) {
+  background-color: var(--paper);
+  border-color: var(--fivey-cyan);
+  color: var(--ink);
+}
+
+:root[data-fivey-dark] :is(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"],
+    a.practice-button, a.intro-link, .home-main .hero a, a.card, .profile-picture-upload, header nav .fivey-subjects a) {
+  border-color: var(--fivey-cyan) !important;
+  background-color: var(--paper) !important;
+  background-image: linear-gradient(var(--fivey-cyan), var(--fivey-cyan)) !important;
+  background-position: right center !important;
+  background-repeat: no-repeat !important;
+  background-size: 0% 100% !important;
+  color: var(--fivey-cyan) !important;
+  transition: background-size 260ms ease-out, translate 160ms ease-out;
+}
+
+:root[data-fivey-dark] a.card small { color: inherit; }
+:root[data-fivey-dark] :is(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"],
+    a.practice-button, a.intro-link, .home-main .hero a, a.card, .profile-picture-upload, header nav .fivey-subjects a):focus-visible:not(:disabled),
+:root[data-fivey-dark] .profile-picture-upload:has(:focus-visible) {
+  background-size: 100% 100% !important;
+  color: var(--paper) !important;
+}
+
+@media (hover: hover) {
+  :root[data-fivey-dark] :is(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"],
+      a.practice-button, a.intro-link, .home-main .hero a, a.card, .profile-picture-upload, header nav .fivey-subjects a):hover:not(:disabled) {
+    background-size: 100% 100% !important;
+    color: var(--paper) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-fivey-dark] :is(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"],
+      a.practice-button, a.intro-link, .home-main .hero a, a.card, .profile-picture-upload, header nav .fivey-subjects a) {
+    transition: none;
   }
 }
