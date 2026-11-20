@@ -128,7 +128,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
     visibility: hidden;
   }
   :root[data-fivey-entrance-pause] #fivey-access-status:has(> a) {
-    animation: fivey-sign-in-status 0s 500ms backwards;
+    animation: fivey-sign-in-status 0s 200ms backwards;
   }
 
   [data-fivey-entrance]:not([data-fivey-revealed]) { opacity: 0; }
@@ -140,7 +140,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   }
 
   [data-fivey-revealed="course"] {
-    /* Symmetric easing puts the visual halfway point at half the duration. */
+    /* The one-third travel point of this easing is used in entrances.js. */
     animation: fivey-course-enter 1450ms cubic-bezier(.35, .2, .65, .8) backwards;
   }
   @keyframes fivey-sign-in-status {

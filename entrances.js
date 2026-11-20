@@ -35,13 +35,14 @@
         courseAnimation = undefined;
         playNextCourseGroup();
       };
-      const midpoint = animation.effect.getComputedTiming().activeDuration / 2;
-      const waitForMidpoint = () => {
+      // The course entrance easing covers one third of the rise at 36.25% of its duration.
+      const nextStartTime = animation.effect.getComputedTiming().activeDuration * .3625;
+      const waitForNextStart = () => {
         if (courseAnimation !== animation) return;
-        if (animation.currentTime >= midpoint) advance();
-        else window.requestAnimationFrame(waitForMidpoint);
+        if (animation.currentTime >= nextStartTime) advance();
+        else window.requestAnimationFrame(waitForNextStart);
       };
-      window.requestAnimationFrame(waitForMidpoint);
+      window.requestAnimationFrame(waitForNextStart);
       animation.finished.then(advance, advance);
       break;
     }
@@ -88,7 +89,7 @@
         else if (target.dataset.fiveyEntrance !== 'course') reveal(target, 'load');
       }
       playNextCourseGroup();
-    }, 500);
+    }, 200);
   }
 
   // Watch both the original markup and sections inserted by the course scripts.
