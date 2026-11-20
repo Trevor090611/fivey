@@ -42,6 +42,8 @@ h1{font-size:clamp(36px,6vw,64px)}
 .profile-card button{justify-self:start;padding:10px 16px;border-radius:6px;font:inherit;font-weight:750;cursor:pointer}
 .profile-status:not(:empty){margin-top:14px;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
+.recovery-phone-fields{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px}
+@media(max-width:520px){.recovery-phone-fields{grid-template-columns:1fr}}
 @media(max-width:520px){footer .bar{flex-wrap:wrap}.profile-picture{align-items:flex-start}.profile-picture img{width:64px;height:64px}}
 </style>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
@@ -79,10 +81,15 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
       <section class="profile-card recovery-phone-card" aria-labelledby="recovery-phone-title">
         <form id="recovery-phone-form">
           <h2 id="recovery-phone-title">Account recovery</h2>
-          <label for="recovery-phone">Recovery phone number (optional)
-            <input id="recovery-phone" name="recovery-phone" type="tel" autocomplete="tel" placeholder="+1 202 555 0148" maxlength="32" aria-describedby="recovery-phone-help" disabled>
-          </label>
-          <p id="recovery-phone-help">Include your country code. To remove a saved number, clear the field and save. A number must be verified before it can be used for recovery.</p>
+          <div class="recovery-phone-fields">
+            <label for="recovery-phone-country">Country or region
+              <select id="recovery-phone-country" name="recovery-phone-country" autocomplete="tel-country-code" aria-describedby="recovery-phone-help" disabled></select>
+            </label>
+            <label for="recovery-phone">Phone number
+              <input id="recovery-phone" name="recovery-phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(202) 555-0148" maxlength="32" aria-describedby="recovery-phone-help" disabled>
+            </label>
+          </div>
+          <p id="recovery-phone-help">Choose your country or region, then enter your number in the local format shown. The calling code is shown in the country list. To remove a saved number, clear the field and save. A number must be verified before it can be used for recovery.</p>
           <button class="practice-button" type="submit" disabled>Save recovery phone</button>
         </form>
         <p class="profile-status" id="recovery-phone-status" role="status" aria-live="polite"></p>
