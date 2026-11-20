@@ -81,29 +81,17 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
     animation-duration: 680ms;
   }
 
-  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :where(.panel, .study-result-card, .account-analytics-card):not([hidden]) {
+  main:not([data-fivey-course]) :where(.columns, .study-results, .account-analytics-list) > :where(.panel, .study-result-card, .account-analytics-card):not([hidden]) {
     --fivey-section-delay: 220ms;
   }
-  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(2 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
+  main:not([data-fivey-course]) :where(.columns, .study-results, .account-analytics-list) > :nth-child(2 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
     --fivey-section-delay: 740ms;
     --fivey-scroll-delay: 290ms;
   }
-  main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(n + 3 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
+  main:not([data-fivey-course]) :where(.columns, .study-results, .account-analytics-list) > :nth-child(n + 3 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
     --fivey-section-delay: 1260ms;
     --fivey-scroll-delay: 580ms;
   }
-
-  #course-actions { --fivey-first-action-delay: 740ms; }
-  #resources:has(> :nth-child(2 of .panel:not([hidden]))) ~ #course-actions {
-    --fivey-first-action-delay: 1260ms;
-  }
-  #course-actions > .panel { --fivey-section-delay: var(--fivey-first-action-delay); }
-  #course-actions > :nth-child(2 of .panel:not([hidden])) {
-    --fivey-section-delay: calc(var(--fivey-first-action-delay) + 520ms);
-    --fivey-scroll-delay: 290ms;
-  }
-  .analytics-insights > .analytics-insight:first-child { --fivey-section-delay: 480ms; }
-  .analytics-insights > .analytics-insight:nth-child(2) { --fivey-section-delay: 1000ms; --fivey-scroll-delay: 290ms; }
 
   .directory .grid > a.card:nth-child(2) { --fivey-section-delay: 145ms; }
   .directory .grid > a.card:nth-child(3) { --fivey-section-delay: 300ms; }
@@ -116,7 +104,6 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
     --fivey-entrance-keyframes: fivey-text-enter;
     --fivey-entrance-duration: 1450ms;
     --fivey-entrance-offset: 0ms;
-    --fivey-entrance-opacity: .15;
   }
   main :where(p, dd, figcaption, label)[data-fivey-entrance="text"] {
     --fivey-entrance-offset: 85ms;
@@ -125,20 +112,26 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
     --fivey-entrance-keyframes: fivey-art-enter;
     --fivey-entrance-duration: 1380ms;
     --fivey-entrance-offset: 50ms;
-    --fivey-entrance-opacity: 0;
   }
   [data-fivey-entrance="button"] {
     --fivey-entrance-keyframes: fivey-button-enter;
     --fivey-entrance-duration: 1150ms;
     --fivey-entrance-offset: 130ms;
-    --fivey-entrance-opacity: .35;
   }
   main [data-fivey-entrance="button"]:nth-child(2) { --fivey-entrance-offset: 185ms; }
   main [data-fivey-entrance="button"]:nth-child(n + 3) { --fivey-entrance-offset: 240ms; }
 
-  [data-fivey-entrance]:not([data-fivey-revealed]) {
-    opacity: var(--fivey-entrance-opacity);
+  :root[data-fivey-entrance-pause] body > :not(header, main, footer, #fivey-access-status),
+  :root[data-fivey-entrance-pause] body > :is(header, footer) > *,
+  :root[data-fivey-entrance-pause] main > :not(.hero),
+  :root[data-fivey-entrance-pause] main > .hero > :not(.hero-art, .hero-equations) {
+    visibility: hidden;
   }
+  :root[data-fivey-entrance-pause] #fivey-access-status:has(> a) {
+    animation: fivey-sign-in-status 0s 1s backwards;
+  }
+
+  [data-fivey-entrance]:not([data-fivey-revealed]) { opacity: 0; }
   [data-fivey-revealed="load"] { --fivey-entrance-order: var(--fivey-section-delay, 0ms); }
   [data-fivey-revealed="scroll"] { --fivey-entrance-order: var(--fivey-scroll-delay, 0ms); }
   [data-fivey-revealed="load"], [data-fivey-revealed="scroll"] {
@@ -146,14 +139,23 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
       calc(var(--fivey-entrance-order) + var(--fivey-entrance-offset)) backwards;
   }
 
+  [data-fivey-revealed="course"] {
+    animation: fivey-course-enter 1450ms cubic-bezier(.28, .50, .38, 1) backwards;
+  }
+  @keyframes fivey-sign-in-status {
+    from { visibility: hidden; }
+  }
   @keyframes fivey-text-enter {
-    from { opacity: .15; translate: 0 14px; }
+    from { opacity: 0; translate: 0 14px; }
+  }
+  @keyframes fivey-course-enter {
+    from { opacity: 0; translate: 0 18px; }
   }
   @keyframes fivey-art-enter {
     from { opacity: 0; scale: .975; }
   }
   @keyframes fivey-button-enter {
-    from { opacity: .35; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(10px); }
   }
 }
 
