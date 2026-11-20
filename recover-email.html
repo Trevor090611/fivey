@@ -66,7 +66,10 @@
     <h2>Select your account</h2>
     <button type="button" class="recovery-account" id="account-card">
       <span><strong id="account-username"></strong><span class="recovery-account-caption">Use this username</span></span>
-      <span class="recovery-avatar" id="account-initial" aria-hidden="true"></span>
+      <span class="recovery-avatar" aria-hidden="true">
+        <span id="account-initial"></span>
+        <img id="account-public-photo" alt="" referrerpolicy="no-referrer" hidden>
+      </span>
     </button>
     <button type="button" id="different-username">Change username</button>
   </section>
@@ -114,6 +117,7 @@ const card = document.querySelector('#account-card');
 const forgotPassword = document.querySelector('#recovery-forgot-password');
 const status = document.querySelector('#recovery-status');
 let username = '';
+let publicPhotoLookup = 0;
 let busy = false;
 
 function show(step) {
@@ -152,11 +156,41 @@ function recoveryRequest(phase, details) {
   });
 }
 
+async function showPublicPhoto(accountName) {
+  const lookup = ++publicPhotoLookup;
+  const image = document.querySelector('#account-public-photo');
+  const fallback = document.querySelector('#account-initial');
+  image.hidden = true;
+  image.removeAttribute('src');
+  fallback.hidden = false;
+
+  try {
+    const response = await fetch(new URL('/rest/v1/rpc/fivey_find_public_photo', authConfig.url), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: authConfig.key },
+      cache: 'no-store',
+      body: JSON.stringify({ lookup_username: accountName }),
+      signal: AbortSignal.timeout(6000),
+    });
+    if (!response.ok) return;
+    const path = await response.json();
+    if (lookup !== publicPhotoLookup || typeof path !== 'string' || !/^[a-f0-9]{64}\/avatar\?v=[0-9]+$/.test(path)) return;
+    image.src = new URL('/storage/v1/object/public/public-profile-photos/' + path, authConfig.url).href;
+    await image.decode();
+    if (lookup !== publicPhotoLookup) return;
+    image.hidden = false;
+    fallback.hidden = true;
+  } catch {
+    // The initial remains visible when there is no usable public photo.
+  }
+}
+
 submit(findForm, fields => {
   username = fields.get('username').trim();
   if (!username) throw new Error('Enter your username.');
   document.querySelector('#account-username').textContent = username;
   document.querySelector('#account-initial').textContent = username.slice(0, 1).toUpperCase();
+  void showPublicPhoto(username);
   show(selectSection);
 });
 
