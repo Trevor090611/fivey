@@ -21,6 +21,7 @@
 
   const observer = new IntersectionObserver(entries => {
     for (const { target, isIntersecting, intersectionRatio } of entries) {
+      if (target.hasAttribute('data-fivey-revealed')) continue;
       if (!target.isConnected || !isIntersecting || intersectionRatio === 0) {
         inView.delete(target);
       } else if (ready) {
