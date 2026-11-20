@@ -57,14 +57,14 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
   <section class="profile-section" aria-label="Account settings">
     <div class="wrap">
       <div class="profile-card">
-        <form id="profile-form">
+        <form id="profile-form" data-photo-visibility="public">
           <div class="profile-picture">
             <img id="profile-picture-preview" alt="Profile picture preview">
             <div class="profile-picture-copy">
               <strong>Profile picture</strong>
-              <p>Your Google account picture is used by default. Upload a JPG, PNG, or WebP image (up to 1 MB).</p>
+              <p>New uploads are public. Anyone who enters your Fivey username can see the photo before signing in. Use a JPG, PNG, or WebP image up to 1 MB.</p>
               <div class="profile-picture-actions">
-                <label class="profile-picture-upload" for="profile-picture-file">Upload picture<input id="profile-picture-file" name="profile-picture" type="file" accept="image/jpeg,image/png,image/webp"></label>
+                <label class="profile-picture-upload" for="profile-picture-file">Upload public photo<input id="profile-picture-file" name="profile-picture" type="file" accept="image/jpeg,image/png,image/webp"></label>
                 <button class="profile-picture-reset" id="profile-picture-reset" type="button">Use Google photo</button>
               </div>
             </div>
@@ -91,6 +91,6 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
   </section>
 </main>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="./account.html">My Account</a></div></footer>
-<script type="module" src="./settings.js?v=recovery-phone1"></script>
+<script type="module" src="./settings.js?v=public-photo1"></script>
 </body>
 </html>
