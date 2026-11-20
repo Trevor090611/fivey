@@ -119,6 +119,8 @@ function createStreakCounter(user, subjectTrigger) {
 }
 
 async function appendAccountNavigation(nav, signOut, user, client) {
+  if (nav.dataset.fiveyAccountNavigation === 'initializing' || nav.querySelector(':scope > .fivey-account-actions')) return;
+  nav.dataset.fiveyAccountNavigation = 'initializing';
   const dropdown = document.createElement('div');
   dropdown.className = 'fivey-subjects';
   const trigger = document.createElement('button');
