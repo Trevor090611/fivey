@@ -184,14 +184,8 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 }
 
 :root[data-fivey-dark] body > header:has(.brand) {
-  background: rgb(8 24 49 / 90%);
+  background: rgb(22 50 84 / 90%);
   color: var(--ink);
-}
-
-:root[data-fivey-dark] body > header.over-dark-hero,
-:root[data-fivey-dark] body:has(.home-main) > header:not(.over-content) {
-  background: rgb(98 231 255 / 88%);
-  color: var(--paper);
 }
 
 :root[data-fivey-dark] main > .hero { color: var(--ink); }
