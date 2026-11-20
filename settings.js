@@ -8,6 +8,7 @@ const picturePreview = document.querySelector('#profile-picture-preview');
 const pictureReset = document.querySelector('#profile-picture-reset');
 const status = document.querySelector('#profile-status');
 const bucket = 'profile-pictures';
+const publicPhotoBucket = 'public-profile-photos';
 const maxPhotoBytes = 1024 * 1024;
 const acceptedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 let client;
@@ -17,6 +18,24 @@ let selectedPhoto = null;
 let removePhoto = false;
 let previewObjectUrl = '';
 let googlePhoto = '';
+
+async function preparePublicPhoto(file) {
+  const image = await createImageBitmap(file);
+  try {
+    const scale = Math.min(1, 512 / Math.max(image.width, image.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Could not prepare the public photo.');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const photo = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', 0.9));
+    if (!photo || photo.size > maxPhotoBytes) throw new Error('Could not prepare the public photo. Choose a smaller image.');
+    return photo;
+  } finally {
+    image.close();
+  }
+}
 
 function defaultGooglePhoto() {
   const identity = user?.identities?.find(entry => entry.provider === 'google')?.identity_data || {};
@@ -151,7 +170,18 @@ try {
     const submit = form.querySelector('button[type="submit"]');
     submit.disabled = true;
     pictureReset.disabled = true;
+    pictureField.disabled = true;
     try {
+      // Only the form that labels uploads as public can publish the selected file.
+      const publishPhoto = selectedPhoto && form.dataset.photoVisibility === 'public';
+      let publicPath;
+      let publicPhoto;
+      if (publishPhoto || removePhoto) {
+        const { data, error } = await client.rpc('fivey_public_photo_path');
+        if (error || !data) throw new Error('Could not open public photo storage. Please try again.');
+        publicPath = data;
+        if (publishPhoto) publicPhoto = await preparePublicPhoto(selectedPhoto);
+      }
       let avatarPath = user.user_metadata?.fivey_avatar_path || null;
       if (selectedPhoto) {
         const { error: uploadError } = await client.storage.from(bucket).upload(user.id + '/avatar', selectedPhoto, {
@@ -180,7 +210,18 @@ try {
       }
       if (selectedPhoto && previewObjectUrl) avatarUrl = previewObjectUrl;
       window.dispatchEvent(new CustomEvent('fivey:profile-updated', { detail: { username, role, avatarUrl } }));
-      status.textContent = 'Settings saved.';
+      if (publicPath) {
+        const publicPhotos = client.storage.from(publicPhotoBucket);
+        const { error } = publicPhoto
+          ? await publicPhotos.upload(publicPath, publicPhoto, { cacheControl: '60', contentType: publicPhoto.type, upsert: true })
+          : await publicPhotos.remove([publicPath]);
+        if (error) {
+          throw new Error(publicPhoto
+            ? 'Settings saved, but the photo could not be published. Try saving again.'
+            : 'Settings saved, but the public photo could not be removed. Try saving again.');
+        }
+      }
+      status.textContent = publicPhoto ? 'Settings saved. Your profile photo is now public.' : 'Settings saved.';
       selectedPhoto = null;
       removePhoto = false;
       pictureField.value = '';
@@ -190,6 +231,7 @@ try {
     } finally {
       submit.disabled = false;
       pictureReset.disabled = false;
+      pictureField.disabled = false;
     }
   });
 } catch (error) {
