@@ -31,6 +31,13 @@
     overflow: hidden;
   }
   .recovery-account-caption { display: block; font-weight: 400; }
+  .auth-card .verified-account {
+    box-sizing: border-box;
+    padding: .75rem;
+    border: 1px solid currentColor;
+    border-radius: .5rem;
+  }
+  .recovery-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .auth-card #recovery-forgot-password {
     justify-self: start;
     width: fit-content;
@@ -79,18 +86,30 @@
       <button type="button" id="back-to-password">Back to password</button>
     </div>
   </form>
+  <section id="verified-account" class="recovery-step" hidden>
+    <h2>You’re signed in</h2>
+    <div class="recovery-account verified-account">
+      <span><strong id="verified-username"></strong><span class="recovery-account-caption" id="verified-email"></span></span>
+      <span class="recovery-avatar" aria-hidden="true">
+        <span id="verified-initial"></span>
+        <img id="verified-photo" alt="" referrerpolicy="no-referrer" hidden>
+      </span>
+    </div>
+    <button type="button" id="continue-to-fivey">Continue to Fivey</button>
+  </section>
   <p id="recovery-status" role="status" aria-live="polite"></p>
   <a class="recovery-back" href="./login.html">Back to log in</a>
   <noscript>Enable JavaScript to recover your account.</noscript>
 </main>
 <script type="module">
 import { authConfig } from './auth-config.js';
-import { completed, connect, continueToSite, login } from './auth-client.js?v=username-login1';
+import { completed, connect, connectClient, continueToSite, login } from './auth-client.js?v=username-login1';
 
 const findForm = document.querySelector('#find-account');
 const selectSection = document.querySelector('#select-account');
 const loginForm = document.querySelector('#recovery-login');
 const resetForm = document.querySelector('#recovery-reset');
+const verifiedSection = document.querySelector('#verified-account');
 const card = document.querySelector('#account-card');
 const forgotPassword = document.querySelector('#recovery-forgot-password');
 const status = document.querySelector('#recovery-status');
@@ -98,7 +117,7 @@ let username = '';
 let busy = false;
 
 function show(step) {
-  for (const section of [findForm, selectSection, loginForm, resetForm]) section.hidden = section !== step;
+  for (const section of [findForm, selectSection, loginForm, resetForm, verifiedSection]) section.hidden = section !== step;
   status.textContent = '';
   const field = step.querySelector('input:not([type="hidden"])') || step.querySelector('button');
   field?.focus();
@@ -176,8 +195,38 @@ submit(resetForm, async () => {
   status.textContent = 'If the username matches an account, check its inbox for a reset link. Open it in this same browser tab.';
 });
 
+const verifiedPhoto = document.querySelector('#verified-photo');
+const verifiedInitial = document.querySelector('#verified-initial');
+verifiedPhoto.addEventListener('load', () => {
+  verifiedPhoto.hidden = false;
+  verifiedInitial.hidden = true;
+});
+verifiedPhoto.addEventListener('error', () => {
+  verifiedPhoto.hidden = true;
+  verifiedInitial.hidden = false;
+});
+document.querySelector('#continue-to-fivey').addEventListener('click', continueToSite);
+
+async function showVerifiedAccount(client, user) {
+  const profile = user.user_metadata || {};
+  const name = profile.fivey_username || username;
+  document.querySelector('#verified-username').textContent = name;
+  document.querySelector('#verified-email').textContent = user.email || '';
+  verifiedInitial.textContent = name.slice(0, 1).toUpperCase();
+  show(verifiedSection);
+
+  const google = user.identities?.find(identity => identity.provider === 'google')?.identity_data;
+  let photoUrl = profile.avatar_url || profile.picture || google?.avatar_url || google?.picture;
+  if (profile.fivey_avatar_path === user.id + '/avatar') {
+    const signed = await client.storage.from('profile-pictures').createSignedUrl(profile.fivey_avatar_path, 120).catch(() => null);
+    if (signed?.data?.signedUrl) photoUrl = signed.data.signedUrl;
+  }
+  if (typeof photoUrl === 'string' && photoUrl.startsWith('https://')) verifiedPhoto.src = photoUrl;
+}
+
 submit(loginForm, async fields => {
-  const auth = await connect();
+  const client = await connectClient();
+  const auth = client?.auth;
   if (!auth) throw new Error('Fivey sign-in is unavailable. Please try again.');
   let response;
   try {
@@ -194,7 +243,7 @@ submit(loginForm, async fields => {
   }
   const { data, error } = await auth.setSession(result.session);
   if (error || !data.user) throw new Error('Fivey could not open your session. Please try again.');
-  if (completed(data.user)) continueToSite();
+  if (completed(data.user)) await showVerifiedAccount(client, data.user);
   else location.replace(login.href);
 });
 </script>
