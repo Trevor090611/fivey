@@ -39,8 +39,8 @@
     toggle.disabled = true;
 
     const style = document.createElement('style');
-    style.textContent =       '.fivey-theme-countdown{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;width:100vw;height:100vh;height:100dvh;margin:0;background:rgba(255,255,255,.5);color:#d9f783;font:900 clamp(12rem,52vmin,70vh)/.85 system-ui,sans-serif;transition:background-color 1000ms ease,color 1000ms ease;pointer-events:all}' +
-      '.fivey-theme-countdown.is-darkening{background:rgba(0,0,0,.5);color:#62e7ff}' +
+    style.textContent =       '.fivey-theme-countdown{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;width:100vw;height:100vh;height:100dvh;margin:0;background:rgba(255,255,255,.7);color:#d9f783;font:900 clamp(12rem,52vmin,70vh)/.85 system-ui,sans-serif;transition:background-color 1000ms ease,color 1000ms ease;pointer-events:all}' +
+      '.fivey-theme-countdown.is-darkening{background:rgba(0,0,0,.7);color:#62e7ff}' +
       '.fivey-theme-countdown-number{display:block;text-align:center;line-height:.85}' +
       '@media(prefers-reduced-motion:reduce){.fivey-theme-countdown{transition:none}}';
     const overlay = document.createElement('div');
