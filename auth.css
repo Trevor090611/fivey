@@ -74,7 +74,7 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 .auth-card .role-options label { display: flex; align-items: center; gap: 6px; }
 .auth-card .role-options input { width: auto; padding: 0; accent-color: #294735; }
 
-/* Page entrances begin when the sign-in gate reveals the content. */
+/* Entrances start after the page pause or when content first enters view. */
 @media (prefers-reduced-motion: no-preference) {
   :root::view-transition-new(root) {
     animation-delay: 100ms;
@@ -86,9 +86,11 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   }
   main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(2 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
     --fivey-section-delay: 740ms;
+    --fivey-scroll-delay: 290ms;
   }
   main :where(.columns:not(.course-actions), .study-results, .account-analytics-list) > :nth-child(n + 3 of .panel:not([hidden]), .study-result-card:not([hidden]), .account-analytics-card:not([hidden])) {
     --fivey-section-delay: 1260ms;
+    --fivey-scroll-delay: 580ms;
   }
 
   #course-actions { --fivey-first-action-delay: 740ms; }
@@ -98,39 +100,10 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   #course-actions > .panel { --fivey-section-delay: var(--fivey-first-action-delay); }
   #course-actions > :nth-child(2 of .panel:not([hidden])) {
     --fivey-section-delay: calc(var(--fivey-first-action-delay) + 520ms);
+    --fivey-scroll-delay: 290ms;
   }
   .analytics-insights > .analytics-insight:first-child { --fivey-section-delay: 480ms; }
-  .analytics-insights > .analytics-insight:nth-child(2) { --fivey-section-delay: 1000ms; }
-
-  body > header :where(.brand, nav > a, .fivey-orbies, .fivey-user-label),
-  body > footer > .wrap,
-  body > :where(#macro-credits, #chemistry-credits),
-  main :where(h1, h2, h3, h4, h5, h6, p, dt, dd, figcaption, label, legend, .hero .tag, li:not(:has(p, button, a.practice-button))):not(:where(.progress-quiz *)),
-  .fivey-welcome-dialog :where(h2, p) {
-    animation: fivey-text-enter 900ms cubic-bezier(.22, .61, .36, 1) var(--fivey-section-delay, 0ms) backwards;
-  }
-
-  main :where(p, dd, figcaption, label):not(:where(.progress-quiz *)) {
-    animation-delay: calc(var(--fivey-section-delay, 0ms) + 85ms);
-  }
-
-  main :where(img, svg[role="img"], .mark, .hero-equations):not(:where(.progress-quiz *)),
-  .download-backdrop :where(img, .hero-equations) {
-    animation: fivey-art-enter 1080ms cubic-bezier(.22, .61, .36, 1) calc(var(--fivey-section-delay, 0ms) + 50ms) backwards;
-  }
-
-  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"], a.practice-button, a.intro-link, a.card, .home-main .hero a):not(:where(.progress-quiz *)),
-  body > header .fivey-subjects-trigger {
-    --fivey-button-enter-delay: 130ms;
-    animation: fivey-button-enter 840ms cubic-bezier(.22, .61, .36, 1) calc(var(--fivey-section-delay, 0ms) + var(--fivey-button-enter-delay)) backwards;
-  }
-
-  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(2) {
-    --fivey-button-enter-delay: 185ms;
-  }
-  :is(main, .fivey-welcome-dialog) :where(button, [role="button"], a.practice-button, a.card):nth-child(n + 3) {
-    --fivey-button-enter-delay: 240ms;
-  }
+  .analytics-insights > .analytics-insight:nth-child(2) { --fivey-section-delay: 1000ms; --fivey-scroll-delay: 290ms; }
 
   .directory .grid > a.card:nth-child(2) { --fivey-section-delay: 145ms; }
   .directory .grid > a.card:nth-child(3) { --fivey-section-delay: 300ms; }
@@ -138,6 +111,40 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
   .directory .grid > a.card:nth-child(5) { --fivey-section-delay: 700ms; }
   .directory .grid > a.card:nth-child(6) { --fivey-section-delay: 900ms; }
   .directory .grid > a.card:nth-child(n + 7) { --fivey-section-delay: 1100ms; }
+
+  [data-fivey-entrance="text"] {
+    --fivey-entrance-keyframes: fivey-text-enter;
+    --fivey-entrance-duration: 1450ms;
+    --fivey-entrance-offset: 0ms;
+    --fivey-entrance-opacity: .15;
+  }
+  main :where(p, dd, figcaption, label)[data-fivey-entrance="text"] {
+    --fivey-entrance-offset: 85ms;
+  }
+  [data-fivey-entrance="art"] {
+    --fivey-entrance-keyframes: fivey-art-enter;
+    --fivey-entrance-duration: 1380ms;
+    --fivey-entrance-offset: 50ms;
+    --fivey-entrance-opacity: 0;
+  }
+  [data-fivey-entrance="button"] {
+    --fivey-entrance-keyframes: fivey-button-enter;
+    --fivey-entrance-duration: 1150ms;
+    --fivey-entrance-offset: 130ms;
+    --fivey-entrance-opacity: .35;
+  }
+  main [data-fivey-entrance="button"]:nth-child(2) { --fivey-entrance-offset: 185ms; }
+  main [data-fivey-entrance="button"]:nth-child(n + 3) { --fivey-entrance-offset: 240ms; }
+
+  [data-fivey-entrance]:not([data-fivey-revealed]) {
+    opacity: var(--fivey-entrance-opacity);
+  }
+  [data-fivey-revealed="load"] { --fivey-entrance-order: var(--fivey-section-delay, 0ms); }
+  [data-fivey-revealed="scroll"] { --fivey-entrance-order: var(--fivey-scroll-delay, 0ms); }
+  [data-fivey-revealed="load"], [data-fivey-revealed="scroll"] {
+    animation: var(--fivey-entrance-keyframes) var(--fivey-entrance-duration) cubic-bezier(.28, .50, .38, 1)
+      calc(var(--fivey-entrance-order) + var(--fivey-entrance-offset)) backwards;
+  }
 
   @keyframes fivey-text-enter {
     from { opacity: .15; translate: 0 14px; }
