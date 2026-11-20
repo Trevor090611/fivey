@@ -34,9 +34,7 @@
   .auth-card .recovery-links .recovery-link:hover { text-decoration-thickness: 2px; }
   .auth-card .recovery-links .recovery-link:focus-visible { outline: none; text-decoration-thickness: 3px; }
   .auth-card .recovery-links .recovery-link::before,
-  .auth-card .recovery-links .recovery-link::after,
-  .auth-card .recovery-links .recovery-link::-webkit-details-marker { display: none; }
-  .auth-card .recovery-links p { margin: .25rem 0 .5rem; }
+  .auth-card .recovery-links .recovery-link::after { display: none; }
 </style>
 </head>
 <body class="fivey-login">
@@ -53,10 +51,7 @@
     <label>Email address<input name="email" type="email" autocomplete="username" required></label>
     <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
     <div class="recovery-links">
-      <details>
-        <summary class="recovery-link">Forgot Email Address?</summary>
-        <p>Check your password manager for a saved Fivey login, or search your inboxes for the Fivey verification email.</p>
-      </details>
+      <a class="recovery-link" href="./recover-email.html">Forgot Email Address?</a>
       <button type="button" class="recovery-link" id="forgot-password">Forgot Password?</button>
     </div>
     <button type="submit">Log in</button>
