@@ -1,3 +1,4 @@
+import { getOrbiesBalance, orbiesKey } from './orbies-wallet.js';
 import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
 
@@ -318,14 +319,12 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   orbiesIcon.alt = '';
   orbiesIcon.setAttribute('aria-hidden', 'true');
   const orbiesCount = document.createElement('span');
-  const orbiesKey = 'fivey-orbies-v1:' + user.id;
+  const balanceKey = orbiesKey(user.id);
   const orbiesFormat = new Intl.NumberFormat();
   function refreshOrbies() {
     let amount = 0;
     try {
-      const saved = localStorage.getItem(orbiesKey);
-      const parsed = saved === null ? 0 : Number(saved);
-      if (Number.isSafeInteger(parsed) && parsed >= 0) amount = parsed;
+      amount = getOrbiesBalance(user.id);
     } catch {
       // Keep the display at zero when local storage is unavailable.
     }
@@ -336,7 +335,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   refreshOrbies();
   orbiesBalance.append(orbiesIcon, orbiesCount);
   window.addEventListener('storage', event => {
-    if (event.key === null || event.key === orbiesKey) refreshOrbies();
+    if (event.key === null || event.key === balanceKey) refreshOrbies();
   });
   window.addEventListener('fivey:orbies-updated', refreshOrbies);
   const accountActions = document.createElement('div');

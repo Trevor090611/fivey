@@ -1,4 +1,5 @@
-import { analyticsAccount } from './auth-gate.js?v=orbies3';
+import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
+import { createChest, qualifiesForChest } from './orbies-wallet.js';
 import { units, unitPool } from './practice-units.js?v=5';
 
 
@@ -375,12 +376,31 @@ function setupPractice(selected, timed) {
         save();
       }
       const attempted = set.length - unanswered.length;
-      if (!restoring && attempted) recordSet(reviews.flatMap(({ field, item }) => { const checked = field.querySelector(':checked'); return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : []; }), params.get('mode') === 'unit' ? 'unit' : 'allUnits').catch(() => {
-        status.textContent = message + ' Your analytics could not be saved.';
-      });
       summary.textContent = 'Score: ' + score + ' of ' + set.length + ' (' + Math.round(score / set.length * 100) + '%).';
       summary.hidden = false;
-      if (!restoring) summary.focus();
+      if (restoring) return;
+      summary.focus();
+
+      if (!attempted) return;
+      const mode = params.get('mode');
+      const results = reviews.flatMap(({ field, item }) => {
+        const checked = field.querySelector(':checked');
+        return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : [];
+      });
+      const recording = recordSet(results, mode === 'unit' ? 'unit' : 'allUnits').catch(() => {
+        status.textContent = message + ' Your analytics could not be saved.';
+      });
+      if (analyticsAccount && analyticsAccount !== 'guest' && qualifiesForChest(mode, score, set.length)) {
+        const openReward = async () => {
+          const id = await createChest(analyticsAccount, course, selected[0], set.length);
+          await recording;
+          const rewardUrl = './orbies-reward.html?' + new URLSearchParams({ chest: id });
+          location.assign(rewardUrl);
+        };
+        void openReward().catch(() => {
+          status.textContent += ' Your Orbies chest could not be saved. Check that site storage is available.';
+        });
+      }
     }
 
     if (timed) {

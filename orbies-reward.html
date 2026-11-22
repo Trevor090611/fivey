@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orbies Treasure Chest | Fivey</title>
+  <script src="./theme.js?v=1"></script>
+  <link rel="stylesheet" href="./brand.css?v=fb47b45">
+  <link rel="stylesheet" href="./auth.css?v=magenta2">
+  <link rel="stylesheet" href="./orbies-reward.css">
+  <script type="module" src="./orbies-reward.js"></script>
+</head>
+<body>
+  <header>
+    <div class="reward-bar">
+      <a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a>
+      <nav aria-label="Main navigation"><a href="./courses.html">Courses</a></nav>
+    </div>
+  </header>
+  <main class="reward-main">
+    <p id="reward-unavailable" hidden>This chest is unavailable. <a href="./courses.html">Browse courses</a> to start a practice set.</p>
+    <section id="reward" aria-labelledby="reward-title" hidden>
+      <h1 id="reward-title">Congratulations! You scored above 85% in this question set! :D</h1>
+      <div class="reward-stage" data-rarity="starting">
+        <p class="reward-stars" id="reward-stars" role="img" aria-label="1 out of 5 stars"></p>
+        <button type="button" id="reward-chest" class="reward-chest" aria-label="Unlock treasure chest" aria-describedby="reward-status">
+          <span class="chest-shadow" aria-hidden="true"></span>
+          <span class="chest-lid" aria-hidden="true"></span>
+          <span class="chest-box" aria-hidden="true"></span>
+          <span class="chest-lock" aria-hidden="true"></span>
+          <img class="chest-coin" src="./orbies-coin.png?v=1" alt="">
+        </button>
+        <p id="reward-status" class="reward-status" aria-live="polite"></p>
+      </div>
+      <a class="reward-return" id="reward-return" href="./courses.html">Practice another set</a>
+    </section>
+  </main>
+</body>
+</html>
