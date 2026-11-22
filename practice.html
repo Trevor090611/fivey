@@ -62,7 +62,7 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./progress.css?v=3">
-<script type="module" src="./progress.js?v=orbies-chest2"></script>
+<script type="module" src="./progress.js?v=practice-exams1"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
 <script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
 </head>
@@ -119,7 +119,12 @@ const id = new URLSearchParams(location.search).get('course');
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
-  document.title = name + ' Practice Questions | Fivey';
+  const options = new URLSearchParams(location.search);
+  const page = options.get('mode') === 'timed' && options.get('from') === 'exams'
+    ? 'Practice Exam'
+    : 'Practice Questions';
+  document.querySelector('#title').textContent = page;
+  document.title = name + ' ' + page + ' | Fivey';
   const tag = document.querySelector('#tag');
   tag.textContent = name;
   tag.style.setProperty('--tint', tint);

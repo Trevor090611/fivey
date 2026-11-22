@@ -32,6 +32,15 @@ details{padding:12px 0;border-bottom:1px solid var(--line)}
 summary{cursor:pointer;font-weight:750}
 details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 #status{padding-top:24px}
+#practice-exams-panel{scroll-margin-top:90px}
+#practice-exam-setup{display:grid;gap:14px;margin-top:14px}
+#practice-exam-setup[hidden]{display:none}
+#practice-exam-setup label{display:block}
+#practice-exam-setup details label{padding-block:4px}
+#practice-exam-setup select{max-width:100%;font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--white);color:var(--ink)}
+#practice-exam-setup button{justify-self:start;font:inherit;font-weight:750;padding:8px 12px;cursor:pointer}
+#practice-exam-status:empty{display:none}
+#practice-exams:not(:empty){margin-top:12px}
 footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
 [hidden]{display:none}
 @media(max-width:620px){.columns{grid-template-columns:1fr}}
@@ -46,7 +55,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
-<script type="module" src="./auth-gate.js?v=orbies2"></script>
+<script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
+<script type="module" src="./progress.js?v=practice-exams1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -60,9 +70,20 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
     <p>Find released free-response questions and scoring materials for this course on AP Central.</p>
     <p><a id="official-exam" href="https://apcentral.collegeboard.org/courses/past-exam-questions">View released AP exam materials</a></p>
   </section>
-  <section class="panel" aria-labelledby="practice-title">
+  <section class="panel" id="practice-exams-panel" aria-labelledby="practice-title">
     <h2 id="practice-title">Practice Exams</h2>
-    <div id="practice-exams"><p>No full-length practice exams have been posted yet.</p></div>
+    <form id="practice-exam-setup" hidden>
+      <p>Select one or more units, a question count, and a time limit.</p>
+      <details>
+        <summary>Choose units</summary>
+        <div id="mixed-units"></div>
+      </details>
+      <div><label for="mixed-count">Multiple-choice questions per set</label><select id="mixed-count" name="count"></select></div>
+      <div><label for="mixed-minutes">Time limit</label><select id="mixed-minutes" name="minutes"></select></div>
+      <button class="practice-button" type="submit">Start Practice Exam</button>
+      <p id="practice-exam-status" role="status"></p>
+    </form>
+    <div id="practice-exams"></div>
   </section>
 </div>
 <noscript><p class="wrap">Enable JavaScript to view exam resources for this course.</p></noscript>
@@ -120,7 +141,9 @@ if (selected) {
     'https://apcentral.collegeboard.org/courses/ap-' + id + '/exam/past-exam-questions';
   document.querySelector('#exam-sections').hidden = false;
   loadPracticeExams(id).catch(() => {
-    document.querySelector('#practice-exams p').textContent = 'Practice exams could not be loaded. Try refreshing the page.';
+    const message = document.createElement('p');
+    message.textContent = 'Posted practice exams could not be loaded. Try refreshing the page.';
+    document.querySelector('#practice-exams').append(message);
   });
 } else {
   const status = document.querySelector('#status');

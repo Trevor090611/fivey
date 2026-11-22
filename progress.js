@@ -31,6 +31,52 @@ function addLink(container, label, options) {
   container.append(link);
 }
 
+function examSetupUrl(options) {
+  return './full-length.html?' + new URLSearchParams({ course, ...options }) + '#practice-exams-panel';
+}
+
+function setupMixedPractice(form, status, fromExams = false) {
+  const available = units[course].map((_, index) => index + 1);
+  const selected = (params.get('units') || '').split(',').map(Number);
+  const count = Number(params.get('count'));
+  const minutes = Number(params.get('minutes'));
+  form.hidden = false;
+  for (const id of available) {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.name = 'unit';
+    input.value = id;
+    input.checked = params.has('units') ? selected.includes(id) : true;
+    label.append(input, ' ' + unitLabel(id));
+    form.querySelector('#mixed-units').append(label);
+  }
+  for (const size of sizes) form.elements.count.add(new Option(size + ' questions', size, false, count === size));
+  for (const limit of timeLimits()) form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
+  const questionCount = form.elements.count;
+  const updateRecommendation = () => {
+    for (const option of form.elements.minutes.options) {
+      const label = option.value + ' minutes';
+      option.textContent = option.index === questionCount.selectedIndex ? label + ' (Recommended)' : label;
+    }
+  };
+  questionCount.addEventListener('change', updateRecommendation);
+  window.addEventListener('pageshow', updateRecommendation);
+  updateRecommendation();
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const values = new FormData(form);
+    const chosen = values.getAll('unit');
+    if (!chosen.length) {
+      form.querySelector('details').open = true;
+      form.querySelector('input').focus();
+      status.textContent = 'Select at least one unit.';
+      return;
+    }
+    location.assign(practiceUrl({ ...(fromExams ? { from: 'exams' } : {}), mode: 'timed', units: chosen.join(','), count: values.get('count'), minutes: values.get('minutes'), run: crypto.randomUUID() }));
+  });
+}
+
 function showPractice() {
   section.hidden = false;
   const heading = section.querySelector('#progress-title');
@@ -42,9 +88,18 @@ function showPractice() {
   const minutes = Number(params.get('minutes'));
   const selected = [...new Set((params.get('units') || '').split(',').map(Number))];
   const back = document.querySelector('#practice-back');
-  if (mode) {
-    back.href = practiceUrl(mode === 'unit' ? { mode: 'choose' } : mode === 'timed' ? { mode: 'mixed', units: selected.join(','), count, minutes } : {});
-    back.textContent = mode === 'unit' ? '← Choose a unit' : mode === 'timed' ? '← Practice setup' : '← Practice options';
+  if (mode === 'timed') {
+    const setup = { units: selected.join(','), count, minutes };
+    if (params.get('from') === 'exams') {
+      back.href = examSetupUrl(setup);
+      back.textContent = '← Practice Exams';
+    } else {
+      back.href = practiceUrl({ mode: 'mixed', ...setup });
+      back.textContent = '← Practice setup';
+    }
+  } else if (mode) {
+    back.href = practiceUrl(mode === 'unit' ? { mode: 'choose' } : {});
+    back.textContent = mode === 'unit' ? '← Choose a unit' : '← Practice options';
   }
   if (mode === 'choose') {
     heading.textContent = 'Practice By Units';
@@ -58,42 +113,7 @@ function showPractice() {
   } else if (mode === 'mixed') {
     heading.textContent = 'Practice All Units';
     description.textContent = 'Select one or more units, a question count, and a time limit.';
-    const form = section.querySelector('#mixed-setup');
-    form.hidden = false;
-    for (const id of available) {
-      const label = document.createElement('label');
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.name = 'unit';
-      input.value = id;
-      input.checked = params.has('units') ? selected.includes(id) : true;
-      label.append(input, ' ' + unitLabel(id));
-      form.querySelector('#mixed-units').append(label);
-    }
-    for (const size of sizes) form.elements.count.add(new Option(size + ' questions', size, false, count === size));
-    for (const limit of timeLimits()) form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
-    const questionCount = form.elements.count;
-    const updateRecommendation = () => {
-      for (const option of form.elements.minutes.options) {
-        const label = option.value + ' minutes';
-        option.textContent = option.index === questionCount.selectedIndex ? label + ' (Recommended)' : label;
-      }
-    };
-    questionCount.addEventListener('change', updateRecommendation);
-    window.addEventListener('pageshow', updateRecommendation);
-    updateRecommendation();
-    form.addEventListener('submit', event => {
-      event.preventDefault();
-      const values = new FormData(form);
-      const chosen = values.getAll('unit');
-      if (!chosen.length) {
-        form.querySelector('details').open = true;
-        form.querySelector('input').focus();
-        section.querySelector('.progress-status').textContent = 'Select at least one unit.';
-        return;
-      }
-      location.assign(practiceUrl({ mode: 'timed', units: chosen.join(','), count: values.get('count'), minutes: values.get('minutes'), run: crypto.randomUUID() }));
-    });
+    setupMixedPractice(section.querySelector('#mixed-setup'), section.querySelector('.progress-status'));
   } else if (mode === 'timed' && selected.every(id => available.includes(id)) && sizes.includes(count) && timeLimits().includes(minutes) && /^[a-f0-9-]{36}$/.test(params.get('run') || '')) {
     heading.textContent = 'Timed Practice';
     description.textContent = selected.map(unitLabel).join(' · ');
@@ -432,4 +452,8 @@ function setupPractice(selected, timed) {
   }
 }
 
-if (section && supported.has(course)) showPractice();
+if (supported.has(course)) {
+  if (section) showPractice();
+  const examSetup = document.querySelector('#practice-exam-setup');
+  if (examSetup) setupMixedPractice(examSetup, document.querySelector('#practice-exam-status'), true);
+}
