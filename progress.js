@@ -8,6 +8,7 @@ const course = params.get('course');
 const section = document.querySelector('#progress-check');
 const supported = new Set(Object.keys(units));
 const sizes = [20, 30, 40, 50, 60];
+const unitSizes = [5, 10, 15, 20, 25, 30];
 
 function timeLimits() {
   if (course === 'chemistry' || course === 'biology') return [30, 45, 60, 75, 90];
@@ -88,7 +89,12 @@ function showPractice() {
   const minutes = Number(params.get('minutes'));
   const selected = [...new Set((params.get('units') || '').split(',').map(Number))];
   const back = document.querySelector('#practice-back');
-  if (mode === 'timed') {
+  if (mode === 'set') {
+    back.href = params.get('from') === 'more'
+      ? './practice-more.html?' + new URLSearchParams({ course, units: selected.join(','), unit, count })
+      : practiceUrl({ ...(available.includes(unit) ? { mode: 'unit', unit } : {}), count });
+    back.textContent = '← Question set setup';
+  } else if (mode === 'timed') {
     const setup = { units: selected.join(','), count, minutes };
     if (params.get('from') === 'exams') {
       back.href = examSetupUrl(setup);
@@ -109,25 +115,48 @@ function showPractice() {
     for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
   } else if (mode === 'unit' && available.includes(unit)) {
     heading.textContent = unitLabel(unit);
-    setupPractice([unit]); const requestedCount = Number(params.get('count')); if ([5, 10, 15, 20].includes(requestedCount)) section.querySelector('#progress-size').value = String(requestedCount);
+    showSetSetup(unit, count);
+  } else if (mode === 'set' && (!params.has('unit') || available.includes(unit)) && unitSizes.includes(count) && validRun()) {
+    heading.textContent = available.includes(unit) ? unitLabel(unit) : 'Question Set';
+    setupPractice(available.includes(unit) ? [unit] : available, count);
   } else if (mode === 'mixed') {
     heading.textContent = 'Practice All Units';
     description.textContent = 'Select one or more units, a question count, and a time limit.';
     setupMixedPractice(section.querySelector('#mixed-setup'), section.querySelector('.progress-status'));
-  } else if (mode === 'timed' && selected.every(id => available.includes(id)) && sizes.includes(count) && timeLimits().includes(minutes) && /^[a-f0-9-]{36}$/.test(params.get('run') || '')) {
+  } else if (mode === 'timed' && selected.every(id => available.includes(id)) && sizes.includes(count) && timeLimits().includes(minutes) && validRun()) {
     heading.textContent = 'Timed Practice';
     description.textContent = selected.map(unitLabel).join(' · ');
-    setupPractice(selected, { count, minutes, key: 'fivey-timed-practice:' + analyticsAccount });
+    setupPractice(selected, count, minutes);
   } else {
     const choices = section.querySelector('#practice-modes');
     if (!choices) {
-      setupPractice(available);
+      showSetSetup(undefined, count);
       return;
     }
     choices.hidden = false;
     addLink(choices, 'Practice By Units', { mode: 'choose' });
     addLink(choices, 'Practice All Units', { mode: 'mixed' });
   }
+}
+
+function validRun() {
+  return /^[a-f0-9-]{36}$/.test(params.get('run') || '');
+}
+
+function showSetSetup(unit, count) {
+  const form = section.querySelector('.progress-setup');
+  const size = form.querySelector('#progress-size');
+  if (unitSizes.includes(count)) size.value = String(count);
+  form.hidden = false;
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    location.assign(practiceUrl({
+      mode: 'set',
+      ...(unit ? { unit } : {}),
+      count: size.value,
+      run: crypto.randomUUID()
+    }));
+  });
 }
 
 function analyticsKey() {
@@ -226,71 +255,125 @@ function markChoice(field, index, result, text) {
   label.append(badge);
 }
 
-function setupPractice(selected, timed) {
-  const setup = section.querySelector('.progress-setup');
-  const size = setup.querySelector('#progress-size');
-  const start = setup.querySelector('button');
+function guardQuestionSet() {
+  const dialog = document.querySelector('#question-set-exit');
+  const cancel = dialog.querySelector('[data-cancel]');
+  const fallback = document.querySelector('#practice-back').href;
+  const run = params.get('run');
+  const base = run + ':base';
+  const guarded = run + ':guarded';
+  let destination;
+
+  function confirmExit(leave) {
+    if (dialog.open) return;
+    destination = leave;
+    dialog.showModal();
+    cancel.focus();
+  }
+
+  function warnBeforeUnload(event) {
+    event.preventDefault();
+    event.returnValue = true;
+  }
+
+  function interceptLink(event) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey ||
+        event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href]');
+    if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
+    const url = new URL(link.href);
+    if (!['http:', 'https:', 'file:'].includes(url.protocol)) return;
+    if (url.origin === location.origin && url.pathname === location.pathname && url.search === location.search) return;
+    event.preventDefault();
+    confirmExit(() => location.assign(url.href));
+  }
+
+  function confirmBack(event) {
+    if (event.state?.fiveyQuestionSet !== base) return;
+    history.pushState({ ...history.state, fiveyQuestionSet: guarded }, '');
+    confirmExit(() => {
+      if (history.length > 2) history.go(-2);
+      else location.assign(fallback);
+    });
+  }
+
+  function enable() {
+    if (history.state?.fiveyQuestionSet !== guarded) {
+      history.replaceState({ ...history.state, fiveyQuestionSet: base }, '');
+      history.pushState({ ...history.state, fiveyQuestionSet: guarded }, '');
+    }
+    document.addEventListener('click', interceptLink, true);
+    window.addEventListener('popstate', confirmBack);
+    window.addEventListener('beforeunload', warnBeforeUnload);
+  }
+
+  function disable() {
+    document.removeEventListener('click', interceptLink, true);
+    window.removeEventListener('popstate', confirmBack);
+    window.removeEventListener('beforeunload', warnBeforeUnload);
+    if (dialog.open) dialog.close();
+  }
+
+  dialog.querySelector('[data-exit]').addEventListener('click', () => {
+    const leave = destination;
+    disable();
+    leave();
+  });
+  cancel.addEventListener('click', () => dialog.close());
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) enable();
+  });
+  enable();
+  return disable;
+}
+
+function setupPractice(selected, count, minutes = 0) {
   const quiz = section.querySelector('.progress-quiz');
   const status = section.querySelector('.progress-status');
-  let questions;
-  let active = false;
-
   const timer = section.querySelector('#practice-timer');
+  const key = (minutes ? 'fivey-timed-practice:' : 'fivey-untimed-practice:') + analyticsAccount;
   let attempt;
   let interval;
-  const save = () => sessionStorage.setItem(timed.key, JSON.stringify(attempt));
+  let active = false;
+  const save = () => sessionStorage.setItem(key, JSON.stringify(attempt));
 
-  async function startSet(count) {
-    start.disabled = true;
+  async function startSet() {
     status.textContent = 'Loading practice questions…';
     try {
-      if (timed) {
-        const saved = JSON.parse(sessionStorage.getItem(timed.key) || 'null');
-        if (saved?.url === location.search) attempt = saved;
-      }
-      if (!attempt) {
-        if (!questions) {
-          const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
-          if (!response.ok) throw new Error('Question bank unavailable');
-          questions = (await response.json())[course];
-        }
-        const reserve = () => reserveQuestions(questions, selected, count);
+      const saved = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if (saved?.url === location.search) {
+        attempt = saved;
+      } else {
+        const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
+        if (!response.ok) throw new Error('Question bank unavailable');
+        const bank = (await response.json())[course];
+        const reserve = () => reserveQuestions(bank, selected, count);
         const set = navigator.locks
           ? await navigator.locks.request('fivey-progress:' + course, reserve)
           : reserve();
         if (!set?.length || set.length !== count) throw new Error('Incorrect practice set size');
-        if (timed) {
-          attempt = { url: location.search, set, deadline: Date.now() + timed.minutes * 60000, answers: {}, finished: false };
-          save();
-        } else {
-          render(set);
-        }
+        attempt = {
+          url: location.search,
+          set,
+          ...(minutes ? { deadline: Date.now() + minutes * 60000 } : {}),
+          answers: {},
+          finished: false
+        };
+        save();
       }
       status.textContent = count + ' questions ready.';
-      if (timed) render(attempt.set);
+      render(attempt.set);
       if (active) quiz.querySelector('input').focus();
     } catch {
-      status.textContent = 'Could not load the practice set. Check your connection and site storage, then try again.';
-      if (timed) status.textContent += ' Refresh this page to retry.';
-    } finally {
-      start.disabled = false;
+      status.textContent = 'Could not load the practice set. Check your connection and site storage, then refresh to retry.';
     }
   }
 
-  if (timed) {
-    void startSet(timed.count);
-  } else {
-    setup.hidden = false;
-    setup.addEventListener('submit', event => {
-      event.preventDefault();
-      if (active && !window.confirm('Start a new set and clear your current answers?')) return;
-      void startSet(Number(size.value));
-    });
-  }
+  void startSet();
 
   function render(set) {
     active = true;
-    start.textContent = 'Start a new set';
+    const stopExitGuard = guardQuestionSet();
     quiz.replaceChildren();
     quiz.hidden = false;
     const reviews = [];
@@ -308,19 +391,17 @@ function setupPractice(selected, timed) {
         input.name = 'question-' + index;
         input.value = String(choice.value);
         input.checked = attempt?.answers[index] === choice.value;
-        if (timed) {
-          input.addEventListener('change', () => {
-            if (Date.now() >= attempt.deadline) {
-              input.checked = false;
-              const previous = field.querySelector('input[value="' + attempt.answers[index] + '"]');
-              if (previous) previous.checked = true;
-              finish(true);
-              return;
-            }
-            attempt.answers[index] = choice.value;
-            save();
-          });
-        }
+        input.addEventListener('change', () => {
+          if (minutes && Date.now() >= attempt.deadline) {
+            input.checked = false;
+            const previous = field.querySelector('input[value="' + attempt.answers[index] + '"]');
+            if (previous) previous.checked = true;
+            finish(true);
+            return;
+          }
+          attempt.answers[index] = choice.value;
+          save();
+        });
         label.append(input, document.createTextNode(choice.text));
         field.append(label);
       }
@@ -345,7 +426,7 @@ function setupPractice(selected, timed) {
 
     quiz.onsubmit = event => {
       event.preventDefault();
-      finish(timed && Date.now() >= attempt.deadline);
+      finish(Boolean(minutes && Date.now() >= attempt.deadline));
     };
 
     function finish(expired, restoring = false) {
@@ -390,7 +471,7 @@ function setupPractice(selected, timed) {
       if (timer) timer.hidden = true;
       const message = expired ? 'Time is up. Your set was submitted.' : 'Set submitted.';
       status.textContent = message;
-      if (timed && !restoring) {
+      if (!restoring) {
         attempt.finished = true;
         attempt.expired = Boolean(expired);
         save();
@@ -402,12 +483,12 @@ function setupPractice(selected, timed) {
       summary.focus();
 
       if (!attempted) return;
-      const mode = params.get('mode');
+      const mode = params.get('mode') === 'set' && params.has('unit') ? 'unit' : 'allUnits';
       const results = reviews.flatMap(({ field, item }) => {
         const checked = field.querySelector(':checked');
         return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : [];
       });
-      const recording = recordSet(results, mode === 'unit' ? 'unit' : 'allUnits').catch(() => {
+      const recording = recordSet(results, mode).catch(() => {
         status.textContent = message + ' Your analytics could not be saved.';
       });
       if (analyticsAccount && analyticsAccount !== 'guest' && qualifiesForChest(mode, score, set.length)) {
@@ -427,6 +508,7 @@ function setupPractice(selected, timed) {
               fill: 'forwards'
             }).finished.catch(() => {});
           }
+          stopExitGuard();
           location.assign(rewardUrl);
         };
         void openReward().catch(() => {
@@ -435,11 +517,11 @@ function setupPractice(selected, timed) {
       }
     }
 
-    if (timed) {
-      if (attempt.finished) {
-        finish(attempt.expired, true);
-        return;
-      }
+    if (attempt.finished) {
+      finish(attempt.expired, true);
+      return;
+    }
+    if (minutes) {
       timer.hidden = false;
       const tick = () => {
         const seconds = Math.max(0, Math.ceil((attempt.deadline - Date.now()) / 1000));

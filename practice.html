@@ -58,11 +58,36 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 #progress-check a.practice-button{display:inline-block;padding:8px 12px;text-decoration:none;font-weight:750}
 .progress-quiz legend{white-space:pre-line}
 .orbies-page-fade{position:fixed;inset:0;z-index:2147483647;background:#d9efff;opacity:0}
+#question-set-exit{
+  --exit-bg:#fff;--exit-text:#000;--exit-accent:#a4e568;--exit-focus:#396623;
+  width:min(460px,calc(100% - 32px));max-height:calc(100% - 32px);
+  box-sizing:border-box;margin:auto;padding:clamp(20px,5vw,30px);
+  color:var(--exit-text);background:var(--exit-bg);
+  border:2px solid var(--exit-accent);border-radius:16px;text-align:center;
+  box-shadow:0 18px 60px #0005
+}
+:root[data-fivey-dark] #question-set-exit{
+  --exit-bg:#000;--exit-text:#fff;--exit-accent:#57e6ff;--exit-focus:#57e6ff
+}
+#question-set-exit::backdrop{background:#080d147a}
+#question-set-exit h2{font-size:clamp(18px,4vw,24px);line-height:1.3}
+.question-exit-actions{display:flex;gap:12px;justify-content:center;margin-top:22px}
+#question-set-exit button{
+  --swipe:var(--exit-accent);--hover-text:#000;
+  min-width:92px;min-height:44px;padding:6px 14px;color:var(--exit-text);
+  border:2px solid var(--exit-accent);border-radius:8px;font:inherit;font-weight:750;cursor:pointer;
+  background:linear-gradient(var(--swipe),var(--swipe)) right/0% 100% no-repeat var(--exit-bg);
+  transition:background-size .23s ease,color .23s ease
+}
+#question-set-exit [data-exit]{--swipe:#d62231;--hover-text:#fff}
+#question-set-exit button:is(:hover,:focus-visible){background-size:100% 100%;color:var(--hover-text)}
+#question-set-exit button:focus-visible{outline:2px solid var(--exit-focus);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){#question-set-exit button{transition:none}}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css">
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./progress.css?v=3">
-<script type="module" src="./progress.js?v=practice-exams1"></script>
+<script type="module" src="./progress.js?v=question-set2"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
 <script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
 </head>
@@ -104,6 +129,13 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </section>
 <noscript><p class="wrap">Enable JavaScript to start a practice set.</p></noscript>
 </main>
+<dialog id="question-set-exit" aria-labelledby="question-set-exit-title">
+  <h2 id="question-set-exit-title">Are you sure you want to Exit this Questions Set?</h2>
+  <div class="question-exit-actions">
+    <button type="button" data-exit>Exit</button>
+    <button type="button" data-cancel autofocus>Cancel</button>
+  </div>
+</dialog>
 <footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
 <script>
 const courses = [
@@ -122,7 +154,7 @@ if (selected) {
   const options = new URLSearchParams(location.search);
   const page = options.get('mode') === 'timed' && options.get('from') === 'exams'
     ? 'Practice Exam'
-    : 'Practice Questions';
+    : options.get('mode') === 'set' ? 'Question Set' : 'Practice Questions';
   document.querySelector('#title').textContent = page;
   document.title = name + ' ' + page + ' | Fivey';
   const tag = document.querySelector('#tag');

@@ -45,6 +45,7 @@ const allowed=Array.isArray(units?.[course])?units[course]:[];
 const requested=[...new Set((params.get('units')||'').split(',').map(Number).filter(Number.isInteger))].filter(id=>id>0&&id<=allowed.length);
 const unitSelect=document.querySelector('#unit-select');
 const status=document.querySelector('#status');
+const countSelect=document.querySelector('#count-select');
 const name=courses[course];
 if(!name||!requested.length){status.textContent='No weakness units are available. Return to analytics after completing practice in multiple units.';status.hidden=false;document.querySelector('#practice-form').hidden=true;}
 else{
@@ -53,8 +54,10 @@ else{
  document.querySelector('#description').textContent='Choose a unit from your '+name+' Weakness list and set the number of questions.';
  document.querySelector('#back-link').href='./course.html?'+new URLSearchParams({course,view:'analytics'});
  for(const id of requested){const option=document.createElement('option');option.value=String(id);option.textContent='Unit '+id+': '+allowed[id-1];unitSelect.append(option);}
+ if(requested.includes(Number(params.get('unit'))))unitSelect.value=params.get('unit');
+ if([...countSelect.options].some(option=>option.value===params.get('count')))countSelect.value=params.get('count');
 }
-document.querySelector('#practice-form').addEventListener('submit',event=>{event.preventDefault();if(!unitSelect.value)return;location.assign('./practice.html?'+new URLSearchParams({course,mode:'unit',unit:unitSelect.value,count:document.querySelector('#count-select').value}));});
+document.querySelector('#practice-form').addEventListener('submit',event=>{event.preventDefault();if(!unitSelect.value)return;location.assign('./practice.html?'+new URLSearchParams({course,mode:'set',from:'more',units:requested.join(','),unit:unitSelect.value,count:countSelect.value,run:crypto.randomUUID()}));});
 </script>
 </body>
 </html>
