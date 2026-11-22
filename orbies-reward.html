@@ -7,10 +7,10 @@
   <script src="./theme.js?v=1"></script>
   <link rel="stylesheet" href="./brand.css?v=fb47b45">
   <link rel="stylesheet" href="./auth.css?v=magenta2">
-  <link rel="stylesheet" href="./orbies-reward.css">
-  <script type="module" src="./orbies-reward.js"></script>
+  <link rel="stylesheet" href="./orbies-reward.css?v=2">
+  <script type="module" src="./orbies-reward.js?v=2"></script>
 </head>
-<body>
+<body class="reward-page" data-rarity="starting">
   <header>
     <div class="reward-bar">
       <a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a>
@@ -21,19 +21,42 @@
     <p id="reward-unavailable" hidden>This chest is unavailable. <a href="./courses.html">Browse courses</a> to start a practice set.</p>
     <section id="reward" aria-labelledby="reward-title" hidden>
       <h1 id="reward-title">Congratulations! You scored above 85% in this question set! :D</h1>
-      <div class="reward-stage" data-rarity="starting">
+      <div class="reward-stage">
         <p class="reward-stars" id="reward-stars" role="img" aria-label="1 out of 5 stars"></p>
-        <button type="button" id="reward-chest" class="reward-chest" aria-label="Unlock treasure chest" aria-describedby="reward-status">
+        <button type="button" id="reward-chest" class="reward-chest">
           <span class="chest-shadow" aria-hidden="true"></span>
-          <span class="chest-lid" aria-hidden="true"></span>
-          <span class="chest-box" aria-hidden="true"></span>
-          <span class="chest-lock" aria-hidden="true"></span>
-          <img class="chest-coin" src="./orbies-coin.png?v=1" alt="">
+          <span class="chest-rotor" aria-hidden="true">
+            <span class="chest-model">
+              <span class="chest-base">
+                <span class="chest-face chest-front"></span>
+                <span class="chest-face chest-back"></span>
+                <span class="chest-face chest-left"></span>
+                <span class="chest-face chest-right"></span>
+                <span class="chest-face chest-bottom"></span>
+                <span class="chest-interior"></span>
+              </span>
+              <span class="chest-lid">
+                <span class="chest-face chest-front"></span>
+                <span class="chest-face chest-back"></span>
+                <span class="chest-face chest-left"></span>
+                <span class="chest-face chest-right"></span>
+                <span class="chest-top"></span>
+                <span class="chest-underside"></span>
+                <span class="chest-lock"></span>
+              </span>
+            </span>
+          </span>
+          <span id="chest-prompt" class="chest-prompt">Click Me!</span>
         </button>
-        <p id="reward-status" class="reward-status" aria-live="polite"></p>
+        <p id="reward-status" class="reward-status" role="status"></p>
       </div>
       <a class="reward-return" id="reward-return" href="./courses.html">Practice another set</a>
     </section>
   </main>
+  <section class="reward-reveal" id="reward-reveal" aria-labelledby="reward-amount" hidden>
+    <img src="./orbies-coin.png?v=1" alt="" width="240" height="240">
+    <h2 id="reward-amount" tabindex="-1"></h2>
+    <a class="reward-return" id="reward-reveal-return" href="./courses.html">Practice another set</a>
+  </section>
 </body>
 </html>

@@ -395,6 +395,18 @@ function setupPractice(selected, timed) {
           const id = await createChest(analyticsAccount, course, selected[0], set.length);
           await recording;
           const rewardUrl = './orbies-reward.html?' + new URLSearchParams({ chest: id });
+          if (!matchMedia('(prefers-reduced-motion: reduce)').matches && document.body.animate) {
+            const fade = document.createElement('div');
+            fade.className = 'orbies-page-fade';
+            fade.setAttribute('aria-hidden', 'true');
+            document.body.append(fade);
+            window.addEventListener('pageshow', () => fade.remove(), { once: true });
+            await fade.animate([{ opacity: 0 }, { opacity: 1 }], {
+              duration: 330,
+              easing: 'ease-in-out',
+              fill: 'forwards'
+            }).finished.catch(() => {});
+          }
           location.assign(rewardUrl);
         };
         void openReward().catch(() => {
