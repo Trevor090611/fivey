@@ -145,10 +145,198 @@ function discussion(postId) {
   return section;
 }
 
+const articleLimit = 32000;
+const formattedArticle = 'FIVEY:FORMATTED:1\n';
+const articleFonts = ['Arial', 'Georgia', 'Times New Roman', 'Verdana', 'Courier New'];
+const articleSizes = ['12px', '14px', '16px', '20px', '24px', '32px', '48px'];
+const articleTags = new Set(['b', 'strong', 'i', 'em', 'u', 'div', 'p', 'br', 'span', 'font']);
+const articleStyles = {
+  color: /^#[a-f\d]{3,8}$|^rgba?\([\d., %]+\)$/i,
+  backgroundColor: /^#[a-f\d]{3,8}$|^rgba?\([\d., %]+\)$/i,
+  fontFamily: new RegExp('^(?:' + articleFonts.join('|') + ')$', 'i'),
+  fontSize: /^(12|14|16|20|24|32|48)px$/,
+  fontWeight: /^(bold|normal|[1-9]00)$/,
+  fontStyle: /^(italic|normal)$/,
+  textDecorationLine: /^(underline|none)$/
+};
+
+function cleanArticleMarkup(markup) {
+  const template = document.createElement('template');
+  template.innerHTML = markup;
+  const result = document.createDocumentFragment();
+  const remaining = Array.from(template.content.childNodes, child => [child, result]).reverse();
+  while (remaining.length) {
+    const [child, target] = remaining.pop();
+    if (child.nodeType === Node.TEXT_NODE) {
+      target.append(document.createTextNode(child.data));
+      continue;
+    }
+    if (child.nodeType !== Node.ELEMENT_NODE) continue;
+    const tag = child.localName;
+    let parent = target;
+    if (articleTags.has(tag)) {
+      parent = document.createElement(tag === 'font' ? 'span' : tag);
+      const styles = child.style;
+      if (tag === 'font') {
+        styles.color ||= child.getAttribute('color') || '';
+        styles.fontFamily ||= child.getAttribute('face') || '';
+        styles.fontSize ||= articleSizes[Number(child.getAttribute('size')) - 1] || '';
+      }
+      for (const [property, allowed] of Object.entries(articleStyles)) {
+        const value = styles?.[property]?.replace(/["']/g, '');
+        if (value && allowed.test(value)) parent.style[property] = value;
+      }
+      target.append(parent);
+    }
+    for (let index = child.childNodes.length - 1; index >= 0; index--) {
+      remaining.push([child.childNodes[index], parent]);
+    }
+  }
+  return result;
+}
+
+function articleEditor() {
+  const section = node('div', 'blog-article-editor');
+  const label = node('div', 'blog-editor-label', 'Article text');
+  label.id = 'blog-editor-label';
+  const toolbar = node('div', 'blog-editor-tools');
+  toolbar.setAttribute('role', 'group');
+  toolbar.setAttribute('aria-label', 'Article formatting');
+  const field = node('div', 'blog-editor-field');
+  field.contentEditable = 'true';
+  field.setAttribute('role', 'textbox');
+  field.setAttribute('aria-labelledby', label.id);
+  field.setAttribute('aria-multiline', 'true');
+  field.setAttribute('aria-required', 'true');
+  section.append(label, toolbar, field);
+
+  let savedRange;
+  const toggles = [];
+  function getEditorRange() {
+    const selection = window.getSelection();
+    if (!selection?.rangeCount) return;
+    const range = selection.getRangeAt(0);
+    if (field.contains(range.commonAncestorContainer)) return range;
+  }
+
+  function rememberSelection() {
+    const range = getEditorRange();
+    if (!range) return;
+    savedRange = range.cloneRange();
+    for (const [control, command] of toggles) {
+      control.setAttribute('aria-pressed', String(document.queryCommandState(command)));
+    }
+  }
+
+  function apply(command, value) {
+    const range = getEditorRange()?.cloneRange() || savedRange;
+    field.focus();
+    if (range && field.contains(range.commonAncestorContainer)) {
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    if (!document.execCommand(command, false, value) && command === 'hiliteColor') {
+      document.execCommand('backColor', false, value);
+    }
+    rememberSelection();
+  }
+
+  for (const [text, command] of [['Bold', 'bold'], ['Italic', 'italic'], ['Underline', 'underline']]) {
+    const control = node('button', 'blog-editor-' + command, text);
+    control.type = 'button';
+    control.setAttribute('aria-pressed', 'false');
+    control.addEventListener('mousedown', event => event.preventDefault());
+    control.addEventListener('click', () => apply(command));
+    toolbar.append(control);
+    toggles.push([control, command]);
+  }
+
+  function addControl(text, control, command) {
+    const caption = node('label', null, text);
+    caption.append(control);
+    toolbar.append(caption);
+    control.addEventListener('change', () => apply(command, control.value));
+    return caption;
+  }
+
+  for (const [text, command, choices] of [
+    ['Font', 'fontName', articleFonts.map(font => [font, font])],
+    ['Size', 'fontSize', articleSizes.map((size, index) => [size, String(index + 1)])]
+  ]) {
+    const control = node('select');
+    const placeholder = node('option', null, 'Choose');
+    placeholder.value = '';
+    placeholder.disabled = true;
+    control.append(placeholder);
+    for (const [name, value] of choices) {
+      const option = node('option', null, name);
+      option.value = value;
+      control.append(option);
+    }
+    control.value = '';
+    addControl(text, control, command);
+    control.addEventListener('change', () => { control.value = ''; });
+  }
+
+  for (const [text, command, initial] of [
+    ['Font color', 'foreColor', '#19271f'],
+    ['Highlight', 'hiliteColor', '#fff184']
+  ]) {
+    const control = node('input');
+    control.type = 'color';
+    control.value = initial;
+    const caption = addControl(text, control, command);
+    const applyColor = node('button', null, 'Apply');
+    applyColor.type = 'button';
+    applyColor.setAttribute('aria-label', 'Apply ' + text.toLowerCase());
+    applyColor.addEventListener('mousedown', event => event.preventDefault());
+    applyColor.addEventListener('click', () => apply(command, control.value));
+    const colorTool = node('div', 'blog-editor-color');
+    toolbar.insertBefore(colorTool, caption);
+    colorTool.append(caption, applyColor);
+  }
+
+  field.addEventListener('paste', event => {
+    event.preventDefault();
+    apply('insertText', event.clipboardData.getData('text/plain'));
+  });
+  field.addEventListener('drop', event => event.preventDefault());
+  document.addEventListener('selectionchange', rememberSelection);
+
+  return {
+    section,
+    field,
+    text: () => field.innerText.trim(),
+    write(text) {
+      field.textContent = text;
+      savedRange = undefined;
+    },
+    serialize() {
+      const content = node('div');
+      content.append(cleanArticleMarkup(field.innerHTML));
+      if (content.childElementCount === 0) return content.textContent.trim();
+      return formattedArticle + content.innerHTML.trim();
+    },
+    disable(disabled) {
+      field.contentEditable = String(!disabled);
+      for (const control of toolbar.querySelectorAll('button, select, input')) {
+        control.disabled = disabled;
+      }
+    }
+  };
+}
+
 function postCard(post, full = false) {
   const card = node('article', 'blog-card');
   if (full) {
-    card.append(node('p', 'blog-article-body', post.body));
+    const body = node('div', 'blog-article-body');
+    if (post.body.startsWith(formattedArticle)) {
+      body.append(cleanArticleMarkup(post.body.slice(formattedArticle.length)));
+    } else {
+      body.textContent = post.body;
+    }
+    card.append(body);
   } else {
     card.append(
       node('h2', null, post.title),
@@ -203,10 +391,7 @@ function ownerForm() {
   const file = node('input');
   file.type = 'file';
   file.accept = '.txt,.md,text/plain,text/markdown';
-  const body = node('textarea');
-  body.required = true;
-  body.maxLength = 32000;
-  body.rows = 9;
+  const editor = articleEditor();
   const summary = node('textarea');
   summary.maxLength = 1500;
   summary.rows = 3;
@@ -217,21 +402,23 @@ function ownerForm() {
   const publish = node('button', null, 'Publish Entry');
   publish.type = 'submit';
 
-  for (const [text, field] of [['Article title', title], ['Import text file', file], ['Article text', body], ['Summary', summary]]) {
+  for (const [text, field] of [['Article title', title], ['Import text file', file], ['Summary', summary]]) {
     const label = node('label', null, text);
     label.append(field);
+    if (field === summary) form.append(editor.section);
     form.append(label);
   }
   form.append(generate, publish, status);
   card.append(form);
 
   function disable(disabled) {
-    for (const control of [title, file, body, summary, generate, publish]) control.disabled = disabled;
+    for (const control of [title, file, summary, generate, publish]) control.disabled = disabled;
+    editor.disable(disabled);
   }
 
   async function generateSummary() {
-    const text = body.value.trim();
-    if (!text || text.length > 32000) {
+    const text = editor.text();
+    if (!text || text.length > articleLimit) {
       status.textContent = 'Enter an article of up to 32,000 characters.';
       return false;
     }
@@ -249,18 +436,24 @@ function ownerForm() {
     disable(true);
     try { await generateSummary(); } finally { disable(false); }
   });
-  body.addEventListener('input', () => { summary.value = ''; });
+  let summarizedText = '';
+  editor.field.addEventListener('input', () => {
+    const text = editor.text();
+    if (text !== summarizedText) summary.value = '';
+    summarizedText = text;
+  });
   file.addEventListener('change', async () => {
     const selected = file.files[0];
     if (!selected) return;
     disable(true);
     try {
       const contents = (await selected.text()).trim();
-      if (!contents || contents.length > 32000) {
+      if (!contents || contents.length > articleLimit) {
         status.textContent = 'Choose a nonempty text file with up to 32,000 characters.';
         return;
       }
-      body.value = contents;
+      editor.write(contents);
+      summarizedText = contents;
       summary.value = '';
       await generateSummary();
     } catch {
@@ -271,8 +464,13 @@ function ownerForm() {
   });
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!title.value.trim() || !body.value.trim()) {
+    if (!title.value.trim() || !editor.text()) {
       status.textContent = 'Enter an article title and text.';
+      return;
+    }
+    const body = editor.serialize();
+    if (body.length > articleLimit) {
+      status.textContent = 'This article exceeds the 32,000-character limit, including formatting. Shorten the article or simplify the formatting.';
       return;
     }
     disable(true);
@@ -281,9 +479,11 @@ function ownerForm() {
       await rpc('publish', {
         p_title: title.value.trim(),
         p_summary: summary.value.trim(),
-        p_body: body.value.trim()
+        p_body: body
       });
       form.reset();
+      editor.write('');
+      summarizedText = '';
       status.textContent = 'Entry published.';
       await loadPosts();
     } catch {
