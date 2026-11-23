@@ -16,8 +16,8 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px 20px;
+  justify-content: flex-start;
+  gap: 12px;
 }
 .fivey-site-footer-links a {
   display: inline-block;
@@ -31,7 +31,7 @@
 }
 .fivey-site-footer-links a:is(:hover,:focus-visible) { background: var(--footer-hover); color: #101b21; }
 .fivey-site-footer-links a:focus-visible { outline: 2px solid var(--footer-accent); outline-offset: 3px; }
-.fivey-blog-link { position: relative; margin-left: auto; }
+.fivey-blog-link { position: relative; }
 .fivey-blog-hint {
   position: absolute;
   right: 0;
@@ -76,3 +76,17 @@
 :root[data-fivey-dark] .fivey-blog-hint { background-color: #0d1722; color: #fff; }
 :root[data-fivey-dark] .fivey-site-footer-links a:is(:hover,:focus-visible) { background-color: #62e7ff; color: #101b21; }
 @media (prefers-reduced-motion:reduce) { .fivey-blog-hint { transition: none; } }
+
+@media (max-width: 420px) {
+  .fivey-site-footer-links { align-items: stretch; flex-wrap: nowrap; gap: 8px; }
+  .fivey-site-footer-links > * { flex: 1; min-width: 0; }
+  .fivey-site-footer-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    height: 100%;
+    padding-inline: 8px;
+    text-align: center;
+  }
+}
