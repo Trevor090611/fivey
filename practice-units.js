@@ -1,3 +1,5 @@
+import { biologyQuestions } from './practice-biology.js?v=1';
+
 export const units = {
   "biology": [
     "Chemistry of Life",
@@ -68,8 +70,8 @@ export const units = {
   ]
 };
 
-// All earlier practice question sets were removed on 2026-11-23.
-// Add new question sets here: unitPool returns the questions for one course unit.
+// Question banks by course. Courses without a bank return no questions yet.
 export function unitPool(course, unit) {
+  if (course === 'biology') return biologyQuestions(unit);
   return [];
 }
