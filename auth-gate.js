@@ -1,6 +1,7 @@
 import { getOrbiesBalance, orbiesKey } from './orbies-wallet.js';
 import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
+import { syncAccountData } from './account-data.js?v=1';
 
 export let analyticsAccount = null;
 export let authenticatedClient = null;
@@ -558,6 +559,8 @@ try {
       rememberDestination();
       location.replace(login.href);
     } else {
+      // Load this account's saved data into the page before anything reads it.
+      await syncAccountData(client, data.user.id).catch(() => {});
       analyticsAccount = data.user.id;
       authenticatedClient = client;
       const signOut = document.createElement('button');
