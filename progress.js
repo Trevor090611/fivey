@@ -33,6 +33,132 @@ function addLink(container, label, options) {
   container.append(link);
 }
 
+const courseNames = {
+  biology: 'AP Biology',
+  chemistry: 'AP Chemistry',
+  'physics-1': 'AP Physics 1',
+  'calculus-ab': 'AP Calculus AB',
+  psychology: 'AP Psychology',
+  macroeconomics: 'AP Macroeconomics',
+  'environmental-science': 'AP Environmental Science'
+};
+
+const bookIcon = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5.5C2 4.7 2.7 4 3.5 4H9c1.3 0 2.4.6 3 1.5.6-.9 1.7-1.5 3-1.5h5.5c.8 0 1.5.7 1.5 1.5V18c0 .8-.7 1.5-1.5 1.5H15c-1 0-1.9.5-2.4 1.2a.8.8 0 0 1-1.2 0c-.5-.7-1.4-1.2-2.4-1.2H3.5c-.8 0-1.5-.7-1.5-1.5Z"/></svg>';
+const bookArt = '<svg viewBox="0 0 220 170" aria-hidden="true"><path d="M110 46c-26-22-62-26-92-14v118c30-12 66-8 92 14Z" fill="#f4d9ef"/><path d="M110 46c26-22 62-26 92-14v118c-30-12-66-8-92 14Z" fill="#fdf0fa"/><path d="M36 66c14-4 30-3 46 2M36 88c14-4 30-3 46 2M36 110c14-4 30-3 46 2M136 70c14-5 30-6 46-2M136 92c14-5 30-6 46-2M136 114c14-5 30-6 46-2" fill="none" stroke="#c46ab6" stroke-width="5" stroke-linecap="round"/><path d="M168 18l34 30-62 70-22 8 6-22Z" fill="#a8479a"/><path d="M118 126l6-22 16 14Z" fill="#f2c9e6"/></svg>';
+
+function progressStyles() {
+  if (document.querySelector('#fivey-bank-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'fivey-bank-styles';
+  style.textContent = `
+.fivey-bank-card{position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;max-width:560px;margin-top:24px;padding:26px 28px;border-radius:18px;background:linear-gradient(135deg,#cc6fbd,#b65aa8);color:#fff}
+:root .fivey-bank-card h3,:root[data-fivey-dark] .fivey-bank-card h3{margin:0 0 18px;color:#fff!important;font:600 clamp(22px,4vw,30px)/1.15 system-ui,sans-serif;letter-spacing:-.01em}
+.fivey-bank-meta{display:flex;justify-content:space-between;gap:12px;max-width:60%;font-size:clamp(15px,2.6vw,19px)}
+.fivey-bank-meta strong{font-weight:700}
+.fivey-bank-track{max-width:60%;height:10px;margin:12px 0 24px;overflow:hidden;border-radius:999px;background:rgb(255 255 255 / 42%)}
+.fivey-bank-fill{height:100%;min-width:8px;border-radius:inherit;background:#fff}
+a.fivey-bank-open{display:inline-flex;align-items:center;gap:14px;padding:10px 20px;border:0;border-radius:999px;background:#111;color:#fff;font-size:18px;font-weight:600;text-decoration:none}
+a.fivey-bank-open:is(:hover,:focus-visible){background:#000;color:#fff}
+.fivey-bank-open span{color:#9a9a9a;font-size:22px;line-height:1}
+.fivey-bank-art{position:absolute;right:-8px;bottom:-12px;z-index:-1;width:44%;max-width:230px}
+.fivey-bank-art svg{display:block;width:100%;height:auto}
+#practice-unit-list:has(.fivey-unit-row){justify-items:stretch;max-width:760px}
+a.fivey-unit-row{display:flex;align-items:center;gap:18px;box-sizing:border-box;width:100%;padding:16px 20px;border:0;border-radius:12px;background:#151515;color:#e8e8e8;text-decoration:none}
+a.fivey-unit-row:is(:hover,:focus-visible){background:#222;color:#fff}
+.fivey-unit-icon{display:grid;flex:none;place-items:center;width:48px;height:48px;border-radius:8px;background:#272727;color:#c4c4c4}
+.fivey-unit-body{flex:1;min-width:0}
+.fivey-unit-title{display:block;margin-bottom:10px;color:#f2f2f2;font-size:clamp(15px,2.4vw,18px);font-weight:600}
+.fivey-unit-line{display:flex;align-items:center;gap:16px}
+.fivey-unit-track{flex:1;height:6px;overflow:hidden;border-radius:999px;background:#303030}
+.fivey-unit-fill{height:100%;min-width:6px;border-radius:inherit;background:#4f7cff}
+.fivey-unit-count{flex:none;color:#a3a3a3;font-size:14px;white-space:nowrap}
+@media(max-width:560px){.fivey-unit-line{flex-direction:column;align-items:stretch;gap:6px}.fivey-bank-meta,.fivey-bank-track{max-width:none}.fivey-bank-art{opacity:.3}}
+`;
+  document.head.append(style);
+}
+
+function percentOf(done, total) {
+  return total ? Math.round(done / total * 100) : 0;
+}
+
+// Pink card: how many questions in the whole course bank the user has solved.
+function addBankCard(container) {
+  const { total, done } = bankProgress(units[course].map((_, index) => index + 1));
+  if (!total) return;
+  progressStyles();
+  const card = document.createElement('div');
+  card.className = 'fivey-bank-card';
+  const title = document.createElement('h3');
+  title.textContent = (courseNames[course] ?? 'Course') + ' Question Bank';
+  const meta = document.createElement('div');
+  meta.className = 'fivey-bank-meta';
+  const solved = document.createElement('span');
+  solved.textContent = done.toLocaleString() + ' of ' + total.toLocaleString() + ' solved';
+  const percent = document.createElement('strong');
+  percent.textContent = percentOf(done, total) + '%';
+  meta.append(solved, percent);
+  const track = document.createElement('div');
+  track.className = 'fivey-bank-track';
+  track.setAttribute('role', 'progressbar');
+  track.setAttribute('aria-label', 'Questions solved');
+  track.setAttribute('aria-valuemin', '0');
+  track.setAttribute('aria-valuemax', String(total));
+  track.setAttribute('aria-valuenow', String(done));
+  const fill = document.createElement('div');
+  fill.className = 'fivey-bank-fill';
+  fill.style.width = percentOf(done, total) + '%';
+  track.append(fill);
+  const open = document.createElement('a');
+  open.className = 'fivey-bank-open';
+  open.href = practiceUrl({ mode: 'mixed' });
+  open.innerHTML = 'Open <span aria-hidden="true">›</span>';
+  const art = document.createElement('div');
+  art.className = 'fivey-bank-art';
+  art.innerHTML = bookArt;
+  card.append(title, meta, track, open, art);
+  container.after(card);
+}
+
+// Dark rows: questions completed in each unit.
+function addUnitRows(list, available) {
+  progressStyles();
+  for (const id of available) {
+    const { total, done } = bankProgress([id]);
+    const row = document.createElement('a');
+    row.className = 'fivey-unit-row';
+    row.href = practiceUrl({ mode: 'unit', unit: id });
+    const icon = document.createElement('span');
+    icon.className = 'fivey-unit-icon';
+    icon.innerHTML = bookIcon;
+    const body = document.createElement('span');
+    body.className = 'fivey-unit-body';
+    const title = document.createElement('span');
+    title.className = 'fivey-unit-title';
+    title.textContent = unitLabel(id);
+    const line = document.createElement('span');
+    line.className = 'fivey-unit-line';
+    const track = document.createElement('span');
+    track.className = 'fivey-unit-track';
+    track.setAttribute('role', 'progressbar');
+    track.setAttribute('aria-label', unitLabel(id) + ' questions completed');
+    track.setAttribute('aria-valuemin', '0');
+    track.setAttribute('aria-valuemax', String(total));
+    track.setAttribute('aria-valuenow', String(done));
+    const fill = document.createElement('span');
+    fill.className = 'fivey-unit-fill';
+    fill.style.display = 'block';
+    fill.style.width = percentOf(done, total) + '%';
+    track.append(fill);
+    const count = document.createElement('span');
+    count.className = 'fivey-unit-count';
+    count.textContent = done.toLocaleString() + ' / ' + total.toLocaleString() + ' questions completed';
+    line.append(track, count);
+    body.append(title, line);
+    row.append(icon, body);
+    list.append(row);
+  }
+}
+
 function examSetupUrl(options) {
   return './full-length.html?' + new URLSearchParams({ course, ...options }) + '#practice-exams-panel';
 }
@@ -113,7 +239,8 @@ function showPractice() {
     description.hidden = true;
     const list = section.querySelector('#practice-unit-list');
     list.hidden = false;
-    for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
+    if (bankProgress(available).total) addUnitRows(list, available);
+    else for (const id of available) addLink(list, unitLabel(id), { mode: 'unit', unit: id });
   } else if (mode === 'unit' && available.includes(unit)) {
     heading.textContent = unitLabel(unit);
     showSetSetup(unit, count);
@@ -137,6 +264,7 @@ function showPractice() {
     choices.hidden = false;
     addLink(choices, 'Practice By Units', { mode: 'choose' });
     addLink(choices, 'Practice All Units', { mode: 'mixed' });
+    addBankCard(choices);
   }
 }
 
@@ -218,35 +346,85 @@ function spreadQuestionTypes(questions) {
   return ordered.reverse();
 }
 
+// Questions a user has finished are saved on their account and are not given to them again.
+function questionKey(item) {
+  return item.id ?? item.prompt;
+}
+
+function completedKey() {
+  return 'fivey-practice-completed-v1:' + analyticsAccount + ':' + course;
+}
+
+function readCompleted() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(completedKey()) || '[]');
+    return new Set(Array.isArray(saved) ? saved : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function writeCompleted(completed) {
+  try {
+    localStorage.setItem(completedKey(), JSON.stringify([...completed]));
+  } catch {
+    // Completion tracking is skipped when storage is unavailable.
+  }
+}
+
+function markCompleted(items) {
+  const completed = readCompleted();
+  for (const item of items) completed.add(questionKey(item));
+  writeCompleted(completed);
+}
+
+function remainingQuestions(unit, completed = readCompleted()) {
+  return unitPool(course, unit).filter(item => !completed.has(questionKey(item)));
+}
+
+function bankProgress(unitList) {
+  const completed = readCompleted();
+  let total = 0;
+  let done = 0;
+  for (const unit of unitList) {
+    for (const item of unitPool(course, unit)) {
+      total++;
+      if (completed.has(questionKey(item))) done++;
+    }
+  }
+  return { total, done };
+}
+
 function reserveQuestions(selected, count) {
   const key = 'fivey-progress-seen-v1:' + course;
   const saved = JSON.parse(localStorage.getItem(key) ?? '{"seen":[],"offset":0}');
   const seen = new Set(saved.seen);
+  const completed = readCompleted();
   const pools = shuffle(selected).map(unit => {
-    const pool = unitPool(course, unit);
-    const used = pool.filter(item => seen.has(item.prompt));
-    const fresh = pool.filter(item => !seen.has(item.prompt));
+    const pool = remainingQuestions(unit, completed);
+    const used = pool.filter(item => seen.has(questionKey(item)));
+    const fresh = pool.filter(item => !seen.has(questionKey(item)));
     return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)].map(item => ({ ...item, unit }));
   });
-  // Graph questions can be added to a unit's pool with a `plot` field.
+  // Up to a third of a set can be graph questions (items with a `plot` field).
   const graphQuestions = shuffle(pools.flat().filter(item => item.plot));
-  const freshGraphs = graphQuestions.filter(item => !seen.has(item.prompt));
+  const freshGraphs = graphQuestions.filter(item => !seen.has(questionKey(item)));
   const graphChoices = freshGraphs.length ? freshGraphs : graphQuestions;
   const set = graphChoices.slice(0, Math.ceil(count / 3));
-  const used = new Set(set.map(item => item.prompt));
-  for (const item of set) seen.add(item.prompt);
+  const used = new Set(set.map(questionKey));
+  for (const item of set) seen.add(questionKey(item));
   while (set.length < count) {
     const before = set.length;
     for (const pool of pools) {
       let item = pool.pop();
-      while (item && used.has(item.prompt)) item = pool.pop();
+      while (item && used.has(questionKey(item))) item = pool.pop();
       if (!item) continue;
       set.push(item);
-      used.add(item.prompt);
-      seen.add(item.prompt);
+      used.add(questionKey(item));
+      seen.add(questionKey(item));
       if (set.length === count) break;
     }
-    if (before === set.length) return null;
+    if (before === set.length) break;
   }
   localStorage.setItem(key, JSON.stringify({ ...saved, seen: [...seen] }));
   return shuffle(set);
@@ -350,16 +528,20 @@ function setupPractice(selected, count, minutes = 0) {
       if (saved?.url === location.search) {
         attempt = saved;
       } else {
-        const available = selected.reduce((total, unit) => total + unitPool(course, unit).length, 0);
-        if (available < count) {
+        const total = selected.reduce((sum, unit) => sum + unitPool(course, unit).length, 0);
+        if (!total) {
           status.textContent = 'Practice questions for this course are being rebuilt. Check back soon!';
+          return;
+        }
+        if (!selected.some(unit => remainingQuestions(unit).length)) {
+          showAllCompleted(total);
           return;
         }
         const reserve = () => reserveQuestions(selected, count);
         const set = navigator.locks
           ? await navigator.locks.request('fivey-progress:' + course, reserve)
           : reserve();
-        if (!set?.length || set.length !== count) throw new Error('Incorrect practice set size');
+        if (!set?.length) throw new Error('Practice set unavailable');
         attempt = {
           url: location.search,
           set,
@@ -369,12 +551,33 @@ function setupPractice(selected, count, minutes = 0) {
         };
         save();
       }
-      status.textContent = count + ' questions ready.';
+      const size = attempt.set.length;
+      status.textContent = size < count
+        ? 'Only ' + size + ' new question' + (size === 1 ? ' is' : 's are') + ' left in this selection, so this set has ' + size + '.'
+        : size + ' questions ready.';
       render(attempt.set);
       if (active) quiz.querySelector('input').focus();
     } catch {
       status.textContent = 'Could not load the practice set. Check your connection and site storage, then refresh to retry.';
     }
+  }
+
+  // Every question in the selection has been completed: offer to practice them again.
+  function showAllCompleted(total) {
+    status.textContent = 'You have completed all ' + total.toLocaleString() + ' questions in this selection. Great work!';
+    const again = document.createElement('button');
+    again.type = 'button';
+    again.className = 'practice-button';
+    again.textContent = 'Practice these questions again';
+    again.addEventListener('click', () => {
+      const completed = readCompleted();
+      for (const unit of selected) {
+        for (const item of unitPool(course, unit)) completed.delete(questionKey(item));
+      }
+      writeCompleted(completed);
+      location.reload();
+    });
+    status.after(again);
   }
 
   void startSet();
@@ -497,6 +700,7 @@ function setupPractice(selected, count, minutes = 0) {
       summary.focus();
 
       if (!attempted) return;
+      markCompleted(reviews.filter(({ field }) => field.querySelector(':checked')).map(({ item }) => item));
       const mode = params.get('mode') === 'set' && params.has('unit') ? 'unit' : 'allUnits';
       const results = reviews.flatMap(({ field, item }) => {
         const checked = field.querySelector(':checked');
