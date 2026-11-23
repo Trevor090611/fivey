@@ -40,3 +40,34 @@
 .progress-quiz label[data-result] input { border-color: currentColor; color: inherit; }
 .progress-quiz .choice-result { font-size: .88em; }
 .progress-quiz .progress-explain { display: block; margin: -7px 0 20px; }
+
+.practice-context { margin:6px 0 12px; }
+.practice-plot {
+  --plot-first:#2654a5;
+  --plot-second:#965516;
+  --plot-third:#6f357a;
+  --plot-grid:#d6ddd7;
+  --plot-paper:#fff;
+  width:min(600px,100%);
+  margin:0 0 14px;
+  padding:6px 9px;
+  border:1px solid var(--plot-grid);
+  border-radius:8px;
+  background:var(--plot-paper);
+}
+:root[data-fivey-dark] .practice-plot {
+  --plot-first:#76adff;
+  --plot-second:#ffb069;
+  --plot-third:#f1a4fa;
+  --plot-grid:#43494e;
+  --plot-paper:#14191c;
+}
+.practice-plot svg { display:block; width:100%; height:auto; }
+.practice-plot svg text { fill:currentColor; font:15px system-ui,sans-serif; }
+.practice-plot figcaption { display:flex; flex-wrap:wrap; justify-content:center; gap:4px 14px; font-size:.9rem; }
+.practice-plot figcaption span { display:inline-flex; gap:7px; align-items:center; }
+.practice-plot figcaption i { width:22px; border-top:2px solid; }
+.practice-plot details { overflow-x:auto; margin:6px 0; font-size:.9rem; }
+.practice-plot summary { cursor:pointer; }
+.practice-plot table { border-collapse:collapse; margin:7px 0; }
+.practice-plot th, .practice-plot td { text-align:start; padding:4px 10px; border:1px solid var(--plot-grid); }

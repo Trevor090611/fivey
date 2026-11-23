@@ -1,6 +1,8 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
 import { createChest, qualifiesForChest } from './orbies-wallet.js';
 import { units, unitPool } from './practice-units.js?v=5';
+import { stimulusQuestions } from './practice-stimuli.js?v=1';
+import { renderPracticePlot } from './practice-plot.js?v=1';
 
 
 const params = new URLSearchParams(location.search);
@@ -227,8 +229,14 @@ function reserveQuestions(bank, selected, count) {
     const fresh = pool.filter(item => !seen.has(item.prompt));
     return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)].map(item => ({ ...item, unit }));
   });
-  const set = [];
-  const used = new Set();
+  const graphQuestions = shuffle(selected.flatMap(unit =>
+    stimulusQuestions(course, unit).map(item => ({ ...item, unit }))
+  ));
+  const freshGraphs = graphQuestions.filter(item => !seen.has(item.prompt));
+  const graphChoices = freshGraphs.length ? freshGraphs : graphQuestions;
+  const set = graphChoices.slice(0, Math.ceil(count / 3));
+  const used = new Set(set.map(item => item.prompt));
+  for (const item of set) seen.add(item.prompt);
   while (set.length < count) {
     const before = set.length;
     for (const pool of pools) {
@@ -383,6 +391,12 @@ function setupPractice(selected, count, minutes = 0) {
       const legend = document.createElement('legend');
       legend.textContent = (index + 1) + '. ' + item.prompt;
       field.append(legend);
+      if (item.plot) {
+        const context = document.createElement('p');
+        context.className = 'practice-context';
+        context.textContent = item.context;
+        field.append(context, renderPracticePlot(item.plot));
+      }
 
       for (const choice of shuffle(item.choices.map((text, value) => ({ text, value })))) {
         const label = document.createElement('label');
