@@ -1,0 +1,84 @@
+.biology-cheatsheet {
+  --notes-accent: #326249;
+  --notes-selected: #d9f783;
+  --notes-wash: #edf5e6;
+  display: grid;
+  grid-template-columns: minmax(9rem, 11.5rem) minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-top: 1.5rem;
+  padding: clamp(.9rem, 2.4vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+:root[data-fivey-dark] .biology-cheatsheet {
+  --notes-accent: #63d5e7;
+  --notes-selected: #9effdb;
+  --notes-wash: #182c34;
+}
+
+.biology-cheatsheet > p { grid-column: 1 / -1; margin: 0; }
+.biology-unit-menu { display: grid; align-content: start; gap: .45rem; }
+.biology-unit-menu button {
+  appearance: none;
+  min-height: 44px;
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.biology-unit-menu button:hover { border-color: var(--notes-accent); }
+.biology-unit-menu button[aria-pressed="true"] {
+  border-color: var(--notes-accent);
+  background: var(--notes-selected);
+  color: #172820;
+}
+.biology-unit-menu button:focus-visible,
+.biology-table-scroll:focus-visible { outline: 2px solid var(--notes-accent); outline-offset: 2px; }
+.biology-unit-content { min-width: 0; }
+.biology-unit-content h3 { margin: 0 0 1.1rem; font-size: clamp(1.2rem, 2.5vw, 1.65rem); line-height: 1.25; }
+.biology-source-heading { margin: 0 0 1rem; color: var(--muted); }
+.biology-topic {
+  margin: 0 0 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--white);
+}
+.biology-topic:last-child { margin-bottom: 0; }
+.biology-topic h4, .biology-cover h4 {
+  margin: 0;
+  padding: .8rem .95rem;
+  background: var(--notes-wash);
+  font-size: 1.03rem;
+  line-height: 1.35;
+}
+.biology-table-scroll { overflow-x: auto; }
+.biology-topic table { width: 100%; border-collapse: collapse; text-align: left; }
+.biology-topic tbody th { width: 25%; min-width: 6.5rem; font-weight: 700; }
+.biology-topic thead th { background: var(--paper); }
+.biology-topic th, .biology-topic td {
+  padding: .65rem .8rem;
+  border-top: 1px solid var(--line);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.biology-topic table:has(thead) { min-width: 31rem; }
+.biology-figure { display: block; width: min(100%, 20rem); height: auto; margin-top: .65rem; background: #fff; }
+.biology-cover { margin-bottom: 1.35rem; text-align: center; }
+.biology-cover > p { margin: .6rem 0; }
+@media (max-width: 660px) {
+  .biology-cheatsheet { grid-template-columns: minmax(0, 1fr); }
+  .biology-unit-menu { grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr)); }
+  .biology-unit-menu button { text-align: center; }
+  .biology-unit-menu button:first-child { grid-column: 1 / -1; }
+  .biology-topic th, .biology-topic td { padding: .55rem; }
+  .biology-topic tbody th { min-width: 5.15rem; }
+}

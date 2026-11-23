@@ -423,6 +423,20 @@ function renderCheatsheet(id) {
   download.href = './textbook-download.html?type=cheatsheet&course=' + encodeURIComponent(id);
   guides.append(googleDocs, download);
   guides.hidden = false;
+  if (id === 'biology') {
+    const notes = element('section');
+    notes.className = 'biology-cheatsheet';
+    notes.setAttribute('aria-label', 'AP Biology cheatsheet notes');
+    const status = element('p', 'Loading AP Biology notes…');
+    status.setAttribute('role', 'status');
+    notes.append(status);
+    guides.append(notes);
+    import('./biology-cheatsheet.js')
+      .then(({mountBiologyCheatsheet}) => mountBiologyCheatsheet(notes))
+      .catch(() => {
+        status.textContent = 'The notes could not load. You can still open the Google Doc or download the PDF above.';
+      });
+  }
 }
 
 function renderGuides(course) {
