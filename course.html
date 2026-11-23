@@ -489,7 +489,17 @@ if (selected) {
     document.querySelector('#articles-title').textContent = articleView ? 'Articles' : articleTitle;
     document.querySelector('#articles-panel').hidden = false;
   }
-  const courseHref = './course.html?course=' + encodeURIComponent(id); if (guideView) { const actions = document.querySelectorAll('#study-guide-actions a'); actions[0].href = courseHref + '&view=detailed-guide'; actions[1].href = courseHref + '&view=cheatsheet'; }
+  const courseHref = './course.html?course=' + encodeURIComponent(id);
+  if (guideView) {
+    const detailedGuideLink = document.querySelector('#detailed-guide-link');
+    const cheatsheetOnlyCourses = ['environmental-science', 'physics-1', 'psychology', 'calculus-ab'];
+    if (cheatsheetOnlyCourses.includes(id)) {
+      detailedGuideLink.remove();
+    } else {
+      detailedGuideLink.href = courseHref + '&view=detailed-guide';
+    }
+    document.querySelector('#cheatsheet-link').href = courseHref + '&view=cheatsheet';
+  }
   if (guideView || detailedGuideView || cheatsheetView || articleView || resourcesView || analyticsView) {
     document.querySelector('main').classList.add('resource-view');
     const back = document.querySelector('#course-back');
