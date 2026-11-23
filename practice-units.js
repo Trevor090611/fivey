@@ -1,4 +1,5 @@
 import { examQuestions } from './practice-exam-questions.js?v=3';
+import { biologySkillQuestions } from './practice-biology-skills.js?v=1';
 
 export const units = {
   "biology": [
@@ -173,10 +174,12 @@ const chemistryOfLife = [
 })));
 
 export function unitPool(course, unit, bank) {
-  if (course === 'biology' && unit === 1) return chemistryOfLife;
+  // Biology also draws on skill questions written for each unit (data, calculation, design, prediction, concept).
+  const skills = course === 'biology' ? biologySkillQuestions(unit) : [];
+  if (course === 'biology' && unit === 1) return [...chemistryOfLife, ...skills];
   const reviewItems = bankGroups[course][unit - 1].slice(0, 2).map(index => ({
     ...bank[index],
     family: 'review'
   }));
-  return [...examQuestions(course, unit), ...reviewItems];
+  return [...examQuestions(course, unit), ...reviewItems, ...skills];
 }
