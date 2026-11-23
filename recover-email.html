@@ -54,6 +54,7 @@
   .auth-card #recovery-forgot-password:hover { text-decoration-thickness: 2px; }
   .auth-card #recovery-forgot-password:focus-visible { text-decoration-thickness: 3px; }
 </style>
+<link rel="stylesheet" href="./site-footer.css?v=1">
 </head>
 <body class="fivey-login">
 <main class="auth-card">
@@ -104,6 +105,15 @@
   <a class="recovery-back" href="./login.html">Back to log in</a>
   <noscript>Enable JavaScript to recover your account.</noscript>
 </main>
+<footer class="fivey-site-footer">
+  <nav aria-label="Footer navigation" class="fivey-site-footer-links">
+    <a href="./about.html">About the Developer</a>
+    <span class="fivey-blog-link">
+      <a href="./blog.html" aria-describedby="fivey-blog-hint">Developer's Personal Blog</a>
+      <span class="fivey-blog-hint" id="fivey-blog-hint" role="tooltip">Learn how the Developer got a 5 on all those AP exams!</span>
+    </span>
+  </nav>
+</footer>
 <script type="module">
 import { authConfig } from './auth-config.js';
 import { completed, connect, connectClient, continueToSite, login } from './auth-client.js?v=username-login1';

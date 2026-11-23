@@ -46,6 +46,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <script type="module" src="./fivey-chat.js?v=6"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta3">
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
+<link rel="stylesheet" href="./site-footer.css?v=1">
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -54,7 +55,15 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <section class="directory" id="courses" aria-labelledby="directory-title"><h1 id="directory-title">AP Course Library</h1><nav class="grid" id="directory" aria-label="AP courses"></nav></section>
 <noscript>Enable JavaScript to browse the course library.</noscript>
 </main>
-<footer><div class="wrap bar"><span>Fivey · AP study guides and articles</span><a href="https://github.com/Trevor090611/fivey/blob/main/PUBLISHING.md">Add guides or articles</a></div></footer>
+<footer class="fivey-site-footer">
+  <nav aria-label="Footer navigation" class="fivey-site-footer-links">
+    <a href="./about.html">About the Developer</a>
+    <span class="fivey-blog-link">
+      <a href="./blog.html" aria-describedby="fivey-blog-hint">Developer's Personal Blog</a>
+      <span class="fivey-blog-hint" id="fivey-blog-hint" role="tooltip">Learn how the Developer got a 5 on all those AP exams!</span>
+    </span>
+  </nav>
+</footer>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],

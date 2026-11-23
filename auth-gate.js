@@ -3,6 +3,7 @@ import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
 
 export let analyticsAccount = null;
+export let authenticatedClient = null;
 
 const subjects = [
   ['biology', 'AP Biology'],
@@ -498,6 +499,7 @@ try {
       location.replace(login.href);
     } else {
       analyticsAccount = data.user.id;
+      authenticatedClient = client;
       const signOut = document.createElement('button');
       signOut.className = 'fivey-sign-out';
       signOut.textContent = 'Sign out';
