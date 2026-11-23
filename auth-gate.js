@@ -15,29 +15,54 @@ const subjects = [
   ['macroeconomics', 'AP Macroeconomics', 'humanities'],
 ];
 
-const streakCooldownMs = 24 * 60 * 60 * 1000;
+// Streaks are saved on the account (Supabase user metadata) so every device sees the same count.
+const streakWindowMs = 24 * 60 * 60 * 1000;
+const streakActivityWriteMs = 10 * 60 * 1000;
 
-function streakAfterSignIn(previous, signedInAt) {
-  const count = Number.isSafeInteger(previous?.count) && previous.count > 0 ? previous.count : 0;
-  if (!Number.isFinite(signedInAt)) return count ? previous : null;
-  if (!count) return { count: 1, countedAt: signedInAt };
-
-  if (!Number.isFinite(previous.countedAt)) {
-    // Older records saved a calendar day without an exact sign-in time.
-    const date = new Date();
-    const day = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / streakCooldownMs;
-    const continuous = previous.day === day || previous.day === day - 1;
-    if (!continuous) return { count: 1, countedAt: signedInAt };
-    const savedDayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate() - (day - previous.day));
-    return { count, countedAt: Math.max(signedInAt, savedDayStart.getTime()) };
-  }
-
-  const elapsed = signedInAt - previous.countedAt;
-  if (elapsed < streakCooldownMs) return previous;
-  return { count: elapsed < 2 * streakCooldownMs ? count + 1 : 1, countedAt: signedInAt };
+function normalizeStreak(record) {
+  if (!record || typeof record !== 'object') return null;
+  const count = Number(record.count);
+  if (!Number.isSafeInteger(count) || count < 0) return null;
+  let countedAt = Number(record.countedAt);
+  // The oldest browser-only records saved a day number instead of a time.
+  if (!Number.isFinite(countedAt) && Number.isFinite(record.day)) countedAt = record.day * streakWindowMs;
+  if (!Number.isFinite(countedAt)) return null;
+  const lastActiveAt = Number(record.lastActiveAt);
+  return { count, countedAt, lastActiveAt: Number.isFinite(lastActiveAt) ? Math.max(lastActiveAt, countedAt) : countedAt };
 }
 
-function createStreakCounter(user, subjectTrigger) {
+function streakIsAlive(record, now) {
+  return now - record.lastActiveAt <= streakWindowMs;
+}
+
+// Combines the account's streak with one left in this browser by the old browser-only version.
+function mergeStreaks(saved, local, now) {
+  if (!saved || !local) return saved || local;
+  const best = streakIsAlive(saved, now) === streakIsAlive(local, now)
+    ? (local.count > saved.count ? local : saved)
+    : (streakIsAlive(saved, now) ? saved : local);
+  return { ...best, lastActiveAt: Math.max(saved.lastActiveAt, local.lastActiveAt) };
+}
+
+function sameLocalDay(a, b) {
+  const first = new Date(a);
+  const second = new Date(b);
+  return first.getFullYear() === second.getFullYear() && first.getMonth() === second.getMonth() &&
+    first.getDate() === second.getDate();
+}
+
+function streakAfterVisit(previous, now) {
+  if (!previous) return { count: 1, countedAt: now, lastActiveAt: now };
+  // More than 24 hours without visiting while signed in breaks the streak.
+  if (now - previous.lastActiveAt > streakWindowMs) return { count: 0, countedAt: now, lastActiveAt: now };
+  // One increase per calendar day.
+  if (now <= previous.countedAt || sameLocalDay(previous.countedAt, now)) {
+    return { ...previous, lastActiveAt: Math.max(previous.lastActiveAt, now) };
+  }
+  return { count: previous.count + 1, countedAt: now, lastActiveAt: now };
+}
+
+function createStreakCounter(user, subjectTrigger, client) {
   const counter = document.createElement('span');
   counter.className = 'fivey-streak';
   counter.title = 'Daily streak';
@@ -58,39 +83,58 @@ function createStreakCounter(user, subjectTrigger) {
   sparkles.append(trail);
   counter.append(fire, number, sparkles);
 
-  const key = 'fivey-sign-in-streak-v2:' + user.id;
-  const legacyKey = 'fivey-visit-streak-v1:' + user.id;
-  const signedInAt = Date.parse(user.last_sign_in_at);
+  const lockKey = 'fivey-streak:' + user.id;
+  // Browser-only streaks from earlier versions; merged into the account once, then removed.
+  const localKeys = ['fivey-sign-in-streak-v2:' + user.id, 'fivey-visit-streak-v1:' + user.id];
   const format = new Intl.NumberFormat();
+  let currentUser = user;
   let knownStreak = null;
 
-  function recordSignIn() {
-    let previous = knownStreak;
-    try {
-      previous = JSON.parse(localStorage.getItem(key) || 'null') ?? knownStreak
-        ?? JSON.parse(localStorage.getItem(legacyKey) || 'null');
-    } catch {
-      // Keep the last known count if storage is unavailable.
-    }
-
-    const next = streakAfterSignIn(previous, signedInAt);
-    if (next && next !== previous) {
+  async function recordVisit() {
+    const now = Date.now();
+    if (client && knownStreak) {
       try {
-        localStorage.setItem(key, JSON.stringify(next));
+        const { data } = await client.auth.getUser();
+        if (data?.user) currentUser = data.user;
       } catch {
-        // Keep the updated count in memory for this page.
+        // Use the account details already loaded for this page.
+      }
+    }
+    const saved = normalizeStreak(currentUser.user_metadata?.fivey_streak);
+    let local = null;
+    try {
+      for (const localKey of localKeys) {
+        local = mergeStreaks(local, normalizeStreak(JSON.parse(localStorage.getItem(localKey) || 'null')), now);
+      }
+    } catch {
+      // Browser storage is optional now that the streak lives on the account.
+    }
+    const previous = mergeStreaks(saved, local, now) ?? knownStreak;
+    const next = streakAfterVisit(previous, now);
+    const changed = !saved || local || next.count !== saved.count || next.countedAt !== saved.countedAt ||
+      next.lastActiveAt - saved.lastActiveAt >= streakActivityWriteMs;
+    if (client && changed) {
+      try {
+        const { data, error } = await client.auth.updateUser({ data: { fivey_streak: next } });
+        if (error) throw error;
+        if (data?.user) currentUser = data.user;
+        if (local) {
+          for (const localKey of localKeys) localStorage.removeItem(localKey);
+        }
+      } catch {
+        // Show the updated count now; the next visit will try saving it again.
       }
     }
     knownStreak = next;
-    return { count: next?.count ?? 0, increased: next !== previous && next?.count > (previous?.count ?? 0) };
+    return { count: next.count, increased: next.count > (previous?.count ?? 0) };
   }
 
   async function renderStreak() {
     let state;
     try {
-      state = navigator.locks ? await navigator.locks.request(key, recordSignIn) : recordSignIn();
+      state = navigator.locks ? await navigator.locks.request(lockKey, recordVisit) : await recordVisit();
     } catch {
-      state = recordSignIn();
+      state = { count: knownStreak?.count ?? 0, increased: false };
     }
     number.textContent = format.format(state.count);
     counter.setAttribute('aria-label', 'Daily streak: ' + number.textContent);
@@ -341,7 +385,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   window.addEventListener('fivey:orbies-updated', refreshOrbies);
   const accountActions = document.createElement('div');
   accountActions.className = 'fivey-account-actions';
-  accountActions.append(orbiesBalance, createStreakCounter(user, trigger), dropdown, userMenu);
+  accountActions.append(orbiesBalance, createStreakCounter(user, trigger, client), dropdown, userMenu);
   nav.append(accountActions);
 
   function setExpanded(expanded) {
