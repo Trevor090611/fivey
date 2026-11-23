@@ -274,7 +274,8 @@ a.card[data-category="humanities"] { --button-fill: #fff1b8; }
 
 /* Course category pills use black text for clear contrast. */
 .directory .card[data-category="stem"] .tag { color: #000 !important; }
-.directory .card[data-category="humanities"] .tag { background: #ff4fd8 !important; color: #000 !important; }
+.directory .card[data-category="humanities"] .tag { background: #ffd84d !important; color: #000 !important; }
+:root[data-fivey-dark] .directory .card[data-category="humanities"] .tag { background: #ff4fd8 !important; }
 
 /* Humanities course buttons use a magenta sweep in dark mode. */
 :root[data-fivey-dark] main[data-category="humanities"] :is(button,[role="button"],input[type="button"],input[type="submit"],input[type="reset"],a.practice-button,a.intro-link,a.card,.profile-picture-upload) {
