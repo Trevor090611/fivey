@@ -404,6 +404,22 @@ function showWelcomeDialog(user) {
   about.href = new URL('./#intro-title', import.meta.url).href;
   about.setAttribute('role', 'button');
   about.textContent = 'What is Fivey?';
+  about.addEventListener('click', event => {
+    const homePath = new URL('./', import.meta.url).pathname;
+    const onHome = location.pathname === homePath || location.pathname === homePath + 'index.html';
+    const section = onHome && document.getElementById('intro-title');
+    if (!section) return; // Other pages: follow the link to the homepage section.
+    event.preventDefault();
+    dialog.close();
+    const header = document.querySelector('body > header');
+    const offset = header ? header.getBoundingClientRect().height + 16 : 16;
+    const top = section.getBoundingClientRect().top + window.scrollY - offset;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
+    history.replaceState(null, '', '#intro-title');
+    section.setAttribute('tabindex', '-1');
+    section.focus({ preventScroll: true });
+  });
   const plan = document.createElement('a');
   plan.className = 'practice-button fivey-welcome-button';
   const planTarget = new URL('./account.html', import.meta.url);
