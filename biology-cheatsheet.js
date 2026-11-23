@@ -8,7 +8,8 @@ export async function mountBiologyCheatsheet(container) {
     stylesheet.addEventListener('error', reject, { once: true });
     document.head.append(stylesheet);
   });
-  const [response] = await Promise.all([fetch('./biology-cheatsheet-notes.html'), styleReady]);
+  const notesRequest = fetch('./biology-cheatsheet-notes.html?v=2', { cache: 'no-cache' });
+  const [response] = await Promise.all([notesRequest, styleReady]);
   if (!response.ok) throw new Error('Cannot load AP Biology notes');
 
   const notes = document.createElement('template');

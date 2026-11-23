@@ -431,7 +431,7 @@ function renderCheatsheet(id) {
     status.setAttribute('role', 'status');
     notes.append(status);
     guides.append(notes);
-    import('./biology-cheatsheet.js')
+    import('./biology-cheatsheet.js?v=2')
       .then(({mountBiologyCheatsheet}) => mountBiologyCheatsheet(notes))
       .catch(() => {
         status.textContent = 'The notes could not load. You can still open the Google Doc or download the PDF above.';
