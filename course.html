@@ -466,9 +466,9 @@ if (selected) {
     equation.style.setProperty('--size', (0.88 + Math.random() * 0.24).toFixed(2));
     equationLayer.append(equation);
   }
-  const hasArticleSection = id !== 'environmental-science';
+  const hasArticleSection = !['environmental-science', 'biology', 'psychology', 'macroeconomics'].includes(id);
   const articleView = hasArticleSection && params.get('view') === 'article';
-  const articleTitle = 'How I got a ' + (['biology','psychology','macroeconomics'].includes(id) ? '4' : '5') + ' on ' + name;
+  const articleTitle = 'How I got a 5 on ' + name;
   let title = name;
   if (guideView) title = name + ' Study Guides'; if (detailedGuideView) title = name + ' Detailed Study Guide'; if (cheatsheetView) title = name + ' Cheatsheet';
   if (articleView) title = articleTitle;
