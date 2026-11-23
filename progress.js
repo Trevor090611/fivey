@@ -1,7 +1,6 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
 import { createChest, qualifiesForChest } from './orbies-wallet.js';
-import { units, unitPool } from './practice-units.js?v=5';
-import { stimulusQuestions } from './practice-stimuli.js?v=1';
+import { units, unitPool } from './practice-units.js?v=6';
 import { renderPracticePlot } from './practice-plot.js?v=1';
 
 
@@ -219,19 +218,18 @@ function spreadQuestionTypes(questions) {
   return ordered.reverse();
 }
 
-function reserveQuestions(bank, selected, count) {
+function reserveQuestions(selected, count) {
   const key = 'fivey-progress-seen-v1:' + course;
   const saved = JSON.parse(localStorage.getItem(key) ?? '{"seen":[],"offset":0}');
   const seen = new Set(saved.seen);
   const pools = shuffle(selected).map(unit => {
-    const pool = unitPool(course, unit, bank);
+    const pool = unitPool(course, unit);
     const used = pool.filter(item => seen.has(item.prompt));
     const fresh = pool.filter(item => !seen.has(item.prompt));
     return [...spreadQuestionTypes(used), ...spreadQuestionTypes(fresh)].map(item => ({ ...item, unit }));
   });
-  const graphQuestions = shuffle(selected.flatMap(unit =>
-    stimulusQuestions(course, unit).map(item => ({ ...item, unit }))
-  ));
+  // Graph questions can be added to a unit's pool with a `plot` field.
+  const graphQuestions = shuffle(pools.flat().filter(item => item.plot));
   const freshGraphs = graphQuestions.filter(item => !seen.has(item.prompt));
   const graphChoices = freshGraphs.length ? freshGraphs : graphQuestions;
   const set = graphChoices.slice(0, Math.ceil(count / 3));
@@ -352,10 +350,12 @@ function setupPractice(selected, count, minutes = 0) {
       if (saved?.url === location.search) {
         attempt = saved;
       } else {
-        const response = await fetch(new URL('./progress-questions.json?v=2', import.meta.url));
-        if (!response.ok) throw new Error('Question bank unavailable');
-        const bank = (await response.json())[course];
-        const reserve = () => reserveQuestions(bank, selected, count);
+        const available = selected.reduce((total, unit) => total + unitPool(course, unit).length, 0);
+        if (available < count) {
+          status.textContent = 'Practice questions for this course are being rebuilt. Check back soon!';
+          return;
+        }
+        const reserve = () => reserveQuestions(selected, count);
         const set = navigator.locks
           ? await navigator.locks.request('fivey-progress:' + course, reserve)
           : reserve();
