@@ -26,25 +26,14 @@ select{width:100%;min-height:48px;padding:10px 12px;border:1px solid #9ba697;bor
 .practice-button{display:inline-block;margin-top:24px;padding:10px 16px;border:2px solid #34573a;border-radius:6px;background:#fff;color:var(--ink);font:inherit;font-weight:750;text-decoration:none;cursor:pointer;transition:background .22s,color .22s,transform .22s}
 .practice-button:hover{background:#d9f783;color:var(--ink);transform:translateY(-5px)}
 #status{margin-top:18px;color:#8a3428}
-footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
 [hidden]{display:none!important}
 </style>
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
-<link rel="stylesheet" href="./site-footer.css?v=2">
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav><a id="back-link" href="./courses.html">← Back to analytics</a></nav></div></header>
 <main class="wrap"><section class="card" aria-labelledby="title"><h1 id="title">Practice More</h1><p id="description">Choose a unit from your Weakness list and set the number of questions.</p><form id="practice-form"><label for="unit-select">Weakness unit</label><select id="unit-select" required></select><label for="count-select">Questions per set</label><select id="count-select"><option value="5">5 questions</option><option value="10">10 questions</option><option value="15">15 questions</option><option value="20">20 questions</option></select><button class="practice-button" type="submit">Start practice</button></form><p id="status" role="status" hidden></p></section></main>
-<footer class="fivey-site-footer">
-  <nav aria-label="Footer navigation" class="fivey-site-footer-links">
-    <a href="./about.html">About the Developer</a>
-    <span class="fivey-blog-link">
-      <a href="./blog.html" aria-describedby="fivey-blog-hint">Developer's Personal Blog</a>
-      <span class="fivey-blog-hint" id="fivey-blog-hint" role="tooltip">Discover how the developer studied for the AP exams, and his past experiences!</span>
-    </span>
-  </nav>
-</footer>
 <script type="module">
 import { units } from './practice-units.js?v=5';
 const courses={biology:'AP Biology','environmental-science':'AP Environmental Science',chemistry:'AP Chemistry','physics-1':'AP Physics 1',psychology:'AP Psychology','calculus-ab':'AP Calculus AB',macroeconomics:'AP Macroeconomics'};

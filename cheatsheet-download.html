@@ -4,47 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cheatsheet Download | Fivey</title>
-<script src="./theme.js?v=1"></script>
-<script src="./entrances.js?v=4"></script>
-<link rel="stylesheet" href="./auth.css?v=motion5">
-<link rel="stylesheet" href="./site-footer.css?v=3">
-<style>
-  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f8f7ef;color:#19271f;font:16px/1.55 system-ui,sans-serif}
-  main{grid-area:1/1;box-sizing:border-box;width:min(560px,calc(100% - 32px));padding:24px;background:#fffef8;border:1px solid #d4d9cd;border-radius:10px}
-  h1{margin:0;font-size:1.6rem}
-  .practice-button{display:inline-block;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
-  [hidden]{display:none!important}
-</style>
-</head>
-<body>
-<main>
-  <h1 id="download-title">Cheatsheet Download</h1>
-  <p id="download-status" role="status">No cheatsheet PDF is available for this course yet.</p>
-  <a id="download-pdf" class="practice-button" hidden>Download PDF manually</a>
-  <p><a id="download-back" href="./courses.html">Back to Courses</a></p>
-</main>
-<script src="./cheatsheet-resources.js"></script>
 <script>
 const course = new URLSearchParams(location.search).get('course');
-const resource = getCheatsheetResource(course);
-if (course) {
-  const back = document.querySelector('#download-back');
-  back.href = './course.html?course=' + encodeURIComponent(course) + '&view=cheatsheet';
-  back.textContent = 'Back to Cheatsheet :0';
-}
-if (resource?.pdf) {
-  document.title = resource.title + ' Download | Fivey';
-  document.querySelector('#download-title').textContent = resource.title + ' Download';
-  const status = document.querySelector('#download-status');
-  status.textContent = 'Click the button below to download the PDF.';
-  const download = document.querySelector('#download-pdf');
-  download.href = resource.pdf;
-  download.setAttribute('download', '');
-  download.hidden = false;
-  download.addEventListener('click', () => {
-    status.textContent = 'Your PDF download has started.';
-  });
-}
+const destination = new URL('./textbook-download.html', location.href);
+destination.searchParams.set('type', 'cheatsheet');
+if (course) destination.searchParams.set('course', course);
+location.replace(destination);
 </script>
+</head>
+<body>
+<noscript>Enable JavaScript to open the cheatsheet download page.</noscript>
 </body>
 </html>

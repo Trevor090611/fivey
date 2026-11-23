@@ -137,8 +137,29 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
   mask-image:radial-gradient(ellipse,#000 33%,transparent 82%);
 }
 @media(max-width:760px){.macro-graphs{width:42%;gap:4px;padding-inline-end:4px}}
+.download-backdrop[data-course="biology"] .hero-art img:last-child{
+  object-fit:contain;
+  object-position:right center;
+  mask-image:radial-gradient(ellipse at 72% 50%,#000 10%,transparent 72%);
+}
+.download-backdrop[data-course="biology"]{
+  --hero-base:#0a2024;--hero-glow:#409b83;--hero-accent:#9be0c5;
+  --hero-texture:radial-gradient(ellipse,#a5ead64a 1px,transparent 2px);
+  --hero-texture-size:22px 22px;
+}
+.download-backdrop[data-course="calculus-ab"] .hero-art img{
+  object-fit:contain;
+  filter:grayscale(1) invert(1);
+  mix-blend-mode:screen;
+}
+.download-backdrop[data-course="calculus-ab"] .hero-art img:first-child{object-position:left center}
+.download-backdrop[data-course="calculus-ab"] .hero-art img:last-child{object-position:right center}
+.download-backdrop[data-course="calculus-ab"]{
+  --hero-base:#102533;--hero-glow:#287a9a;--hero-accent:#aee5fa;
+  --hero-texture:linear-gradient(#aee5fa33 1px,transparent 1px),linear-gradient(90deg,#aee5fa33 1px,transparent 1px);
+  --hero-texture-size:28px 28px;
+}
 </style>
-<link rel="stylesheet" href="./site-footer.css?v=2">
 </head>
 <body>
 <div class="download-backdrop" aria-hidden="true" hidden>
@@ -169,22 +190,24 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
     <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/Phillips_curve.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
   </div>
 </div></template>
+<template id="biology-art"><div class="hero-art" aria-hidden="true">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Yeast_Cells_in_Wet_Mount_Microscopy_of_Culture.jpg/960px-Yeast_Cells_in_Wet_Mount_Microscopy_of_Culture.jpg" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Unlabeled_Animal_Cell.png/960px-Unlabeled_Animal_Cell.png" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template>
+<template id="calculus-ab-art"><div class="hero-art" aria-hidden="true">
+  <!-- Public-domain Riemann sum and CC0 tangent and normal diagrams from Wikimedia Commons. -->
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Integration_rectangle.svg/960px-Integration_rectangle.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+  <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Tangent_and_normal_to_a_curve.svg/960px-Tangent_and_normal_to_a_curve.svg.png" alt="" decoding="async" referrerpolicy="no-referrer">
+</div></template>
 <main>
-  <h1>Textbook Download</h1>
+  <h1 id="download-title">Textbook Download</h1>
   <p id="download-status" role="status">Choose a textbook from your course’s Resources page.</p>
   <a id="download-pdf" class="practice-button" hidden>Download PDF manually</a>
+  <p id="download-return" hidden><a id="download-back" href="./courses.html">Back to Courses</a></p>
 </main>
-<footer class="fivey-site-footer">
-  <nav aria-label="Footer navigation" class="fivey-site-footer-links">
-    <a href="./about.html">About the Developer</a>
-    <span class="fivey-blog-link">
-      <a href="./blog.html" aria-describedby="fivey-blog-hint">Developer's Personal Blog</a>
-      <span class="fivey-blog-hint" id="fivey-blog-hint" role="tooltip">Discover how the developer studied for the AP exams, and his past experiences!</span>
-    </span>
-  </nav>
-</footer>
 <p id="macro-credits" hidden>Banner artwork (cropped or tinted). <a href="https://commons.wikimedia.org/wiki/File:Port_of_Los_Angeles_Aerial.jpg">Port photo by Antoine Fleitz</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>), <a href="https://commons.wikimedia.org/wiki/File:AS_%2B_AD_graph.svg">AD–AS graph by Syed</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>), and <a href="https://commons.wikimedia.org/wiki/File:Phillips_curve.jpg">Phillips curve by Eric Findlay</a> (public domain).</p>
 <p id="chemistry-credits" hidden>Banner photos (cropped and tinted), <a href="https://commons.wikimedia.org/wiki/File:Test_tubes_in_a_laboratory.jpg">Sarka Na kopci</a> and <a href="https://commons.wikimedia.org/wiki/File:Copper_Sulfate_Crystal.jpg">Crystal Titan</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.</p>
+<script src="./cheatsheet-resources.js"></script>
 <script>
 const textbookDownloads = {
   macroeconomics: 'https://github.com/Trevor090611/fivey/releases/download/ap-macroeconomics-textbook/Krugman-AP-Macroeconomics-Textbook.pdf',
@@ -195,6 +218,8 @@ const textbookDownloads = {
 };
 
 const courseEquations = {
+  "biology": ["p + q = 1","p² + 2pq + q² = 1","Ψ = Ψₛ + Ψₚ","Ψₛ = −iCRT","χ² = Σ (O − E)² / E","N(t) = N₀eʳᵗ","dN/dt = rN","dN/dt = rN(1 − N/K)","ΔG = ΔH − TΔS","SA / V = 6 / a"],
+  "calculus-ab": ["d(xⁿ)/dx = nxⁿ⁻¹","∫₀¹ 2x dx = 1","(sin x)′ = cos x","(eˣ)′ = eˣ","(ln x)′ = 1/x","(uv)′ = u′v + uv′","(f ∘ g)′ = (f′ ∘ g)g′","∫ₐᵇ f′(x) dx = f(b) − f(a)","∫₀² x dx = 2","(cos x)′ = −sin x"],
   "psychology": ["ΔI / I = k","z = (x − μ) / σ","x̄ = Σx / n","σ² = Σ(x − μ)² / N","σ = √σ²","r² = r × r","range = max − min","IQR = Q₃ − Q₁","SE = s / √n","P(Aᶜ) = 1 − P(A)"],
   "macroeconomics": ["Y = C + I + G + NX","k = 1 / (1 − MPC)","MPC + MPS = 1","NX = exports − imports","MV = PY","S = Y − C − G","CPI = 100 × Cₜ / C₀","GDP deflator = 100 × N / R","ΔY = k × ΔG","r ≈ i − π"],
   "physics-1": ["ΣF = ma","K = ½mv²","p = mv","J = Δp","W = Fd cos θ","τ = rF sin θ","a = v² / r","Uₛ = ½kx²","v = v₀ + at","T = 2π√(m/k)"],
@@ -202,11 +227,18 @@ const courseEquations = {
   "chemistry": ["PV = nRT","pH = −log₁₀[H⁺]","pH + pOH = 14 (25 °C)","q = mcΔT","ΔG = ΔH − TΔS","A = εℓc","M = n / V","λν = c","E = hν","ΔG° = −RT ln K"],
 };
 
-const course = new URLSearchParams(location.search).get('course');
-if (Object.hasOwn(textbookDownloads, course)) {
+const params = new URLSearchParams(location.search);
+const course = params.get('course');
+const isCheatsheet = params.get('type') === 'cheatsheet';
+const textbookUrl = Object.hasOwn(textbookDownloads, course) ? textbookDownloads[course] : null;
+const art = document.getElementById(course + '-art');
+const status = document.querySelector('#download-status');
+const download = document.querySelector('#download-pdf');
+
+if (art && (isCheatsheet || textbookUrl)) {
   const backdrop = document.querySelector('.download-backdrop');
   backdrop.dataset.course = course;
-  backdrop.prepend(document.getElementById(course + '-art').content.cloneNode(true));
+  backdrop.prepend(art.content.cloneNode(true));
   const equationLayer = backdrop.querySelector('.hero-equations');
   for (const formula of courseEquations[course]) {
     const equation = document.createElement('span');
@@ -216,13 +248,34 @@ if (Object.hasOwn(textbookDownloads, course)) {
   backdrop.hidden = false;
   document.querySelector('#chemistry-credits').hidden = course !== 'chemistry';
   document.querySelector('#macro-credits').hidden = course !== 'macroeconomics';
-  const url = textbookDownloads[course];
-  const status = document.querySelector('#download-status');
+}
+
+if (isCheatsheet) {
+  const resource = getCheatsheetResource(course);
+  const title = resource ? resource.title + ' Download' : 'Cheatsheet Download';
+  document.title = title + ' | Fivey';
+  document.querySelector('#download-title').textContent = title;
+  document.querySelector('#download-return').hidden = false;
+  if (art) {
+    const back = document.querySelector('#download-back');
+    back.href = './course.html?course=' + encodeURIComponent(course) + '&view=cheatsheet';
+    back.textContent = 'Back to Cheatsheet :0';
+  }
+  status.textContent = 'No cheatsheet PDF is available for this course yet.';
+  if (resource?.pdf) {
+    status.textContent = 'Click the button below to download the PDF.';
+    download.href = resource.pdf;
+    download.setAttribute('download', '');
+    download.hidden = false;
+    download.addEventListener('click', () => {
+      status.textContent = 'Your PDF download has started.';
+    });
+  }
+} else if (textbookUrl) {
   status.textContent = 'By clicking the button below, the PDF version of the textbook will be downloaded to your computer.';
-  const retry = document.querySelector('#download-pdf');
-  retry.href = url;
-  retry.hidden = false;
-  retry.addEventListener('click', () => {
+  download.href = textbookUrl;
+  download.hidden = false;
+  download.addEventListener('click', () => {
     status.textContent = 'the PDF version of this textbook is being downloaded into your computer';
   });
 }

@@ -41,7 +41,6 @@ details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 #practice-exam-setup button{justify-self:start;font:inherit;font-weight:750;padding:8px 12px;cursor:pointer}
 #practice-exam-status:empty{display:none}
 #practice-exams:not(:empty){margin-top:12px}
-footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(--muted)}
 [hidden]{display:none}
 @media(max-width:620px){.columns{grid-template-columns:1fr}}
 @view-transition{navigation:auto}
@@ -57,7 +56,6 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 <link rel="stylesheet" href="./auth.css?v=magenta2">
 <script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
 <script type="module" src="./progress.js?v=stimulus1"></script>
-<link rel="stylesheet" href="./site-footer.css?v=2">
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -89,15 +87,6 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 </div>
 <noscript><p class="wrap">Enable JavaScript to view exam resources for this course.</p></noscript>
 </main>
-<footer class="fivey-site-footer">
-  <nav aria-label="Footer navigation" class="fivey-site-footer-links">
-    <a href="./about.html">About the Developer</a>
-    <span class="fivey-blog-link">
-      <a href="./blog.html" aria-describedby="fivey-blog-hint">Developer's Personal Blog</a>
-      <span class="fivey-blog-hint" id="fivey-blog-hint" role="tooltip">Discover how the developer studied for the AP exams, and his past experiences!</span>
-    </span>
-  </nav>
-</footer>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],

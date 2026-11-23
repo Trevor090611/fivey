@@ -420,7 +420,7 @@ function renderCheatsheet(id) {
   }
   const download = element('a', 'Download PDF now!');
   download.className = 'practice-button';
-  download.href = './cheatsheet-download.html?course=' + encodeURIComponent(id);
+  download.href = './textbook-download.html?type=cheatsheet&course=' + encodeURIComponent(id);
   guides.append(googleDocs, download);
   guides.hidden = false;
 }
