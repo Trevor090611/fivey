@@ -1,4 +1,8 @@
-export async function mountBiologyCheatsheet(container) {
+export async function mountCheatsheet(container, {
+  url = './biology-cheatsheet-notes.html?v=2',
+  panelCount = 9,
+  initialUnit = '2',
+} = {}) {
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
   stylesheet.href = './biology-cheatsheet.css';
@@ -8,14 +12,15 @@ export async function mountBiologyCheatsheet(container) {
     stylesheet.addEventListener('error', reject, { once: true });
     document.head.append(stylesheet);
   });
-  const notesRequest = fetch('./biology-cheatsheet-notes.html?v=2', { cache: 'no-cache' });
+  const notesRequest = fetch(url, { cache: 'no-cache' });
   const [response] = await Promise.all([notesRequest, styleReady]);
-  if (!response.ok) throw new Error('Cannot load AP Biology notes');
+  if (!response.ok) throw new Error('Cannot load cheatsheet notes');
 
   const notes = document.createElement('template');
   notes.innerHTML = await response.text();
   const units = Array.from(notes.content.querySelectorAll('article[data-unit]'));
-  if (units.length !== 9) throw new Error('Incomplete AP Biology notes');
+  const initial = units.find((unit) => unit.dataset.unit === initialUnit);
+  if (units.length !== panelCount || !initial) throw new Error('Incomplete cheatsheet notes');
 
   const menu = document.createElement('nav');
   menu.className = 'biology-unit-menu';
@@ -27,7 +32,7 @@ export async function mountBiologyCheatsheet(container) {
   const buttons = units.map((unit) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = unit.dataset.unit === 'intro' ? 'Cover & Experiments' : 'Unit ' + unit.dataset.unit;
+    button.textContent = unit.dataset.label || (unit.dataset.unit === 'intro' ? 'Cover & Experiments' : 'Unit ' + unit.dataset.unit);
     button.setAttribute('aria-controls', unit.id);
     menu.append(button);
     content.append(unit);
@@ -44,6 +49,8 @@ export async function mountBiologyCheatsheet(container) {
   buttons.forEach((button, index) => {
     button.addEventListener('click', () => selectUnit(units[index]));
   });
-  selectUnit(units.find((unit) => unit.dataset.unit === '2'));
+  selectUnit(initial);
   container.replaceChildren(menu, content);
 }
+
+export { mountCheatsheet as mountBiologyCheatsheet };

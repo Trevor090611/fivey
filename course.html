@@ -306,7 +306,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     </span>
   </nav>
 </footer>
-<script src="./cheatsheet-resources.js"></script>
+<script src="./cheatsheet-resources.js?v=2"></script>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
@@ -423,16 +423,16 @@ function renderCheatsheet(id) {
   download.href = './textbook-download.html?type=cheatsheet&course=' + encodeURIComponent(id);
   guides.append(googleDocs, download);
   guides.hidden = false;
-  if (id === 'biology') {
+  if (resource?.notes) {
     const notes = element('section');
     notes.className = 'biology-cheatsheet';
-    notes.setAttribute('aria-label', 'AP Biology cheatsheet notes');
-    const status = element('p', 'Loading AP Biology notes…');
+    notes.setAttribute('aria-label', resource.title + ' notes');
+    const status = element('p', 'Loading ' + resource.title + ' notes…');
     status.setAttribute('role', 'status');
     notes.append(status);
     guides.append(notes);
-    import('./biology-cheatsheet.js?v=2')
-      .then(({mountBiologyCheatsheet}) => mountBiologyCheatsheet(notes))
+    import('./biology-cheatsheet.js?v=3')
+      .then(({mountCheatsheet}) => mountCheatsheet(notes, resource.notes))
       .catch(() => {
         status.textContent = 'The notes could not load. You can still open the Google Doc or download the PDF above.';
       });
