@@ -306,6 +306,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     </span>
   </nav>
 </footer>
+<script src="./cheatsheet-resources.js"></script>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
@@ -404,10 +405,30 @@ function guideLink(entry) {
   }
 }
 
+function renderCheatsheet(id) {
+  const guides = document.querySelector('#guides');
+  const resource = getCheatsheetResource(id);
+  const googleDocs = element('p', 'GoogleDocs Link: ');
+  if (resource?.googleDoc) {
+    const link = element('a', resource.title);
+    link.href = resource.googleDoc;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    googleDocs.append(link);
+  } else {
+    googleDocs.append('Not available yet.');
+  }
+  const download = element('a', 'Download PDF now!');
+  download.className = 'practice-button';
+  download.href = './cheatsheet-download.html?course=' + encodeURIComponent(id);
+  guides.append(googleDocs, download);
+  guides.hidden = false;
+}
+
 function renderGuides(course) {
   const guides = document.querySelector('#guides');
   guides.hidden = false;
-  const source = cheatsheetView ? course.cheatsheets : course.guides; const links = (source ?? []).map(guideLink).filter(Boolean);
+  const links = (course.guides ?? []).map(guideLink).filter(Boolean);
   if (links.length) {
     const list = document.createElement('ul');
     for (const link of links) {
@@ -417,7 +438,7 @@ function renderGuides(course) {
     }
     guides.append(list);
   } else {
-    guides.append(element('p', cheatsheetView ? 'No cheatsheet uploaded yet.' : detailedGuideView ? 'No detailed study guides uploaded yet.' : 'No study guides posted yet.'));
+    guides.append(element('p', detailedGuideView ? 'No detailed study guides uploaded yet.' : 'No study guides posted yet.'));
   }
 }
 
@@ -441,7 +462,7 @@ async function loadResources(id, guideView) {
   if (!response.ok) throw new Error('Could not load the resource library');
   const library = await response.json();
   const course = library[id] ?? {};
-  if (guideView || detailedGuideView || cheatsheetView) renderGuides(course);
+  if (guideView || detailedGuideView) renderGuides(course);
   else renderArticles(course);
 }
 
@@ -534,7 +555,9 @@ if (selected) {
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
-  if (guideView || detailedGuideView || cheatsheetView || articleView) {
+  if (cheatsheetView) {
+    renderCheatsheet(id);
+  } else if (guideView || detailedGuideView || articleView) {
     loadResources(id, guideView).catch(() => showStatus('Resources are temporarily unavailable. Try refreshing the page.'));
   }
 } else {
