@@ -112,7 +112,7 @@ function addBankCard(container) {
   track.append(fill);
   const open = document.createElement('a');
   open.className = 'fivey-bank-open';
-  open.href = practiceUrl({ mode: 'mixed' });
+  open.href = practiceUrl({ mode: 'options' });
   open.innerHTML = 'Open <span aria-hidden="true">›</span>';
   const art = document.createElement('div');
   art.className = 'fivey-bank-art';
@@ -218,6 +218,8 @@ function showPractice() {
   const minutes = Number(params.get('minutes'));
   const selected = [...new Set((params.get('units') || '').split(',').map(Number))];
   const back = document.querySelector('#practice-back');
+  // Courses with a question bank show the bank card first; its Open button leads to the practice options.
+  const hasBank = bankProgress(available).total > 0;
   if (mode === 'set') {
     back.href = params.get('from') === 'more'
       ? './practice-more.html?' + new URLSearchParams({ course, units: selected.join(','), unit, count })
@@ -233,8 +235,8 @@ function showPractice() {
       back.textContent = '← Practice setup';
     }
   } else if (mode) {
-    back.href = practiceUrl(mode === 'unit' ? { mode: 'choose' } : {});
-    back.textContent = mode === 'unit' ? '← Choose a unit' : '← Practice options';
+    back.href = practiceUrl(mode === 'unit' ? { mode: 'choose' } : mode !== 'options' && hasBank ? { mode: 'options' } : {});
+    back.textContent = mode === 'unit' ? '← Choose a unit' : mode === 'options' ? '← Question bank' : '← Practice options';
   }
   if (mode === 'choose') {
     heading.textContent = 'Practice By Units';
@@ -263,10 +265,13 @@ function showPractice() {
       showSetSetup(undefined, count);
       return;
     }
+    if (hasBank && mode !== 'options') {
+      addBankCard(choices);
+      return;
+    }
     choices.hidden = false;
     addLink(choices, 'Practice By Units', { mode: 'choose' });
     addLink(choices, 'Practice All Units', { mode: 'mixed' });
-    addBankCard(choices);
   }
 }
 
