@@ -22,7 +22,10 @@ widget.innerHTML = `
     <form class="chat-form">
       <label for="fivey-question">Your question</label>
       <textarea id="fivey-question" maxlength="1000" rows="3" placeholder="Ask about a topic or request a quiz"></textarea>
-      <button class="chat-send" type="submit">Send</button>
+      <div class="chat-actions">
+        <label class="chat-enter-option"><input type="checkbox"> Press Enter to send</label>
+        <button class="chat-send" type="submit">Send</button>
+      </div>
     </form>
     <p class="chat-status" role="status" hidden></p>
   </section>`;
@@ -34,6 +37,7 @@ const close = widget.querySelector('.chat-close');
 const input = widget.querySelector('textarea');
 const form = widget.querySelector('form');
 const send = widget.querySelector('.chat-send');
+const enterToSend = widget.querySelector('.chat-enter-option input');
 const log = widget.querySelector('.chat-log');
 const status = widget.querySelector('.chat-status');
 
@@ -276,6 +280,14 @@ async function requestAnswer(system, messages, course) {
     fail('Fivey could not complete the request. Check your connection and try again.');
   }
 }
+
+input.addEventListener('keydown', event => {
+  if (!enterToSend.checked || event.key !== 'Enter' || event.shiftKey ||
+    event.altKey || event.ctrlKey || event.metaKey || event.isComposing ||
+    event.keyCode === 229 || event.defaultPrevented) return;
+  event.preventDefault();
+  if (!event.repeat && !send.disabled && input.value.trim()) form.requestSubmit(send);
+});
 
 form.addEventListener('submit', event => {
   event.preventDefault();

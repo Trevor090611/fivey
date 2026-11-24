@@ -10,7 +10,7 @@
 .fivey-chat button, .fivey-chat textarea { font: inherit; }
 .fivey-chat button { cursor: pointer; }
 .fivey-chat button:disabled { cursor: wait; opacity: .65; }
-.fivey-chat button:focus-visible, .fivey-chat select:focus-visible, .fivey-chat textarea:focus-visible {
+.fivey-chat button:focus-visible, .fivey-chat input[type="checkbox"]:focus-visible, .fivey-chat textarea:focus-visible {
   outline: 2px solid #467335;
   outline-offset: 2px;
 }
@@ -58,3 +58,8 @@
 .fivey-chat .chat-message[data-speaker="You"] { background: #eaf4d2; }
 .fivey-chat .chat-status { margin: 0; padding: 0 14px 10px; font-size: 13px; color: #4e5d52; }
 .fivey-chat .chat-form textarea { resize: vertical; max-height: 100px; }
+
+.fivey-chat .chat-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 14px; }
+.fivey-chat .chat-enter-option { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; font-size: 14px; cursor: pointer; }
+.fivey-chat .chat-enter-option input { width: 16px; height: 16px; margin: 0; accent-color: #467335; cursor: pointer; }
+:root[data-fivey-dark] .fivey-chat .chat-enter-option input { accent-color: var(--fivey-cyan); }
