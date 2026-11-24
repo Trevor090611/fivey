@@ -1,4 +1,5 @@
 import { biologyQuestions } from './practice-biology.js?v=2';
+import { environmentalQuestions } from './practice-environmental.js?v=1';
 
 export const units = {
   "biology": [
@@ -73,5 +74,6 @@ export const units = {
 // Question banks by course. Courses without a bank return no questions yet.
 export function unitPool(course, unit) {
   if (course === 'biology') return biologyQuestions(unit);
+  if (course === 'environmental-science') return environmentalQuestions(unit);
   return [];
 }
