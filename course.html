@@ -306,7 +306,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     </span>
   </nav>
 </footer>
-<script src="./cheatsheet-resources.js?v=2"></script>
+<script src="./cheatsheet-resources.js?v=3"></script>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
@@ -426,12 +426,12 @@ function renderCheatsheet(id) {
   if (resource?.notes) {
     const notes = element('section');
     notes.className = 'biology-cheatsheet';
-    notes.setAttribute('aria-label', resource.title + ' notes');
-    const status = element('p', 'Loading ' + resource.title + ' notes…');
+    notes.setAttribute('aria-label', resource.title);
+    const status = element('p', 'Loading ' + resource.title + '…');
     status.setAttribute('role', 'status');
     notes.append(status);
     guides.append(notes);
-    import('./biology-cheatsheet.js?v=3')
+    import('./biology-cheatsheet.js?v=4')
       .then(({mountCheatsheet}) => mountCheatsheet(notes, resource.notes))
       .catch(() => {
         status.textContent = 'The notes could not load. You can still open the Google Doc or download the PDF above.';
@@ -505,7 +505,7 @@ if (selected) {
   const articleView = hasArticleSection && params.get('view') === 'article';
   const articleTitle = 'How I got a 5 on ' + name;
   let title = name;
-  if (guideView) title = name + ' Study Guides'; if (detailedGuideView) title = name + ' Detailed Study Guide'; if (cheatsheetView) title = name + ' Cheatsheet';
+  if (guideView) title = name + ' Study Guides'; if (detailedGuideView) title = name + ' Detailed Study Guide'; if (cheatsheetView) title = name + ' Quick Review Notes';
   if (articleView) title = articleTitle;
   if (resourcesView) title = name + ' Resources';
   if (analyticsView) title = name + ' Analytics';

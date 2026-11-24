@@ -1,5 +1,5 @@
 export async function mountCheatsheet(container, {
-  url = './biology-cheatsheet-notes.html?v=2',
+  url = './biology-cheatsheet-notes.html?v=3',
   panelCount = 9,
   initialUnit = '2',
 } = {}) {
@@ -14,17 +14,17 @@ export async function mountCheatsheet(container, {
   });
   const notesRequest = fetch(url, { cache: 'no-cache' });
   const [response] = await Promise.all([notesRequest, styleReady]);
-  if (!response.ok) throw new Error('Cannot load cheatsheet notes');
+  if (!response.ok) throw new Error('Cannot load Quick Review Notes');
 
   const notes = document.createElement('template');
   notes.innerHTML = await response.text();
   const units = Array.from(notes.content.querySelectorAll('article[data-unit]'));
   const initial = units.find((unit) => unit.dataset.unit === initialUnit);
-  if (units.length !== panelCount || !initial) throw new Error('Incomplete cheatsheet notes');
+  if (units.length !== panelCount || !initial) throw new Error('Incomplete Quick Review Notes');
 
   const menu = document.createElement('nav');
   menu.className = 'biology-unit-menu';
-  menu.setAttribute('aria-label', 'Cheatsheet units');
+  menu.setAttribute('aria-label', 'Quick Review Notes units');
 
   const content = document.createElement('div');
   content.className = 'biology-unit-content';
