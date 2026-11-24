@@ -19,7 +19,12 @@ const cheatsheetResources = {
     notes: { url: './physics-1-review-notes.html?v=2', panelCount: 9, initialUnit: '1' },
   },
   psychology: { title: 'AP Psychology Quick Review Notes' },
-  'calculus-ab': { title: 'AP Calculus AB Quick Review Notes' },
+  'calculus-ab': {
+    title: 'AP Calculus AB Quick Review Notes',
+    googleDoc: 'https://docs.google.com/document/d/11JDSqengBdLU9_k09d50si_mEBoWk2abz5lYVMcEdIw/edit?usp=sharing',
+    pdf: './ap-calculus-ab-quick-review-notes.pdf',
+    notes: { url: './calculus-ab-review-notes.html?v=1', panelCount: 10, initialUnit: '1' },
+  },
   macroeconomics: { title: 'AP Macroeconomics Quick Review Notes' },
 };
 
