@@ -44,22 +44,24 @@ const courseNames = {
 };
 
 const bookIcon = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5.5C2 4.7 2.7 4 3.5 4H9c1.3 0 2.4.6 3 1.5.6-.9 1.7-1.5 3-1.5h5.5c.8 0 1.5.7 1.5 1.5V18c0 .8-.7 1.5-1.5 1.5H15c-1 0-1.9.5-2.4 1.2a.8.8 0 0 1-1.2 0c-.5-.7-1.4-1.2-2.4-1.2H3.5c-.8 0-1.5-.7-1.5-1.5Z"/></svg>';
-const bookArt = '<svg viewBox="0 0 220 170" aria-hidden="true"><path d="M110 46c-26-22-62-26-92-14v118c30-12 66-8 92 14Z" fill="#f4d9ef"/><path d="M110 46c26-22 62-26 92-14v118c-30-12-66-8-92 14Z" fill="#fdf0fa"/><path d="M36 66c14-4 30-3 46 2M36 88c14-4 30-3 46 2M36 110c14-4 30-3 46 2M136 70c14-5 30-6 46-2M136 92c14-5 30-6 46-2M136 114c14-5 30-6 46-2" fill="none" stroke="#c46ab6" stroke-width="5" stroke-linecap="round"/><path d="M168 18l34 30-62 70-22 8 6-22Z" fill="#a8479a"/><path d="M118 126l6-22 16 14Z" fill="#f2c9e6"/></svg>';
+const bookArt = '<svg viewBox="0 0 220 170" aria-hidden="true"><path class="bank-page" d="M110 46c-26-22-62-26-92-14v118c30-12 66-8 92 14Z"/><path class="bank-page-alt" d="M110 46c26-22 62-26 92-14v118c-30-12-66-8-92 14Z"/><path class="bank-ink" d="M36 66c14-4 30-3 46 2M36 88c14-4 30-3 46 2M36 110c14-4 30-3 46 2M136 70c14-5 30-6 46-2M136 92c14-5 30-6 46-2M136 114c14-5 30-6 46-2" fill="none" stroke-width="5" stroke-linecap="round"/><path class="bank-pencil" d="M168 18l34 30-62 70-22 8 6-22Z"/><path class="bank-pencil-tip" d="M118 126l6-22 16 14Z"/></svg>';
 
 function progressStyles() {
   if (document.querySelector('#fivey-bank-styles')) return;
   const style = document.createElement('style');
   style.id = 'fivey-bank-styles';
   style.textContent = `
-.fivey-bank-card{position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;max-width:560px;margin-top:24px;padding:26px 28px;border-radius:18px;background:linear-gradient(135deg,#cc6fbd,#b65aa8);color:#fff}
-:root .fivey-bank-card h3,:root[data-fivey-dark] .fivey-bank-card h3{margin:0 0 18px;color:#fff!important;font:600 clamp(22px,4vw,30px)/1.15 system-ui,sans-serif;letter-spacing:-.01em}
+.fivey-bank-card{--bank-bg:#d9f783;--bank-text:#000;--bank-track:rgb(0 0 0 / 16%);--bank-fill:#000;--bank-open-bg:#fff;--bank-open-text:#000;--bank-open-hover:#f1f1f1;--bank-chevron:#666;--bank-page:#fff;--bank-page-alt:#f3fbdc;--bank-ink:#4f7d22;--bank-pencil:#2f5a16;--bank-pencil-tip:#e9f8c3;position:relative;isolation:isolate;overflow:hidden;box-sizing:border-box;max-width:560px;margin-top:24px;padding:26px 28px;border-radius:18px;background:var(--bank-bg);color:var(--bank-text)}
+:root[data-fivey-dark] .fivey-bank-card{--bank-bg:#0891b2;--bank-text:#fff;--bank-track:rgb(255 255 255 / 35%);--bank-fill:#fff;--bank-open-bg:#000;--bank-open-text:#fff;--bank-open-hover:#1c1c1c;--bank-chevron:#9a9a9a;--bank-page:#e8fbff;--bank-page-alt:#fff;--bank-ink:#0891b2;--bank-pencil:#04556a;--bank-pencil-tip:#bdf2fb}
+:root .fivey-bank-card h3,:root[data-fivey-dark] .fivey-bank-card h3{margin:0 0 18px;color:var(--bank-text)!important;font:600 clamp(22px,4vw,30px)/1.15 system-ui,sans-serif;letter-spacing:-.01em}
 .fivey-bank-meta{display:flex;justify-content:space-between;gap:12px;max-width:60%;font-size:clamp(15px,2.6vw,19px)}
 .fivey-bank-meta strong{font-weight:700}
-.fivey-bank-track{max-width:60%;height:10px;margin:12px 0 24px;overflow:hidden;border-radius:999px;background:rgb(255 255 255 / 42%)}
-.fivey-bank-fill{height:100%;min-width:8px;border-radius:inherit;background:#fff}
-a.fivey-bank-open{display:inline-flex;align-items:center;gap:14px;padding:10px 20px;border:0;border-radius:999px;background:#111;color:#fff;font-size:18px;font-weight:600;text-decoration:none}
-a.fivey-bank-open:is(:hover,:focus-visible){background:#000;color:#fff}
-.fivey-bank-open span{color:#9a9a9a;font-size:22px;line-height:1}
+.fivey-bank-track{max-width:60%;height:10px;margin:12px 0 24px;overflow:hidden;border-radius:999px;background:var(--bank-track)}
+.fivey-bank-fill{height:100%;min-width:8px;border-radius:inherit;background:var(--bank-fill)}
+a.fivey-bank-open{display:inline-flex;align-items:center;gap:14px;padding:10px 20px;border:0;border-radius:999px;background:var(--bank-open-bg);color:var(--bank-open-text);font-size:18px;font-weight:600;text-decoration:none}
+a.fivey-bank-open:is(:hover,:focus-visible){background:var(--bank-open-hover);color:var(--bank-open-text)}
+.fivey-bank-open span{color:var(--bank-chevron);font-size:22px;line-height:1}
+.fivey-bank-art .bank-page{fill:var(--bank-page)}.fivey-bank-art .bank-page-alt{fill:var(--bank-page-alt)}.fivey-bank-art .bank-ink{stroke:var(--bank-ink)}.fivey-bank-art .bank-pencil{fill:var(--bank-pencil)}.fivey-bank-art .bank-pencil-tip{fill:var(--bank-pencil-tip)}
 .fivey-bank-art{position:absolute;right:-8px;bottom:-12px;z-index:-1;width:44%;max-width:230px}
 .fivey-bank-art svg{display:block;width:100%;height:auto}
 #practice-unit-list:has(.fivey-unit-row){justify-items:stretch;max-width:760px}
