@@ -25,7 +25,12 @@ const cheatsheetResources = {
     pdf: './ap-calculus-ab-quick-review-notes.pdf',
     notes: { url: './calculus-ab-review-notes.html?v=1', panelCount: 10, initialUnit: '1' },
   },
-  macroeconomics: { title: 'AP Macroeconomics Quick Review Notes' },
+  macroeconomics: {
+    title: 'AP Macroeconomics Quick Review Notes',
+    googleDoc: 'https://docs.google.com/document/d/1KyMk7dy_WS5mAK52yzM9_e9rOoIavtWL6NeFZOBADSw/edit?usp=sharing',
+    pdf: './ap-macroeconomics-quick-review-notes.pdf',
+    notes: { url: './macroeconomics-review-notes.html?v=1', panelCount: 7, initialUnit: '1' },
+  },
 };
 
 function getCheatsheetResource(course) {
