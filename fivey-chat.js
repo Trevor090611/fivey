@@ -18,13 +18,10 @@ widget.innerHTML = `
   <button class="chat-open" type="button" aria-expanded="false" aria-controls="fivey-panel">Ask Fivey</button>
   <section class="chat-panel" id="fivey-panel" aria-labelledby="fivey-chat-title" hidden>
     <div class="chat-header"><strong id="fivey-chat-title">Fivey · AP tutor</strong><button class="chat-close" type="button" aria-label="Close Fivey">×</button></div>
-    <div class="chat-tools">
-      <button class="chat-practice" type="button">Generate a practice question</button>
-    </div>
     <div class="chat-log" role="log" aria-label="Conversation" tabindex="0"></div>
     <form class="chat-form">
       <label for="fivey-question">Your question</label>
-      <textarea id="fivey-question" maxlength="1000" rows="2" placeholder="Ask about a topic or request a quiz"></textarea>
+      <textarea id="fivey-question" maxlength="1000" rows="3" placeholder="Ask about a topic or request a quiz"></textarea>
       <button class="chat-send" type="submit">Send</button>
     </form>
     <p class="chat-status" role="status" hidden></p>
@@ -36,7 +33,6 @@ const panel = widget.querySelector('.chat-panel');
 const close = widget.querySelector('.chat-close');
 const input = widget.querySelector('textarea');
 const form = widget.querySelector('form');
-const practice = widget.querySelector('.chat-practice');
 const send = widget.querySelector('.chat-send');
 const log = widget.querySelector('.chat-log');
 const status = widget.querySelector('.chat-status');
@@ -60,17 +56,72 @@ panel.addEventListener('keydown', event => {
   if (event.key === 'Escape') toggle(false);
 });
 
+function appendFormattedReply(message, text) {
+  const tokens = text.match(/\*\*|[()]|[^*()]+|\*/g) ?? [];
+  const openParentheses = [];
+  const matchedParentheses = new Set();
+  let boldMarkers = 0;
+  for (const [index, token] of tokens.entries()) {
+    if (token === '**') boldMarkers++;
+    if (token === '(') openParentheses.push(index);
+    if (token === ')' && openParentheses.length) {
+      matchedParentheses.add(openParentheses.pop());
+      matchedParentheses.add(index);
+    }
+  }
+
+  let bold = false;
+  let italics = 0;
+  let segment = '';
+  let segmentBold = false;
+  let segmentItalic = false;
+  function appendSegment() {
+    if (!segment) return;
+    let content = document.createTextNode(segment);
+    if (segmentItalic) {
+      const emphasis = document.createElement('em');
+      emphasis.append(content);
+      content = emphasis;
+    }
+    if (segmentBold) {
+      const strong = document.createElement('strong');
+      strong.append(content);
+      content = strong;
+    }
+    message.append(content);
+    segment = '';
+  }
+
+  for (const [index, token] of tokens.entries()) {
+    if (token === '**') {
+      if (bold || boldMarkers > 1) bold = !bold;
+      boldMarkers--;
+      continue;
+    }
+    const matched = matchedParentheses.has(index);
+    if (matched && token === '(') italics++;
+    if (segmentBold !== bold || segmentItalic !== (italics > 0)) appendSegment();
+    segmentBold = bold;
+    segmentItalic = italics > 0;
+    segment += token;
+    if (matched && token === ')') italics--;
+  }
+  appendSegment();
+}
+
 function addMessage(speaker, text) {
   const message = document.createElement('p');
   message.className = 'chat-message';
   message.dataset.speaker = speaker;
-  message.textContent = speaker + ': ' + text;
+  message.textContent = speaker + ': ';
+  if (speaker === 'Fivey') appendFormattedReply(message, text);
+  else message.append(text);
   log.append(message);
   log.scrollTop = log.scrollHeight;
 }
 
 function setBusy(busy) {
-  send.disabled = practice.disabled = input.disabled = busy;
+  send.disabled = input.disabled = busy;
 }
 
 function getWorker() {
@@ -137,13 +188,13 @@ function introducesNumbers(answer, source) {
   return numbers(answer).some(value => !provided.has(value));
 }
 
-function ask(isPractice = false, review) {
+function ask(review) {
   if (pending) return;
   const course = review?.course ?? pageCourse;
   const key = Object.hasOwn(subjects, course) ? course : 'general';
 
   const draft = input.value.trim();
-  if (!isPractice && !draft && !review) {
+  if (!draft && !review) {
     input.focus();
     return;
   }
@@ -164,16 +215,12 @@ function ask(isPractice = false, review) {
       review.whyWrong ? 'Checked reasoning about my choice: ' + review.whyWrong : '',
       'Use the checked explanation as your only source of facts and arithmetic. Do not invent intermediate values, definitions, or a different answer. In two or three sentences of plain text, explain how the checked reasoning leads to the correct option, then contrast my selected option with that reasoning. If the checked explanation lacks a step, describe the method in words instead of guessing numbers.'
     ].join('\n');
-  } else if (isPractice) {
-    content = 'Write one original AP-style practice question' + (key === 'general' ? '. ' : ' for ' + name + '. ') +
-      (draft ? 'Focus on this request: ' + draft : 'Pick a topic within the course.') +
-      ' Wait for my answer before explaining the solution.';
   }
   const question = { role: 'user', content };
   const previous = history.get(key) ?? [];
   pending = { key, draft, previous, question, review };
   const request = review ? 'Explain why my answer was wrong and walk me through the correct answer.'
-    : isPractice && !draft ? 'Generate a practice question' + (key === 'general' ? '.' : ' for ' + name + '.') : content;
+    : content;
   addMessage('You', request);
   input.value = '';
   setBusy(true);
@@ -234,7 +281,6 @@ form.addEventListener('submit', event => {
   event.preventDefault();
   ask();
 });
-practice.addEventListener('click', () => ask(true));
 
 document.addEventListener('fivey:explain-answer', ({ detail }) => {
   if (!detail || !Object.hasOwn(subjects, detail.course)) return;
@@ -246,5 +292,5 @@ document.addEventListener('fivey:explain-answer', ({ detail }) => {
   addMessage('Answer key', detail.prompt + '\n\nYour choice: ' + detail.selected +
     '\nCorrect answer: ' + detail.correct + '\n\n' + detail.explanation +
     (detail.whyWrong ? '\n\nWhy your choice was wrong: ' + detail.whyWrong : ''));
-  ask(false, detail);
+  ask(detail);
 });

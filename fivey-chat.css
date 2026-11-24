@@ -7,7 +7,7 @@
   font: 15px/1.45 system-ui, sans-serif;
 }
 .fivey-chat * { box-sizing: border-box; }
-.fivey-chat button, .fivey-chat select, .fivey-chat textarea { font: inherit; }
+.fivey-chat button, .fivey-chat textarea { font: inherit; }
 .fivey-chat button { cursor: pointer; }
 .fivey-chat button:disabled { cursor: wait; opacity: .65; }
 .fivey-chat button:focus-visible, .fivey-chat select:focus-visible, .fivey-chat textarea:focus-visible {
@@ -24,8 +24,8 @@
 }
 .fivey-chat .chat-open { box-shadow: 0 4px 18px #19271f30; }
 .fivey-chat .chat-panel {
-  width: min(380px, calc(100vw - 32px));
-  max-height: calc(100dvh - 32px);
+  width: min(600px, calc(100vw - max(16px, env(safe-area-inset-right)) - max(16px, env(safe-area-inset-left))));
+  height: min(650px, calc(100dvh - max(16px, env(safe-area-inset-bottom)) - max(16px, env(safe-area-inset-top))));
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -35,11 +35,11 @@
   box-shadow: 0 12px 35px #19271f35;
 }
 .fivey-chat [hidden] { display: none; }
-.fivey-chat .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #204b34; color: #fffef8; }
+.fivey-chat .chat-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #204b34; color: #fffef8; }
 .fivey-chat .chat-close { background: transparent; color: inherit; border: 0; min-width: 32px; min-height: 32px; font-size: 22px; }
 .fivey-chat .chat-close:focus-visible { outline-color: #d9f783; }
-.fivey-chat .chat-tools, .fivey-chat .chat-form { display: grid; gap: 8px; padding: 10px 14px; }
-.fivey-chat select, .fivey-chat textarea, .fivey-chat .chat-practice {
+.fivey-chat .chat-form { flex-shrink: 0; display: grid; gap: 8px; padding: 10px 14px; }
+.fivey-chat textarea {
   width: 100%;
   border: 1px solid #8b9c8a;
   border-radius: 6px;
@@ -48,8 +48,8 @@
   background: #fffef8;
 }
 .fivey-chat .chat-log {
+  flex: 1 1 auto;
   min-height: 64px;
-  max-height: min(230px, 34dvh);
   overflow: auto;
   padding: 8px 14px;
   border-block: 1px solid #d4d9cd;
