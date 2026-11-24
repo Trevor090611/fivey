@@ -400,6 +400,257 @@ const generators = {
   ]
 };
 
+// Additional value sets for the calculation types above, plus AP exam-style data types
+// (mitotic index, expected offspring, qPCR fold change, carrier frequency, enzyme optimum,
+// standard error). Every question uses its own numbers or data set.
+const polymers = [['polypeptide', 'amino acids'], ['polysaccharide', 'glucose monomers'], ['single-stranded nucleic acid', 'nucleotides']];
+const chiDecision = (chi, rejected, kept) => chi > 3.84 ? rejected : kept;
+
+const moreGenerators = {
+  1: unit => [
+    ...[30, 45, 62, 88, 101, 120, 135, 164, 175, 199, 222, 265, 280, 318, 333, 377, 402, 450, 480, 520].map((n, index) => {
+      const [polymer, monomer] = polymers[index % 3];
+      return calc(unit, 'calc-condensation', n, index % 2 === 1
+        ? `A linear ${polymer} is built from ${n} ${monomer} by dehydration synthesis. How many water molecules are released?`
+        : `How many water molecules are needed to completely hydrolyze a linear ${polymer} made of ${n} ${monomer}?`,
+        [n - 1, n, n + 1, n - 2], `A linear chain of ${n} monomers has ${n - 1} bonds, and each bond involves one water molecule.`);
+    }),
+    ...[1, 2, 3, 4].flatMap(gap => [1, 2, 3, 4, 5, 6, 7, 8].filter(a => a + gap <= 9).map(a => [a, a + gap])).map(([a, b]) =>
+      calc(unit, 'calc-ph', a + '-' + b, `How many times greater is the hydrogen ion concentration of a solution at pH ${a} than one at pH ${b}?`,
+        [10 ** (b - a), b - a, 2 * (b - a), 10 ** (b - a + 1)], `Each pH unit is a tenfold change, so ${b - a} units is 10^${b - a} = ${format(10 ** (b - a))}.`)),
+    ...[11, 13, 15, 17, 19, 21, 23, 26, 28, 30, 32, 34, 36, 37, 39, 40].map((a, index) => {
+      const base = ['cytosine (C)', 'guanine (G)', 'thymine (T)'][index % 3];
+      const isThymine = index % 3 === 2;
+      return calc(unit, 'calc-chargaff', a + '-x' + index, `A sample of double-stranded DNA is ${a}% adenine. What percentage of its bases are ${base}?`,
+        isThymine ? [a + '%', 50 - a + '%', 100 - 2 * a + '%', 2 * a + '%'] : [50 - a + '%', a + '%', 100 - a + '%', 100 - 2 * a + '%'],
+        `A pairs with T and G pairs with C, so T = ${a}% and G = C = (100 − 2 × ${a}) ÷ 2 = ${50 - a}%.`);
+    })
+  ],
+  2: unit => [
+    ...[0.25, 1.5, 2.5, 7, 9, 11, 14, 16, 18, 30, 40, 50].map(side =>
+      calc(unit, 'calc-sav', side, `A cube-shaped cell has sides of ${side} µm. What is its surface area-to-volume ratio? Round to two decimal places if needed.`,
+        [6 / side, side / 6, 6 * side, side * side], `Surface area = 6 × ${side}² and volume = ${side}³, so the ratio is 6 ÷ ${side} = ${format(6 / side)}.`)),
+    ...[0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.6, 0.75, 0.8, 1].flatMap(molar => [[1, 'sucrose', 310], [2, 'NaCl', 310], [1, 'sucrose', 290], [2, 'NaCl', 290]].map(([i, solute, kelvin]) => {
+      const value = -i * molar * 0.0831 * kelvin;
+      return calc(unit, 'calc-solute-potential', molar + '-' + solute + '-' + kelvin, `Using ψs = −iCRT, what is the solute potential of a ${molar} M ${solute} solution at ${kelvin} K? (R = 0.0831 L·bar/mol·K; i = ${i} for ${solute}.) Round to one decimal place.`,
+        [value.toFixed(1) + ' bar', (-value).toFixed(1) + ' bar', (value / i * (i === 1 ? 2 : 1)).toFixed(1) + ' bar', (-i * molar * 0.0831 * (kelvin - 273)).toFixed(1) + ' bar'],
+        `ψs = −(${i})(${molar})(0.0831)(${kelvin}) ≈ ${value.toFixed(1)} bar.`);
+    })),
+    ...[[2.2, 2.53], [3.4, 3.06], [4.5, 5.04], [1.6, 1.36], [5.2, 5.98], [2.6, 2.21], [3.8, 4.37], [4.2, 3.57], [2.9, 3.19], [6.4, 5.76], [3.3, 3.63], [5.6, 4.76]].map(([before, after]) => {
+      const change = (after - before) / before * 100;
+      return calc(unit, 'calc-mass-change', before + '-' + after, `A potato core has a mass of ${before.toFixed(2)} g before soaking in a sucrose solution and ${after.toFixed(2)} g after. What is the percent change in mass? Round to one decimal place.`,
+        [change.toFixed(1) + '%', (-change).toFixed(1) + '%', ((after - before) / after * 100).toFixed(1) + '%', (after - before).toFixed(1) + '%'],
+        `Percent change = (${after.toFixed(2)} − ${before.toFixed(2)}) ÷ ${before.toFixed(2)} × 100 ≈ ${change.toFixed(1)}%.`);
+    }),
+    ...[[16, 400], [20, 1000], [10, 500], [36, 1200], [14, 700], [27, 900], [45, 1500], [8, 1000], [21, 600], [50, 2500], [12, 1500], [33, 1100]].map(([image, magnification]) => {
+      const actual = image * 1000 / magnification;
+      return calc(unit, 'calc-magnification', image + '-' + magnification, `In a micrograph magnified ${magnification} times, a cell measures ${image} mm across. What is the cell’s actual width in micrometers?`,
+        [actual + ' µm', image * magnification + ' µm', image / magnification + ' µm', actual * 10 + ' µm'],
+        `Actual size = image size ÷ magnification = ${image * 1000} µm ÷ ${magnification} = ${actual} µm.`);
+    })
+  ],
+  3: unit => [
+    ...[[0.48, 6], [0.72, 9], [0.65, 5], [1.12, 14], [0.33, 3], [1.35, 15], [0.8, 4], [1.68, 12], [0.54, 9], [2.4, 16], [0.27, 3], [1.62, 18], [0.88, 11], [1.08, 9]].map(([volume, minutes]) =>
+      calc(unit, 'calc-respiration-rate', volume + '-' + minutes, `In a respirometer, germinating seeds use ${volume} mL of oxygen in ${minutes} minutes. What is the average rate of oxygen consumption, in mL/min?`,
+        [volume / minutes, minutes / volume, volume * minutes, volume / minutes / 2], `Rate = ${volume} mL ÷ ${minutes} min = ${format(volume / minutes)} mL/min.`)),
+    ...[[45, 18], [70, 56], [36, 27], [140, 105], [84, 21], [96, 48], [55, 44], [160, 40], [72, 54], [125, 100], [48, 12], [110, 66], [65, 39], [90, 72]].map(([without, withInhibitor]) => {
+      const percent = (without - withInhibitor) / without * 100;
+      return calc(unit, 'calc-inhibition', without + '-' + withInhibitor, `An enzyme makes ${without} µmol of product per minute. With an inhibitor added, it makes ${withInhibitor} µmol per minute. By what percentage did the inhibitor reduce the rate? Round to one decimal place.`,
+        [percent.toFixed(1) + '%', (100 - percent).toFixed(1) + '%', ((without - withInhibitor) / withInhibitor * 100).toFixed(1) + '%', (without - withInhibitor) + '%'],
+        `Reduction = (${without} − ${withInhibitor}) ÷ ${without} × 100 ≈ ${percent.toFixed(1)}%.`);
+    }),
+    ...[[20, 4], [42, 6], [28, 7], [54, 9], [32, 8], [70, 14], [39, 3], [66, 11], [48, 16], [25, 2], [63, 9], [44, 11]].map(([product, minutes]) =>
+      calc(unit, 'calc-enzyme-rate', product + '-' + minutes, `An enzyme reaction produces ${product} µmol of product in the first ${minutes} minutes. What is the initial reaction rate in µmol/min?`,
+        [product / minutes, minutes / product, product * minutes, product - minutes], `Rate = ${product} µmol ÷ ${minutes} min = ${format(product / minutes)} µmol/min.`)),
+    ...[['temperature', '°C', [10, 20, 30, 40, 50, 60]], ['temperature', '°C', [15, 25, 35, 45, 55, 65]], ['pH', '', [2, 4, 6, 8, 10, 12]], ['pH', '', [3, 4, 5, 6, 7, 8]]].flatMap(([factor, unitLabel, xs], set) =>
+      [1, 2, 3, 4].map(peak => {
+        const values = xs.map((_, index) => Math.max(0, 48 - Math.abs(index - peak) * (14 + set * 2) + (index > peak ? -6 : 0)));
+        const label = x => factor === 'pH' ? 'pH ' + x : x + ' ' + unitLabel;
+        const range = (low, high) => `Between ${label(xs[low])} and ${label(xs[high])}`;
+        const others = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]].filter(([low]) => low !== peak - 1 && low !== peak).slice(0, 3);
+        return calc(unit, 'data-optimum', factor + '-' + set + '-' + peak, `An enzyme’s activity was measured at different values of ${factor}:\n` + xs.map((x, index) => `${label(x)}: ${values[index]} units`).join('\n') + `\nBased on the data, where is the enzyme’s optimum ${factor} most likely located?`,
+          [range(peak - 1, peak + 1), ...others.map(([low, high]) => range(low, high))],
+          `Activity is highest at ${label(xs[peak])}, so the true optimum lies between the neighboring measurements, ${label(xs[peak - 1])} and ${label(xs[peak + 1])}.`);
+      })),
+    ...[[24.0, 4.0, 16], [18.5, 3.0, 9], [32.0, 6.0, 36], [12.4, 2.0, 25], [45.0, 9.0, 81], [27.5, 5.0, 25], [8.6, 1.2, 16], [56.0, 7.0, 49], [15.2, 2.4, 9], [40.0, 10.0, 100], [21.0, 3.6, 36], [9.8, 1.4, 49]].map(([mean, sd, n]) => {
+      const se = sd / Math.sqrt(n);
+      return calc(unit, 'calc-standard-error', mean + '-' + sd + '-' + n, `In an enzyme experiment, ${n} trials gave a mean rate of ${mean} µmol/min with a standard deviation of ${sd}. Using SE = s ÷ √n, what is the approximate 95% confidence interval (mean ± 2 SE)?`,
+        [`${format(mean - 2 * se)} to ${format(mean + 2 * se)} µmol/min`, `${format(mean - se)} to ${format(mean + se)} µmol/min`, `${format(mean - 2 * sd)} to ${format(mean + 2 * sd)} µmol/min`, `${format(mean - 2 * sd / n)} to ${format(mean + 2 * sd / n)} µmol/min`],
+        `SE = ${sd} ÷ √${n} = ${format(se)}, so mean ± 2 SE = ${mean} ± ${format(2 * se)}.`);
+    })
+  ],
+  4: unit => [
+    ...[[300, 36, 20], [400, 20, 24], [250, 50, 18], [500, 75, 16], [600, 48, 25], [350, 28, 22], [800, 64, 20], [200, 30, 14], [450, 54, 18], [900, 90, 24], [150, 18, 20], [640, 32, 22], [720, 36, 30], [560, 84, 15]].map(([total, dividing, hours]) =>
+      calc(unit, 'calc-mitosis-time', total + '-' + dividing + '-' + hours, `In a root tip, ${total} cells are counted and ${dividing} of them are in mitosis. If one cell cycle takes ${hours} hours, about how many hours does mitosis last?`,
+        [dividing / total * hours, (total - dividing) / total * hours, dividing / hours, hours / dividing], `The fraction of cells in mitosis estimates its share of the cycle: ${dividing} ÷ ${total} × ${hours} h = ${format(dividing / total * hours)} h.`)),
+    ...[[4, 10, 150], [16, 5, 80], [7, 12, 100], [24, 6, 45], [9, 15, 60], [35, 4, 250], [11, 8, 120], [14, 20, 30], [45, 3, 400], [3, 25, 160], [60, 2, 75], [22, 9, 50], [13, 7, 200], [28, 5, 90]].map(([receptors, enzymes, messengers]) =>
+      calc(unit, 'calc-amplification', receptors + '-' + enzymes + '-' + messengers, `Each activated receptor activates ${enzymes} enzyme molecules, and each enzyme makes ${messengers} second-messenger molecules. If ${receptors} receptors are activated, how many second-messenger molecules are made?`,
+        [receptors * enzymes * messengers, enzymes * messengers, receptors + enzymes + messengers, receptors * messengers], `${receptors} × ${enzymes} × ${messengers} = ${format(receptors * enzymes * messengers)}, showing how signals are amplified.`)),
+    ...[[2000, 4, 16], [600, 6, 30], [150, 3, 21], [4000, 8, 32], [300, 2, 14], [700, 5, 25], [1500, 6, 24], [80, 4, 32], [1200, 12, 48], [900, 3, 12], [450, 2, 16], [100, 5, 40]].map(([start, generation, hours]) => {
+      const divisions = hours / generation;
+      return calc(unit, 'calc-doubling', start + '-' + generation + '-' + hours, `A culture starts with ${format(start)} cells that divide every ${generation} hours. Assuming every cell divides on schedule, how many cells are present after ${hours} hours?`,
+        [start * 2 ** divisions, start * divisions * 2, start * 2 * divisions + start, start + 2 ** divisions], `${hours} ÷ ${generation} = ${divisions} divisions, so ${format(start)} × 2^${divisions} = ${format(start * 2 ** divisions)} cells.`);
+    }),
+    ...[[200, 18], [500, 35], [250, 40], [400, 52], [800, 56], [150, 21], [600, 90], [300, 27], [1000, 85], [450, 63], [350, 14], [720, 108], [240, 36], [900, 45]].map(([total, dividing]) => {
+      const index = dividing / total * 100;
+      return calc(unit, 'calc-mitotic-index', total + '-' + dividing, `In a field of view of an onion root tip, ${total} cells are counted and ${dividing} are in a stage of mitosis. What is the mitotic index? Round to one decimal place if needed.`,
+        [format(index) + '%', format((total - dividing) / total * 100) + '%', format(dividing / (total - dividing) * 100) + '%', format(index / 10) + '%'],
+        `Mitotic index = cells in mitosis ÷ total cells × 100 = ${dividing} ÷ ${total} × 100 = ${format(index)}%.`);
+    })
+  ],
+  5: unit => [
+    ...[[480, 352], [160, 112], [240, 190], [400, 316], [120, 96], [360, 252], [200, 162], [640, 470], [80, 66], [300, 205], [560, 431], [440, 313], [96, 64], [720, 552]].map(([total, dominant]) => {
+      const recessive = total - dominant;
+      const expectedDominant = total * 0.75;
+      const expectedRecessive = total * 0.25;
+      const value = (dominant - expectedDominant) ** 2 / expectedDominant + (recessive - expectedRecessive) ** 2 / expectedRecessive;
+      const wrong = (dominant - expectedDominant) ** 2 / dominant + (recessive - expectedRecessive) ** 2 / recessive;
+      const decision = chi => chiDecision(chi, 'the 3:1 hypothesis is rejected', 'the 3:1 hypothesis is not rejected');
+      const opposite = chi => chiDecision(chi, 'the 3:1 hypothesis is not rejected', 'the 3:1 hypothesis is rejected');
+      return calc(unit, 'calc-chi-square', total + '-' + dominant, `A cross is expected to produce a 3:1 ratio. Of ${total} offspring, ${dominant} show the dominant trait and ${recessive} show the recessive trait. What is the chi-square value, and what is the conclusion at p = 0.05 (critical value 3.84)?`,
+        [`χ² ≈ ${value.toFixed(2)}; ${decision(value)}`, `χ² ≈ ${value.toFixed(2)}; ${opposite(value)}`, `χ² ≈ ${wrong.toFixed(2)}; ${opposite(wrong)}`, `χ² ≈ ${(value * 2).toFixed(2)}; ${opposite(value * 2)}`],
+        `Expected: ${expectedDominant} and ${expectedRecessive}. χ² = Σ(o − e)²/e ≈ ${value.toFixed(2)}, which is ${value > 3.84 ? 'greater' : 'less'} than 3.84.`);
+    }),
+    ...[[1000, 45, 55], [600, 39, 33], [800, 64, 72], [1500, 90, 105], [500, 20, 25], [1200, 102, 90], [400, 34, 30], [2000, 210, 230], [750, 30, 45], [900, 81, 72], [350, 21, 28], [1100, 66, 77], [650, 52, 39], [1800, 117, 126]].map(([total, first, second]) => {
+      const percent = (first + second) / total * 100;
+      return calc(unit, 'calc-recombination', total + '-' + first + '-' + second, `A testcross of a dihybrid produces ${format(total)} offspring, including ${first} and ${second} with the two recombinant phenotypes. What is the distance between the genes in map units?`,
+        [percent.toFixed(1) + ' map units', (percent / 2).toFixed(1) + ' map units', (100 - percent).toFixed(1) + ' map units', (percent * 2).toFixed(1) + ' map units'],
+        `Recombination frequency = (${first} + ${second}) ÷ ${format(total)} × 100 = ${percent.toFixed(1)}%, and 1% equals 1 map unit.`);
+    }),
+    ...[
+      ['AaBb × AaBB', 'the dominant phenotype for both traits', '3/4', ['9/16', '1/4', '1/2']],
+      ['AaBb × AaBB', 'genotype aaBB', '1/8', ['1/16', '1/4', '3/8']],
+      ['AaBb × aaBb', 'the recessive phenotype for both traits', '1/8', ['1/16', '1/4', '3/16']],
+      ['AaBb × aaBb', 'the dominant phenotype for both traits', '3/8', ['9/16', '1/4', '1/2']],
+      ['AaBbCc × aabbcc', 'genotype aabbcc', '1/8', ['1/64', '1/16', '1/4']],
+      ['AaBbCc × aabbcc', 'the dominant phenotype for all three traits', '1/8', ['27/64', '1/64', '3/8']],
+      ['AaBbCc × AaBbCc', 'genotype AaBbCc', '1/8', ['1/64', '27/64', '1/4']],
+      ['AABbCc × AaBbCc', 'the dominant phenotype for all three traits', '9/16', ['27/64', '3/4', '1/16']]
+    ].map(([cross, outcome, answer, wrong], index) =>
+      calc(unit, 'calc-probability', 'x' + index, `Genes A, B, and C assort independently, and uppercase alleles are dominant. In the cross ${cross}, what is the probability that an offspring has ${outcome}?`,
+        [answer, ...wrong], `Find the probability for each gene separately and multiply them; the result is ${answer}.`)),
+    ...[11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23].map(pairs =>
+      calc(unit, 'calc-gametes', pairs, `An organism has ${pairs} pairs of homologous chromosomes (2n = ${pairs * 2}). Considering independent assortment alone, how many genetically different gametes can it make?`,
+        [2 ** pairs, pairs * 2, pairs ** 2, 2 ** (pairs * 2)], `The number of combinations is 2ⁿ, where n is the number of pairs: 2^${pairs} = ${format(2 ** pairs)}.`)),
+    ...[
+      ['Aa × Aa', 'the recessive phenotype', 1 / 4],
+      ['Aa × Aa', 'the dominant phenotype', 3 / 4],
+      ['Aa × aa', 'the recessive phenotype', 1 / 2],
+      ['AaBb × AaBb', 'both recessive phenotypes', 1 / 16],
+      ['AaBb × AaBb', 'both dominant phenotypes', 9 / 16],
+      ['AaBb × AaBb', 'the dominant A phenotype and the recessive B phenotype', 3 / 16],
+      ['AaBb × aabb', 'both recessive phenotypes', 1 / 4]
+    ].flatMap(([cross, outcome, fraction], index) => [320, 480, 640].filter((_, pick) => (index + pick) % 3 !== 2).map(total =>
+      calc(unit, 'calc-expected-offspring', index + '-' + total, `Genes A and B assort independently, and uppercase alleles are dominant. A cross of ${cross} produces ${total} offspring. How many are expected to show ${outcome}?`,
+        [total * fraction, total * (1 - fraction), total * fraction * 2, total * fraction / 2], `The expected fraction is ${fraction === 1 / 16 ? '1/16' : fraction === 9 / 16 ? '9/16' : fraction === 3 / 16 ? '3/16' : fraction === 1 / 4 ? '1/4' : fraction === 3 / 4 ? '3/4' : '1/2'}, and ${total} × that fraction = ${format(total * fraction)}.`)))
+  ],
+  6: unit => [
+    ...[[2, 5], [4, 6], [3, 8], [6, 7], [1, 15], [10, 8], [5, 6], [8, 9], [2, 12], [3, 7], [15, 4], [7, 5], [1, 16], [9, 6], [4, 9], [25, 3]].map(([start, cycles]) =>
+      calc(unit, 'calc-pcr', start + '-' + cycles, `A PCR reaction starts with ${start} ${start === 1 ? 'copy' : 'copies'} of a target DNA sequence. Assuming perfect doubling, how many copies are present after ${cycles} cycles?`,
+        [start * 2 ** cycles, start * 2 * cycles, start + 2 ** cycles, start * cycles ** 2], `Each cycle doubles the DNA: ${start} × 2^${cycles} = ${format(start * 2 ** cycles)}.`)),
+    ...[60, 88, 110, 132, 155, 199, 230, 275, 320, 365, 420, 480, 575, 720].map(aminoAcids =>
+      calc(unit, 'calc-codons', aminoAcids, `A protein has ${aminoAcids} amino acids. How many nucleotides are in the mRNA coding sequence, counting the stop codon but not the cap, tail, or untranslated regions?`,
+        [3 * (aminoAcids + 1), 3 * aminoAcids, aminoAcids + 1, 4 * aminoAcids], `${aminoAcids} codons for amino acids plus 1 stop codon, each 3 nucleotides: 3 × ${aminoAcids + 1} = ${format(3 * (aminoAcids + 1))}.`)),
+    ...[7, 8, 9, 10].flatMap(sites => ['circular plasmid', 'linear DNA molecule'].map(shape => {
+      const circular = shape.startsWith('circular');
+      return calc(unit, 'calc-fragments', sites + '-' + (circular ? 'circular' : 'linear'), `A restriction enzyme cuts a ${shape} at ${sites} sites. How many DNA fragments are produced?`,
+        circular ? [sites, sites + 1, sites + 2, 2 * sites + 2] : [sites + 1, sites, sites + 2, 2 * sites + 2], circular ? `Cutting a circle at ${sites} sites gives ${sites} fragments.` : `Cutting a linear molecule at ${sites} sites gives ${sites + 1} fragments.`);
+    })),
+    ...['TACGAT', 'TACTTG', 'CCGATA', 'GATTCA', 'TACCGG', 'ATGCAT', 'TTGACC', 'GCCTAT', 'TACATT', 'CAGGTA', 'ACTTGC', 'TGTACG', 'TACGCA', 'GGATCC'].map(template => {
+      const pair = { A: 'U', T: 'A', G: 'C', C: 'G' };
+      const dnaPair = { A: 'T', T: 'A', G: 'C', C: 'G' };
+      const mrna = [...template].map(base => pair[base]).join('');
+      return calc(unit, 'calc-transcription', template, `A DNA template strand reads 3′-${template}-5′. What is the sequence of the mRNA transcribed from it?`,
+        [`5′-${mrna}-3′`, `5′-${template.replaceAll('T', 'U')}-3′`, `5′-${[...template].map(base => dnaPair[base]).join('')}-3′`, `5′-${[...mrna].reverse().join('')}-3′`],
+        `mRNA is complementary and antiparallel to the template strand, with U pairing with A.`);
+    }),
+    ...[[18, 21], [22, 25], [16, 20], [24, 26], [19, 24], [20, 22], [17, 23], [21, 24], [15, 19], [23, 28], [26, 29], [14, 20]].map(([first, second]) => {
+      const gap = second - first;
+      return calc(unit, 'calc-qpcr-fold', first + '-' + second, `In a qPCR experiment, gene P is first detected at cycle ${first} and gene Q at cycle ${second}. Lower Cq means more starting mRNA, and the amount doubles each cycle. About how many times more starting mRNA did gene P have than gene Q?`,
+        [2 ** gap, gap, 2 * gap, 10 ** gap], `The difference is ${gap} cycles, so P had about 2^${gap} = ${format(2 ** gap)} times more starting template.`);
+    })
+  ],
+  7: unit => [
+    ...[0.0025, 0.0049, 0.0144, 0.0256, 0.0324, 0.0484, 0.0576, 0.0729, 0.1024, 0.1444, 0.1764, 0.2304].map(recessive => {
+      const q = Math.sqrt(recessive);
+      const p = 1 - q;
+      return calc(unit, 'calc-hw-heterozygous', recessive, `In a population in Hardy–Weinberg equilibrium, ${format(recessive * 100)}% of individuals show a recessive phenotype. What percentage of the population is expected to be heterozygous?`,
+        [format(2 * p * q * 100) + '%', format(recessive * 100) + '%', format(p * q * 100) + '%', format(p * p * 100) + '%'],
+        `q² = ${recessive}, so q = ${format(q)} and p = ${format(p)}; 2pq = ${format(2 * p * q)}.`);
+    }),
+    ...[0.12, 0.18, 0.22, 0.28, 0.32, 0.38, 0.42, 0.48, 0.52, 0.58, 0.62, 0.68, 0.72, 0.78].map((q, index) => {
+      const p = Number((1 - q).toFixed(2));
+      if (index % 2 === 0) {
+        return calc(unit, 'calc-hw-dominant', q, `In a population in Hardy–Weinberg equilibrium, the frequency of a recessive allele is ${q}. What frequency of individuals is expected to be homozygous dominant? Round to two decimal places.`,
+          [p * p, p, q * q, 2 * p * q], `p = 1 − ${q} = ${format(p)}, and p² ≈ ${format(p * p)}.`);
+      }
+      return calc(unit, 'calc-hw-dominant', q, `In a population in Hardy–Weinberg equilibrium, the frequency of a recessive allele is ${q}. What fraction of the population is expected to show the dominant phenotype? Round to two decimal places.`,
+        [1 - q * q, p * p, p, 2 * p * q], `Everyone except q² shows the dominant phenotype: 1 − ${q}² ≈ ${format(1 - q * q)}.`);
+    }),
+    ...[[60, 30, 10], [40, 40, 20], [70, 20, 10], [20, 50, 30], [55, 35, 10], [15, 30, 55], [80, 15, 5], [35, 45, 20], [64, 32, 24], [12, 40, 48], [150, 100, 50], [90, 60, 50]].map(([homozygousDominant, heterozygous, homozygousRecessive]) => {
+      const total = homozygousDominant + heterozygous + homozygousRecessive;
+      const p = (2 * homozygousDominant + heterozygous) / (2 * total);
+      return calc(unit, 'calc-allele-frequency', homozygousDominant + '-' + heterozygous + '-' + homozygousRecessive, `A population contains ${homozygousDominant} AA, ${heterozygous} Aa, and ${homozygousRecessive} aa individuals. What is the frequency of allele A? Round to two decimal places.`,
+        [p, homozygousDominant / total, (homozygousDominant + heterozygous) / total, 1 - p], `p = (2 × ${homozygousDominant} + ${heterozygous}) ÷ (2 × ${total}) = ${format(p)}.`);
+    }),
+    ...[[20, 4], [33, 3], [28, 7], [60, 12], [48, 8], [35, 5], [42, 6], [64, 8], [26, 2], [54, 9], [72, 12], [15, 3]].map(([differences, rate]) =>
+      calc(unit, 'calc-molecular-clock', differences + '-' + rate, `Two species differ by ${differences} substitutions in a gene. If substitutions accumulate at a rate of ${rate} per million years, about how many million years ago did the species diverge?`,
+        [differences / rate, differences * rate, rate / differences, differences / rate / 2], `Time = ${differences} ÷ ${rate} per million years = ${format(differences / rate)} million years.`)),
+    ...[100, 400, 900, 1600, 2500, 3600, 4900, 6400, 8100, 10000].map(oneIn => {
+      const q = 1 / Math.sqrt(oneIn);
+      const p = 1 - q;
+      return calc(unit, 'calc-hw-carriers', oneIn, `A recessive disorder affects 1 in ${format(oneIn)} people in a population in Hardy–Weinberg equilibrium. What percentage of the population is expected to be heterozygous carriers? Round to two decimal places.`,
+        [(2 * p * q * 100).toFixed(2) + '%', (q * 100).toFixed(2) + '%', (q * q * 100).toFixed(2) + '%', (p * q * 100).toFixed(2) + '%'],
+        `q² = 1/${format(oneIn)}, so q = 1/${format(Math.sqrt(oneIn))} = ${format(q)} and 2pq ≈ ${(2 * p * q).toFixed(4)}, or ${(2 * p * q * 100).toFixed(2)}%.`);
+    })
+  ],
+  8: unit => [
+    ...[[24000, 3], [18000, 2], [55000, 1], [75000, 3], [42000, 2], [16000, 1], [64000, 2], [120000, 3], [48000, 1], [36000, 3], [95000, 2], [28000, 2], [85000, 1], [44000, 3], [32000, 1], [150000, 3], [26000, 2], [65000, 1], [52000, 3], [110000, 2]].map(([energy, level]) => {
+      const name = ['', 'primary', 'secondary', 'tertiary'][level];
+      const answer = energy * 0.1 ** level;
+      return calc(unit, 'calc-energy-transfer', energy + '-' + level, `Producers in an ecosystem capture ${format(energy)} kcal of energy. Using the 10% rule, about how much energy reaches ${name} consumers?`,
+        [Math.round(answer) + ' kcal', Math.round(answer * 10) + ' kcal', Math.round(answer / 10) + ' kcal', Math.round(energy * 0.9 ** level) + ' kcal'],
+        `About 10% passes to each level: ${format(energy)} × 0.1^${level} = ${format(Math.round(answer))} kcal.`);
+    }),
+    ...[[0.3, 400], [0.15, 1200], [0.05, 6000], [0.4, 250], [0.2, 900], [0.45, 200], [0.12, 2500], [0.08, 5000], [0.6, 150], [0.25, 840], [0.35, 300], [0.03, 20000], [0.5, 360], [0.22, 450]].map(([rate, size]) =>
+      calc(unit, 'calc-exponential', rate + '-' + size, `Using dN/dt = rN, how many individuals are added per year to a population of ${format(size)} with a per capita growth rate of ${rate} per year?`,
+        [Math.round(rate * size), size, Math.round(size / rate), Math.round(rate * size / 2)], `dN/dt = ${rate} × ${format(size)} = ${format(Math.round(rate * size))} individuals per year.`)),
+    ...[[0.3, 200, 1000], [0.5, 300, 600], [0.2, 1500, 2000], [0.4, 100, 500], [0.6, 400, 800], [0.25, 900, 1200], [0.1, 3000, 4000], [0.8, 50, 250], [0.45, 600, 1000], [0.3, 1200, 1600], [0.2, 250, 1000], [0.5, 700, 1000]].map(([rate, size, capacity]) => {
+      const growth = rate * size * (capacity - size) / capacity;
+      return calc(unit, 'calc-logistic', rate + '-' + size + '-' + capacity, `Using dN/dt = rN(K − N)/K, what is the population growth rate when r = ${rate} per year, N = ${format(size)}, and K = ${format(capacity)}?`,
+        [Math.round(growth) + ' individuals per year', Math.round(rate * size) + ' individuals per year', Math.round(rate * (capacity - size)) + ' individuals per year', Math.round(rate * capacity) + ' individuals per year'],
+        `dN/dt = ${rate} × ${format(size)} × (${format(capacity)} − ${format(size)}) ÷ ${format(capacity)} = ${format(Math.round(growth))} individuals per year.`);
+    }),
+    ...[[5, 1.5], [7.5, 2], [3, 1], [6, 2.5], [9.5, 3], [4, 2], [8, 1.5], [2, 0.5], [11, 4], [5.5, 1], [7, 3.5], [10, 2.5]].map(([light, dark], index) => {
+      const question = index % 2 === 0 ? 'gross primary productivity' : 'rate of respiration';
+      const answer = index % 2 === 0 ? light + dark : dark;
+      const wrong = index % 2 === 0 ? [light, light - dark, dark] : [light + dark, light, light - dark];
+      return calc(unit, 'calc-productivity', light + '-' + dark, `In a pond study, dissolved oxygen in a sealed clear bottle rises by ${light} mg/L in a day, and in a sealed dark bottle it falls by ${dark} mg/L. What is the ${question} in mg O₂/L per day?`,
+        [answer, ...wrong], `The clear bottle shows net productivity (${light}); the dark bottle shows respiration (${dark}); gross productivity = net + respiration = ${format(light + dark)}.`);
+    }),
+    ...[[32, 8], [27, 13], [36, 24], [23, 17], [40, 20], [29, 11], [34, 26], [48, 12], [25, 15], [44, 16], [55, 25], [31, 29]].map(([first, second]) => {
+      const expected = (first + second) / 2;
+      const value = 2 * (first - expected) ** 2 / expected;
+      const decision = chi => chiDecision(chi, 'the null hypothesis is rejected', 'the null hypothesis is not rejected');
+      const opposite = chi => chiDecision(chi, 'the null hypothesis is not rejected', 'the null hypothesis is rejected');
+      return calc(unit, 'calc-choice-chamber', first + '-' + second, `In a choice chamber, ${first + second} pill bugs settle with ${first} on the moist side and ${second} on the dry side. The null hypothesis predicts an equal split. What is the chi-square value, and what is the conclusion at p = 0.05 (critical value 3.84)?`,
+        [`χ² = ${format(value)}; ${decision(value)}`, `χ² = ${format(value)}; ${opposite(value)}`, `χ² = ${format(value / 2)}; ${opposite(value / 2)}`, `χ² = ${format(Math.abs(first - second))}; ${decision(Math.abs(first - second))}`],
+        `Expected ${format(expected)} on each side: χ² = 2 × (${first} − ${format(expected)})² ÷ ${format(expected)} = ${format(value)}, which is ${value > 3.84 ? 'greater' : 'less'} than 3.84.`);
+    }),
+    ...[[60, 50, 12], [30, 45, 9], [80, 40, 16], [45, 60, 15], [120, 75, 18], [24, 30, 4], [55, 44, 11], [100, 64, 16], [36, 50, 6], [75, 48, 12], [90, 40, 8], [150, 120, 25]].map(([marked, caught, recaptured]) => {
+      const estimate = marked * caught / recaptured;
+      return calc(unit, 'calc-mark-recapture', marked + '-' + caught + '-' + recaptured, `Researchers mark ${marked} turtles and release them. Later they catch ${caught} turtles, of which ${recaptured} are marked. Using N = (marked × caught) ÷ recaptured, what is the estimated population size?`,
+        [Math.round(estimate), marked + caught, Math.round(marked * recaptured / caught), marked + caught - recaptured], `N = ${marked} × ${caught} ÷ ${recaptured} = ${format(Math.round(estimate))}.`);
+    }),
+    ...[[42.0, 6.0, 9], [15.5, 2.0, 16], [88.0, 12.0, 36], [23.4, 3.0, 25], [64.0, 8.0, 16], [9.2, 1.5, 9], [130.0, 20.0, 100], [36.8, 4.2, 49], [51.0, 9.0, 81], [12.6, 2.4, 36]].map(([mean, sd, n]) => {
+      const se = sd / Math.sqrt(n);
+      return calc(unit, 'calc-standard-error', 'eco-' + mean + '-' + sd + '-' + n, `Ecologists count plants in ${n} quadrats and find a mean of ${mean} plants per quadrat with a standard deviation of ${sd}. Using SE = s ÷ √n, what is the approximate 95% confidence interval (mean ± 2 SE)?`,
+        [`${format(mean - 2 * se)} to ${format(mean + 2 * se)} plants`, `${format(mean - se)} to ${format(mean + se)} plants`, `${format(mean - 2 * sd)} to ${format(mean + 2 * sd)} plants`, `${format(mean - 2 * sd / n)} to ${format(mean + 2 * sd / n)} plants`],
+        `SE = ${sd} ÷ √${n} = ${format(se)}, so mean ± 2 SE = ${mean} ± ${format(2 * se)}.`);
+    })
+  ]
+};
+
 function writtenQuestion(unit, entry, index) {
   const id = 'bio-' + unit + '-written-' + index;
   if (!Array.isArray(entry)) return { ...entry, id, answer: 0, family: entry.family };
@@ -412,8 +663,10 @@ const cache = new Map();
 export function biologyQuestions(unit) {
   if (!cache.has(unit)) {
     const items = (written[unit - 1] ?? []).map((entry, index) => writtenQuestion(unit, entry, index));
-    const generated = (generators[unit]?.(unit) ?? []).filter(Boolean);
-    cache.set(unit, [...items, ...generated]);
+    const generated = [...(generators[unit]?.(unit) ?? []), ...(moreGenerators[unit]?.(unit) ?? [])].filter(Boolean);
+    const unique = new Map();
+    for (const item of [...items, ...generated]) if (!unique.has(item.id)) unique.set(item.id, item);
+    cache.set(unit, [...unique.values()]);
   }
   return cache.get(unit);
 }
