@@ -1,5 +1,6 @@
 import { biologyQuestions } from './practice-biology.js?v=2';
 import { environmentalQuestions } from './practice-environmental.js?v=1';
+import { chemistryQuestions } from './practice-chemistry.js?v=1';
 
 export const units = {
   "biology": [
@@ -75,5 +76,6 @@ export const units = {
 export function unitPool(course, unit) {
   if (course === 'biology') return biologyQuestions(unit);
   if (course === 'environmental-science') return environmentalQuestions(unit);
+  if (course === 'chemistry') return chemistryQuestions(unit);
   return [];
 }
