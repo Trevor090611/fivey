@@ -5,8 +5,8 @@
 <script src="./theme.js?v=1"></script>
 <script src="./entrances.js?v=4"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Meet the experts behind Fivey.">
-<title>Meet Our Experts | Fivey</title>
+<meta name="description" content="Fivey is an online revision platform that helps AP students to prepare for their exams.">
+<title>About Us | Fivey</title>
 <link rel="stylesheet" href="./brand.css?v=fb47b45">
 <style>
 :root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
@@ -21,6 +21,10 @@ nav a{font-size:14px;font-weight:700}
 main{flex:1;text-align:center}
 .hero{background:var(--ink);color:var(--white);padding:clamp(40px,8vw,92px) 0}
 h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em;margin:0}
+.about-intro{max-width:58rem;margin:clamp(18px,3vw,26px) auto 0;font-size:clamp(17px,2vw,22px)}
+.about-intro p{margin:0;text-wrap:pretty}
+.about-intro p+p{margin-top:8px}
+.about-intro strong{font-weight:800}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
 @view-transition{navigation:auto}
 ::view-transition-group(root){background:#f8f7ef}
@@ -40,7 +44,15 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./">← Home</a></nav></div></header>
 <main>
-  <section class="hero" aria-labelledby="title"><div class="wrap"><h1 id="title">Meet Our Experts</h1></div></section>
+  <section class="hero" aria-labelledby="title">
+    <div class="wrap">
+      <h1 id="title">About Us</h1>
+      <div class="about-intro">
+        <p>Fivey is an <strong>online revision platform</strong> that helps AP students to prepare for their exams.</p>
+        <p>It combines a library of revision resources, especially non-AI generated study guides &amp; AI-powered practice questions study tools.</p>
+      </div>
+    </div>
+  </section>
 </main>
 <footer class="fivey-site-footer">
   <nav aria-label="Footer navigation" class="fivey-site-footer-links">
