@@ -1,3 +1,6 @@
+import { connectClient } from './auth-client.js';
+import { authConfig } from './auth-config.js';
+
 const subjects = {
   biology: ['AP Biology', 'biochemistry, cells, energetics, cell signaling, heredity, gene expression, evolution, ecology'],
   'environmental-science': ['AP Environmental Science', 'ecosystems, biodiversity, populations, Earth systems, land and water use, energy, air pollution, aquatic and terrestrial pollution, and global change'],
@@ -16,10 +19,6 @@ widget.innerHTML = `
   <section class="chat-panel" id="fivey-panel" aria-labelledby="fivey-chat-title" hidden>
     <div class="chat-header"><strong id="fivey-chat-title">Fivey · AP tutor</strong><button class="chat-close" type="button" aria-label="Close Fivey">×</button></div>
     <div class="chat-tools">
-      <label for="fivey-subject">AP subject</label>
-      <select id="fivey-subject">
-        <option value="">Choose a course</option>
-      </select>
       <button class="chat-practice" type="button">Generate a practice question</button>
     </div>
     <div class="chat-log" role="log" aria-label="Conversation" tabindex="0"></div>
@@ -28,14 +27,13 @@ widget.innerHTML = `
       <textarea id="fivey-question" maxlength="1000" rows="2" placeholder="Ask about a topic or request a quiz"></textarea>
       <button class="chat-send" type="submit">Send</button>
     </form>
-    <p class="chat-status" role="status">Runs on your device. First use downloads a model. AI answers can be wrong.</p>
+    <p class="chat-status" role="status" hidden></p>
   </section>`;
 document.body.append(widget);
 
 const open = widget.querySelector('.chat-open');
 const panel = widget.querySelector('.chat-panel');
 const close = widget.querySelector('.chat-close');
-const select = widget.querySelector('select');
 const input = widget.querySelector('textarea');
 const form = widget.querySelector('form');
 const practice = widget.querySelector('.chat-practice');
@@ -43,12 +41,9 @@ const send = widget.querySelector('.chat-send');
 const log = widget.querySelector('.chat-log');
 const status = widget.querySelector('.chat-status');
 
-for (const [key, [name]] of Object.entries(subjects)) {
-  select.add(new Option(name, key));
-}
-select.value = new URLSearchParams(location.search).get('course') ?? '';
-if (select.selectedIndex < 0) select.selectedIndex = 0;
-
+const pageCourse = new URLSearchParams(location.search).get('course');
+const geminiEndpoint = new URL('/functions/v1/fivey-gemini', authConfig.url);
+let clientPromise;
 let worker;
 let pending;
 const history = new Map();
@@ -57,7 +52,7 @@ function toggle(isOpen) {
   panel.hidden = !isOpen;
   open.hidden = isOpen;
   open.setAttribute('aria-expanded', String(isOpen));
-  (isOpen ? (select.value ? input : select) : open).focus();
+  (isOpen ? (input.disabled ? close : input) : open).focus();
 }
 open.addEventListener('click', () => toggle(true));
 close.addEventListener('click', () => toggle(false));
@@ -75,7 +70,7 @@ function addMessage(speaker, text) {
 }
 
 function setBusy(busy) {
-  send.disabled = practice.disabled = select.disabled = input.disabled = busy;
+  send.disabled = practice.disabled = input.disabled = busy;
 }
 
 function getWorker() {
@@ -84,21 +79,13 @@ function getWorker() {
   worker.addEventListener('message', ({ data }) => {
     if (data.type === 'loading') {
       const model = data.fallback ? 'compact' : 'local';
-      status.textContent = 'Preparing the ' + model + ' model… ' + data.percent + '%';
+      setStatus('Preparing the ' + model + ' model… ' + data.percent + '%');
     } else if (data.type === 'fallback') {
-      status.textContent = 'Trying a smaller model for this device…';
+      setStatus('Trying a smaller model for this device…');
     } else if (data.type === 'generating') {
-      status.textContent = 'Fivey is writing a reply…';
+      setStatus('Fivey is writing a reply…');
     } else if (data.type === 'answer') {
-      if (pending.review && (data.answer.length > 950 || introducesNumbers(data.answer, pending.question.content))) {
-        addMessage('Fivey', 'I couldn’t verify my expanded explanation. The answer key above has the checked solution.');
-        finish('Review the answer key or ask Fivey a more specific follow-up.');
-        return;
-      }
-      const answer = { role: 'assistant', content: data.answer };
-      history.set(pending.key, [...pending.previous, pending.question, answer].slice(-4));
-      addMessage('Fivey', data.answer);
-      finish('AI answers can be wrong. Check important details against your course materials.');
+      showAnswer(data.answer);
     } else if (data.type === 'unsupported') {
       fail('This browser could not access WebGPU. Open Fivey in a WebGPU-enabled browser to use the tutor.');
     } else if (data.type === 'error') {
@@ -110,10 +97,26 @@ function getWorker() {
   return worker;
 }
 
+function showAnswer(answer) {
+  if (pending.review && (answer.length > 950 || introducesNumbers(answer, pending.question.content))) {
+    addMessage('Fivey', 'I couldn’t verify my expanded explanation. The answer key above has the checked solution.');
+    finish('Review the answer key or ask Fivey a more specific follow-up.');
+    return;
+  }
+  history.set(pending.key, [...pending.previous, pending.question, { role: 'assistant', content: answer }].slice(-4));
+  addMessage('Fivey', answer);
+  finish('');
+}
+
+function setStatus(message) {
+  status.hidden = !message;
+  status.textContent = message;
+}
+
 function finish(message) {
   pending = undefined;
   setBusy(false);
-  status.textContent = message;
+  setStatus(message);
   if (!panel.hidden) input.focus();
 }
 
@@ -136,12 +139,8 @@ function introducesNumbers(answer, source) {
 
 function ask(isPractice = false, review) {
   if (pending) return;
-  const key = select.value;
-  if (!Object.hasOwn(subjects, key)) {
-    status.textContent = 'Choose an AP subject first.';
-    select.focus();
-    return;
-  }
+  const course = review?.course ?? pageCourse;
+  const key = Object.hasOwn(subjects, course) ? course : 'general';
 
   const draft = input.value.trim();
   if (!isPractice && !draft && !review) {
@@ -149,15 +148,10 @@ function ask(isPractice = false, review) {
     return;
   }
 
-  if (!navigator.gpu) {
-    status.textContent = 'This browser does not support WebGPU. Open Fivey in a WebGPU-enabled browser to use the tutor.';
-    return;
-  }
-
-  const [name, topics] = subjects[key];
+  const [name, topics] = subjects[key] ?? ['AP courses', 'the AP subject indicated by the student'];
   const system = {
     role: 'system',
-    content: `You are Fivey, a tutor for ${name}. Course scope includes ${topics}. Give clear, accurate AP-level explanations. Show reasoning and units where relevant. Ask for clarification when needed and say when unsure. Keep answers concise. For practice, write original AP-style questions, never claim they are official exam items. For multiple choice, provide four plausible choices and explain the correct answer after the student responds unless they ask for the answer now. If the request belongs to another AP course, ask the student to change the subject. Use plain text, clear numbering, and short paragraphs.`
+    content: `You are Fivey, an AP tutor. The current course context is ${name}, covering ${topics}. If the student names another AP course, help with that course. Give clear, accurate AP-level explanations. Show reasoning and units where relevant. Ask for clarification when needed and say when unsure. Keep answers concise. For practice, write original AP-style questions and never claim they are official exam items. For multiple choice, provide four plausible choices and explain the correct answer after the student responds unless they ask for the answer now. Use plain text, clear numbering, and short paragraphs.`
   };
   let content = draft;
   if (review) {
@@ -171,7 +165,7 @@ function ask(isPractice = false, review) {
       'Use the checked explanation as your only source of facts and arithmetic. Do not invent intermediate values, definitions, or a different answer. In two or three sentences of plain text, explain how the checked reasoning leads to the correct option, then contrast my selected option with that reasoning. If the checked explanation lacks a step, describe the method in words instead of guessing numbers.'
     ].join('\n');
   } else if (isPractice) {
-    content = 'Write one original AP-style practice question for ' + name + '. ' +
+    content = 'Write one original AP-style practice question' + (key === 'general' ? '. ' : ' for ' + name + '. ') +
       (draft ? 'Focus on this request: ' + draft : 'Pick a topic within the course.') +
       ' Wait for my answer before explaining the solution.';
   }
@@ -179,15 +173,60 @@ function ask(isPractice = false, review) {
   const previous = history.get(key) ?? [];
   pending = { key, draft, previous, question, review };
   const request = review ? 'Explain why my answer was wrong and walk me through the correct answer.'
-    : isPractice && !draft ? 'Generate a practice question for ' + name + '.' : content;
+    : isPractice && !draft ? 'Generate a practice question' + (key === 'general' ? '.' : ' for ' + name + '.') : content;
   addMessage('You', request);
   input.value = '';
   setBusy(true);
-  status.textContent = 'Starting Fivey…';
+  setStatus('Fivey is writing a reply…');
+  void requestAnswer(system, [...previous, question], key);
+}
+
+async function requestAnswer(system, messages, course) {
   try {
-    getWorker().postMessage([system, ...previous, question]);
+    clientPromise ??= connectClient().catch(error => {
+      clientPromise = undefined;
+      throw error;
+    });
+    const client = await clientPromise;
+    const { data, error } = await client.auth.getSession();
+    if (error || !data.session) {
+      fail('Sign in again to ask Fivey.');
+      return;
+    }
+    const response = await fetch(geminiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: authConfig.key,
+        Authorization: 'Bearer ' + data.session.access_token
+      },
+      body: JSON.stringify({ messages, course }),
+      signal: AbortSignal.timeout(34000)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok && typeof result.answer === 'string' && result.answer.trim()) {
+      showAnswer(result.answer);
+      return;
+    }
+    if (response.status === 503 && result.code === 'GEMINI_NOT_CONFIGURED') {
+      if (!navigator.gpu) {
+        fail('Fivey is temporarily unavailable in this browser. Try again later.');
+        return;
+      }
+      getWorker().postMessage([system, ...messages]);
+      return;
+    }
+    if (response.status === 429) {
+      fail('Fivey has reached its request limit. Wait a moment and try again.');
+      return;
+    }
+    if (response.status === 401 || response.status === 403) {
+      fail('Sign in again to ask Fivey.');
+      return;
+    }
+    fail('Fivey could not complete the request. Try again.');
   } catch {
-    fail('Fivey could not start. Reload the page and try again.');
+    fail('Fivey could not complete the request. Check your connection and try again.');
   }
 }
 
@@ -204,7 +243,6 @@ document.addEventListener('fivey:explain-answer', ({ detail }) => {
     addMessage('Fivey', 'I’m still working on the current reply. Click Explain with Fivey again when it finishes.');
     return;
   }
-  select.value = detail.course;
   addMessage('Answer key', detail.prompt + '\n\nYour choice: ' + detail.selected +
     '\nCorrect answer: ' + detail.correct + '\n\n' + detail.explanation +
     (detail.whyWrong ? '\n\nWhy your choice was wrong: ' + detail.whyWrong : ''));
