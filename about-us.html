@@ -25,6 +25,22 @@ h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em;margin
 .about-intro p{margin:0;text-wrap:pretty}
 .about-intro p+p{margin-top:8px}
 .about-intro strong{font-weight:800}
+.about-tabs-bar{border-block:1px solid var(--line)}
+.about-tabs{width:min(48rem,100%);margin-inline:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.about-tabs[hidden]{display:none}
+.about-tabs .about-tab{appearance:none;min-height:64px;padding:10px 6px;border:0;border-bottom:4px solid transparent;border-radius:0;background:transparent;color:var(--ink);font:inherit;font-weight:750;line-height:1.25;cursor:pointer;transform:none}
+.about-tabs .about-tab:hover{background:color-mix(in srgb,currentColor 8%,transparent);transform:none}
+.about-tabs .about-tab[aria-selected="true"]{border-bottom-color:#548137;background:color-mix(in srgb,#8ab45a 16%,transparent)}
+.about-tabs .about-tab:focus-visible{outline-offset:-7px}
+:root[data-fivey-dark] .about-tabs .about-tab[aria-selected="true"]{border-bottom-color:var(--fivey-cyan);background:color-mix(in srgb,var(--fivey-cyan) 13%,transparent)}
+.about-panels{position:relative;overflow:hidden}
+.about-panel{width:100%;padding:clamp(40px,7vw,84px) 20px}
+.about-panel[inert]{position:absolute;inset:0 auto auto 0;pointer-events:none}
+.about-panel h2{margin:0;font-size:clamp(30px,5vw,50px);line-height:1.1;letter-spacing:-.04em}
+.about-panel p{max-width:62ch;margin:16px auto 0;font-size:clamp(17px,2vw,20px);color:var(--muted);text-wrap:pretty}
+.about-panel a{display:inline-block;margin-top:18px;font-weight:750;text-underline-offset:4px}
+main .about-tabs .about-tab[data-fivey-entrance],
+main .about-panel :is(h2,p)[data-fivey-entrance]{animation:none;opacity:1}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
 @view-transition{navigation:auto}
 ::view-transition-group(root){background:#f8f7ef}
@@ -53,7 +69,105 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
       </div>
     </div>
   </section>
+  <div class="about-tabs-bar">
+    <div class="about-tabs" role="tablist" aria-label="About Fivey" hidden>
+      <button class="about-tab" type="button" role="tab" id="tab-study-tools" aria-controls="study-tools" aria-selected="true">Study Tools</button>
+      <button class="about-tab" type="button" role="tab" id="tab-mission" aria-controls="mission" aria-selected="false" tabindex="-1">Mission &amp; Vision</button>
+      <button class="about-tab" type="button" role="tab" id="tab-experts" aria-controls="experts" aria-selected="false" tabindex="-1">Our Experts</button>
+    </div>
+  </div>
+  <div class="about-panels">
+    <section class="about-panel" id="study-tools" aria-labelledby="tab-study-tools">
+      <h2>Study Tools</h2>
+      <p>Review each AP unit with original study guides and Quick Review Notes, then test your understanding with AI-powered practice questions in Progress Check.</p>
+      <a href="./courses.html">Explore AP courses</a>
+    </section>
+    <section class="about-panel" id="mission" aria-labelledby="tab-mission">
+      <h2>Mission &amp; Vision</h2>
+      <p>Fivey helps AP students prepare for their exams with clear notes and practice they can work through at their own pace. Our goal is to make it easier for students to see what they know and where they need more practice.</p>
+    </section>
+    <section class="about-panel" id="experts" aria-labelledby="tab-experts">
+      <h2>Our Experts</h2>
+      <p>Meet Kayden Cheung, the developer of Fivey, and learn how his AP exam preparation shaped the study resources on the site.</p>
+      <a href="./about.html">About the Developer</a>
+    </section>
+  </div>
 </main>
+<script>
+  const aboutTabs = document.querySelector('.about-tabs');
+  const tabs = Array.from(aboutTabs.querySelectorAll('[role="tab"]'));
+  const panels = tabs.map(tab => document.getElementById(tab.getAttribute('aria-controls')));
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let activeTab = 0;
+  let slide;
+
+  panels.forEach((panel, index) => {
+    panel.hidden = index !== activeTab;
+    panel.setAttribute('role', 'tabpanel');
+    panel.tabIndex = 0;
+  });
+  aboutTabs.hidden = false;
+
+  function showAboutPanel(index) {
+    if (index === activeTab) return;
+
+    slide?.cancel();
+    const direction = Math.sign(index - activeTab);
+    const outgoing = panels[activeTab];
+    const incoming = panels[index];
+    const animate = !reducedMotion.matches && typeof incoming.animate === 'function';
+
+    tabs[activeTab].setAttribute('aria-selected', 'false');
+    tabs[activeTab].tabIndex = -1;
+    tabs[index].setAttribute('aria-selected', 'true');
+    tabs[index].tabIndex = 0;
+    activeTab = index;
+
+    for (const panel of panels) {
+      panel.inert = panel === outgoing;
+      panel.hidden = panel !== incoming && !(animate && panel === outgoing);
+    }
+    if (!animate) return;
+
+    const timing = { duration: 320, easing: 'cubic-bezier(.25,.70,.25,1)' };
+    const exit = outgoing.animate([
+      { transform: 'translateX(0)' },
+      { transform: `translateX(${-100 * direction}%)` }
+    ], timing);
+    const enter = incoming.animate([
+      { transform: `translateX(${100 * direction}%)` },
+      { transform: 'translateX(0)' }
+    ], timing);
+
+    slide = {
+      cancel() {
+        exit.cancel();
+        enter.cancel();
+      }
+    };
+    exit.onfinish = () => {
+      outgoing.hidden = true;
+      slide = null;
+    };
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => showAboutPanel(index));
+    tab.addEventListener('keydown', event => {
+      const positions = {
+        ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+        ArrowRight: (index + 1) % tabs.length,
+        Home: 0,
+        End: tabs.length - 1
+      };
+      if (!Object.hasOwn(positions, event.key)) return;
+      event.preventDefault();
+      const next = positions[event.key];
+      tabs[next].focus();
+      showAboutPanel(next);
+    });
+  });
+</script>
 <footer class="fivey-site-footer">
   <nav aria-label="Footer navigation" class="fivey-site-footer-links">
     <a href="./about.html">About the Developer</a>
