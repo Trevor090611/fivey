@@ -12,7 +12,12 @@ const cheatsheetResources = {
     notes: { url: './chemistry-cheatsheet-notes.html?v=2', panelCount: 10, initialUnit: '1' },
   },
   'environmental-science': { title: 'AP Environmental Science Quick Review Notes' },
-  'physics-1': { title: 'AP Physics 1 Quick Review Notes' },
+  'physics-1': {
+    title: 'AP Physics 1 Quick Review Notes',
+    googleDoc: 'https://docs.google.com/document/d/1TwLLOIhCTd7YQyft9FYmTQDYh91fV_oAaGKqA5-6BkU/edit?usp=sharing',
+    pdf: './ap-physics-1-quick-review-notes.pdf',
+    notes: { url: './physics-1-review-notes.html?v=1', panelCount: 9, initialUnit: '1' },
+  },
   psychology: { title: 'AP Psychology Quick Review Notes' },
   'calculus-ab': { title: 'AP Calculus AB Quick Review Notes' },
   macroeconomics: { title: 'AP Macroeconomics Quick Review Notes' },
