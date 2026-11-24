@@ -1,6 +1,6 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
 import { createChest, qualifiesForChest } from './orbies-wallet.js';
-import { units, unitPool } from './practice-units.js?v=9';
+import { units, unitPool } from './practice-units.js?v=10';
 import { renderPracticePlot } from './practice-plot.js?v=1';
 
 
