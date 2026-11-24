@@ -264,7 +264,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 </div></template><div class="hero-equations" aria-hidden="true"></div><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Course</h1></div></section>
 <p class="wrap" id="status" role="status" hidden></p>
 <div class="wrap columns" id="resources" hidden>
-<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div class="study-guide-actions" id="study-guide-actions" hidden><a class="practice-button" id="detailed-guide-link" href="#guides">Detailed Study Guide</a><a class="practice-button" id="cheatsheet-link" href="#guides">Cheatsheet :0</a></div><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
+<section class="panel" id="guides-panel" aria-labelledby="guides-title"><h2 id="guides-title">Study Guides</h2><div class="study-guide-actions" id="study-guide-actions" hidden><a class="practice-button" id="detailed-guide-link" href="#guides">Detailed Study Guide</a><a class="practice-button" id="cheatsheet-link" href="#guides">Quick Review Notes :&gt;</a></div><p class="panel-description" id="guide-description" hidden>All study guides are authored exclusively by the developer without the use of AI-generated content.</p><a class="practice-button" id="view-guides" hidden>View Study Guides</a><div id="guides" hidden></div></section>
 <section class="panel" id="articles-panel" hidden aria-labelledby="articles-title"><h2 id="articles-title"></h2><p class="panel-description" id="article-description" hidden></p><a class="practice-button" id="view-article" hidden>View Article</a><div id="articles"></div></section>
 <section class="panel" id="college-board-panel" aria-labelledby="college-board-title" hidden>
   <h2 id="college-board-title">College Board Resources</h2>
@@ -540,7 +540,7 @@ if (selected) {
     const back = document.querySelector('#course-back');
     back.href = detailedGuideView || cheatsheetView ? courseHref + '&view=guides' : courseHref;
     back.textContent = detailedGuideView || cheatsheetView ? '← Back to Study Guides' : '← Back to ' + name;
-    if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides'; else if (detailedGuideView || cheatsheetView) { document.querySelector('#guides-title').textContent = detailedGuideView ? 'Detailed Study Guide' : 'Cheatsheet :0'; }
+    if (guideView) document.querySelector('#guides-title').textContent = 'Available Study Guides'; else if (detailedGuideView || cheatsheetView) { document.querySelector('#guides-title').textContent = detailedGuideView ? 'Detailed Study Guide' : 'Quick Review Notes :>'; }
     else document.querySelector('#guides-panel').hidden = true;
     if (resourcesView) renderCollegeBoardResources(id);
     if (analyticsView) {
