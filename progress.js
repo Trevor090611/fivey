@@ -65,15 +65,18 @@ a.fivey-bank-open:is(:hover,:focus-visible){background:var(--bank-open-hover);co
 .fivey-bank-art{position:absolute;right:-8px;bottom:-12px;z-index:-1;width:44%;max-width:230px}
 .fivey-bank-art svg{display:block;width:100%;height:auto}
 #practice-unit-list:has(.fivey-unit-row){justify-items:stretch;max-width:760px}
-a.fivey-unit-row{display:flex;align-items:center;gap:18px;box-sizing:border-box;width:100%;padding:16px 20px;border:0;border-radius:12px;background:#151515;color:#e8e8e8;text-decoration:none}
-a.fivey-unit-row:is(:hover,:focus-visible){background:#222;color:#fff}
+a.fivey-unit-row{--unit-bg:#fff;--unit-border:#a4e568;--unit-swipe:#d9f783;--unit-text:#000;--unit-hover-text:#000;--unit-track:#e4e4e4;display:flex;align-items:center;gap:18px;box-sizing:border-box;width:100%;padding:16px 20px;border:2px solid var(--unit-border);border-radius:12px;background:linear-gradient(var(--unit-swipe),var(--unit-swipe)) right center/0% 100% no-repeat var(--unit-bg);color:var(--unit-text);text-decoration:none;transition:background-size 220ms ease-out,color 220ms ease-out}
+:root[data-fivey-dark] a.fivey-unit-row{--unit-bg:#000;--unit-border:#62e7ff;--unit-swipe:#62e7ff;--unit-text:#fff;--unit-hover-text:#000;--unit-track:#303030;transition-duration:260ms}
+a.fivey-unit-row:focus-visible{background-size:100% 100%;color:var(--unit-hover-text)}
+@media(hover:hover){a.fivey-unit-row:hover{background-size:100% 100%;color:var(--unit-hover-text)}}
+@media(prefers-reduced-motion:reduce){a.fivey-unit-row{transition:none}}
 .fivey-unit-icon{display:grid;flex:none;place-items:center;width:48px;height:48px;border-radius:8px;background:#272727;color:#c4c4c4}
 .fivey-unit-body{flex:1;min-width:0}
-.fivey-unit-title{display:block;margin-bottom:10px;color:#f2f2f2;font-size:clamp(15px,2.4vw,18px);font-weight:600}
+.fivey-unit-title{display:block;margin-bottom:10px;color:inherit;font-size:clamp(15px,2.4vw,18px);font-weight:600}
 .fivey-unit-line{display:flex;align-items:center;gap:16px}
-.fivey-unit-track{flex:1;height:6px;overflow:hidden;border-radius:999px;background:#303030}
+.fivey-unit-track{flex:1;height:6px;overflow:hidden;border-radius:999px;background:var(--unit-track)}
 .fivey-unit-fill{height:100%;min-width:6px;border-radius:inherit;background:#4f7cff}
-.fivey-unit-count{flex:none;color:#a3a3a3;font-size:14px;white-space:nowrap}
+.fivey-unit-count{flex:none;color:inherit;font-size:14px;white-space:nowrap}
 @media(max-width:560px){.fivey-unit-line{flex-direction:column;align-items:stretch;gap:6px}.fivey-bank-meta,.fivey-bank-track{max-width:none}.fivey-bank-art{opacity:.3}}
 `;
   document.head.append(style);
@@ -121,7 +124,7 @@ function addBankCard(container) {
   container.after(card);
 }
 
-// Dark rows: questions completed in each unit.
+// Unit rows: questions completed in each unit.
 function addUnitRows(list, available) {
   progressStyles();
   for (const id of available) {
