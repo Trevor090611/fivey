@@ -45,7 +45,7 @@ const unitSelect=document.querySelector('#unit-select');
 const status=document.querySelector('#status');
 const countSelect=document.querySelector('#count-select');
 const name=courses[course];
-if(!name||!requested.length){status.textContent='No weakness units are available. Return to analytics after completing practice in multiple units.';status.hidden=false;document.querySelector('#practice-form').hidden=true;}
+if(!name||!requested.length){status.textContent='No units are in your Weakness list. Units averaging 50% or below appear there.';status.hidden=false;document.querySelector('#practice-form').hidden=true;}
 else{
  document.title='Practice More · '+name+' | Fivey';
  document.querySelector('#title').textContent='Practice More';
