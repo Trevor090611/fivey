@@ -69,8 +69,11 @@ Deno.serve(async req => {
     return json({ code: 'AUTH_UNAVAILABLE' }, 502);
   }
 
-  const apiKey = Deno.env.get('GEMINI_API_KEY');
-  if (!apiKey) return json({ code: 'GEMINI_NOT_CONFIGURED' }, 503);
+  const apiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!apiKey?.trim()) {
+    console.error('GEMINI_NOT_CONFIGURED: Supabase Edge Function secret GEMINI_API_KEY is missing or blank.');
+    return json({ code: 'GEMINI_NOT_CONFIGURED' }, 503);
+  }
 
   let payload;
   try {
@@ -139,8 +142,16 @@ Deno.serve(async req => {
         signal: AbortSignal.timeout(25000)
       }
     );
-    if (response.status === 429) return json({ code: 'RATE_LIMIT' }, 429);
-    if (!response.ok) return json({ code: 'GEMINI_UNAVAILABLE' }, 502);
+    if (!response.ok) {
+      const body = await response.text().catch(() => '[Unable to read Google response body]');
+      console.error(
+        `Gemini API returned HTTP ${response.status}. Response body:\n` +
+          body.replaceAll(apiKey, '[REDACTED]')
+      );
+      return response.status === 429
+        ? json({ code: 'RATE_LIMIT' }, 429)
+        : json({ code: 'GEMINI_UNAVAILABLE' }, 502);
+    }
     const result = await response.json();
     const answer = result.candidates?.[0]?.content?.parts
       ?.filter((part: { thought?: boolean; text?: string }) => !part.thought && typeof part.text === 'string')
@@ -148,6 +159,7 @@ Deno.serve(async req => {
       .join('').trim();
     return answer ? json({ answer }) : json({ code: 'NO_ANSWER' }, 422);
   } catch {
+    console.error('GEMINI_UNAVAILABLE: The request to Google failed or its response could not be decoded.');
     return json({ code: 'GEMINI_UNAVAILABLE' }, 502);
   }
 });
