@@ -172,7 +172,9 @@ function showAnswer(answer) {
   }
   history.set(pending.key, [...pending.previous, pending.question, { role: 'assistant', content: answer }].slice(-4));
   const citations = pending.sources ?? [];
-  addMessage('Grogy', answer);
+  // Site citations are rendered from retrieved passages, never from model-generated source lists.
+  const body = answer.split(/^\s*(?:\*\*)?(?:fivey )?(?:sources?|references?|citations?)(?:\*\*)?\s*:/im)[0].trim();
+  addMessage('Grogy', body || 'I couldn’t produce a useful reply. Try asking a more specific question.');
   if (citations.length) showSources(citations);
   finish('');
 }
@@ -313,7 +315,7 @@ function ask(review) {
   const [name, topics] = subjects[key] ?? ['AP courses', 'the AP subject indicated by the student'];
   const system = {
     role: 'system',
-    content: `You are Grogy, the AP tutor on Fivey. The current course context is ${name}, covering ${topics}. If the student names another AP course, help with that course. Give clear, accurate AP-level explanations. Show reasoning and units where relevant. Ask for clarification when needed and say when unsure. Keep answers concise. For practice, write original AP-style questions and never claim they are official exam items. For multiple choice, provide four plausible choices and explain the correct answer after the student responds unless they ask for the answer now. Only cite Fivey sources supplied with the question. If the student asks for a source and no relevant excerpt is supplied, say so. Use clear numbering and short paragraphs.`
+    content: `You are Grogy, the AP tutor on Fivey. The current course context is ${name}, covering ${topics}. If the student names another AP course, help with that course. Solve the student's problem directly. Give the result first, then a concise calculation with units and the governing rule. Check that the rule applies and the arithmetic is correct. In mechanics, net force is mass times the given acceleration. Do not add individual forces to that result. Ask for clarification when the problem lacks essential information. Only cite Fivey sources supplied with the question. If the student asks for a source and no relevant excerpt is supplied, say so. Use clear numbering and short paragraphs.`
   };
   let content = draft;
   if (review) {
@@ -353,6 +355,12 @@ async function requestAnswer(system, messages, course) {
     }
     const sources = pending.review ? [] : await findSources(pending.draft, client).catch(() => []);
     pending.sources = sources;
+    if (sources.length && /\b(?:cite|quote|what (?:does|did) .{0,40}(?:say|write))\b/i.test(pending.draft)) {
+      addMessage('Grogy', 'Here are the relevant passages from Fivey:');
+      showSources(sources);
+      finish('');
+      return;
+    }
     if (sources.length) {
       const last = messages.at(-1);
       const references = sources.map(({ title, excerpt }, index) => '[' + (index + 1) + '] ' + title + ': ' + excerpt).join('\n');
