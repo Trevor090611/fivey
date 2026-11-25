@@ -528,21 +528,25 @@ function setupPractice(selected, count, minutes = 0) {
   let active = false;
   const save = () => sessionStorage.setItem(key, JSON.stringify(attempt));
 
-  document.addEventListener('fivey:read-practice-question', ({ detail }) => {
-    if (!detail || quiz.hidden || !attempt?.set || !Number.isInteger(detail.number)) return;
-    const item = attempt.set[detail.number - 1];
-    if (!item) return;
-    const selected = attempt.answers[detail.number - 1];
-    detail.question = {
+  function questionDetails(item, index) {
+    const selected = attempt.answers[index];
+    return {
       course,
-      number: detail.number,
+      number: index + 1,
       prompt: item.prompt,
       context: item.context,
+      choices: item.choices,
       correct: item.choices[item.answer],
       explanation: item.explanation,
       selected: item.choices[selected],
       whyWrong: selected !== item.answer ? item.choiceExplanations?.[selected] : undefined
     };
+  }
+
+  document.addEventListener('fivey:read-practice-question', ({ detail }) => {
+    if (!detail || quiz.hidden || !attempt?.set || !Number.isInteger(detail.number)) return;
+    const item = attempt.set[detail.number - 1];
+    if (item) detail.question = questionDetails(item, detail.number - 1);
   });
 
   async function startSet() {
@@ -699,7 +703,7 @@ function setupPractice(selected, count, minutes = 0) {
           explain.setAttribute('aria-label', 'Explain question ' + (index + 1) + ' with Grogy');
           explain.addEventListener('click', () => {
             document.dispatchEvent(new CustomEvent('fivey:explain-answer', {
-              detail: { course, prompt: item.prompt, selected: item.choices[selected], correct: item.choices[item.answer], explanation: item.explanation, whyWrong: item.choiceExplanations?.[selected] }
+              detail: questionDetails(item, index)
             }));
           });
           // Keep this button outside the disabled fieldset so it stays interactive.
