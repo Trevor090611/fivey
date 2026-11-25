@@ -3,6 +3,8 @@ import { briefExcerpt, courseNames, findSources, resolveSiteRequest, siteIntent 
 import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localPracticeMessages } from './grogy-conversation.js?v=1';
+const questionCost = 1;
+const costLabel = questionCost + (questionCost === 1 ? ' Orbie' : ' Orbies');
 const widget = document.createElement('aside');
 widget.className = 'fivey-chat';
 widget.setAttribute('aria-label', 'Grogy AP tutor');
@@ -20,7 +22,7 @@ widget.innerHTML = `
       <textarea id="fivey-question" maxlength="1000" rows="3" placeholder="Ask about a topic or request a quiz"></textarea>
       <div class="chat-actions">
         <label class="chat-enter-option"><input type="checkbox"> Press Enter to send</label>
-        <button class="chat-send" type="submit" aria-label="Send" aria-describedby="grogy-cost">Send <span id="grogy-cost" class="chat-cost">2 Orbies</span></button>
+        <button class="chat-send" type="submit" aria-label="Send" aria-describedby="grogy-cost">Send <span id="grogy-cost" class="chat-cost">${costLabel}</span></button>
       </div>
     </form>
     <p class="chat-status" role="status" hidden></p>
@@ -37,7 +39,6 @@ const enterToSend = widget.querySelector('.chat-enter-option input');
 const log = widget.querySelector('.chat-log');
 const status = widget.querySelector('.chat-status');
 const typing = widget.querySelector('.chat-typing');
-const questionCost = 2;
 
 const pageParams = new URLSearchParams(location.search);
 const pageCourse = pageParams.get('course');
@@ -195,7 +196,7 @@ async function getChatSession() {
 
 function insufficientOrbies() {
   if (pending) input.value = pending.draft;
-  finish('You need 2 Orbies to ask Grogy.');
+  finish('You need ' + costLabel + ' to ask Grogy.');
 }
 
 async function payForReply(account) {
