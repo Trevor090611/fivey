@@ -57,6 +57,8 @@ function unitAverage(stats) {
   return { accuracy: observations ? correct / observations : 0, observations };
 }
 
+const shownPercent = accuracy => Math.round(accuracy * 1000) / 10;
+
 function readAnalytics(id) {
   let totals;
   try {
@@ -69,11 +71,13 @@ function readAnalytics(id) {
   const rows = Object.entries(totals?.units || {})
     .filter(([unit, stats]) => units[id]?.[Number(unit) - 1] && unitAverage(stats).observations > 0)
     .map(([unit, stats]) => [unit, stats, unitAverage(stats)]);
-  const strength = rows.slice().sort((a, b) => b[2].accuracy - a[2].accuracy || b[2].observations - a[2].observations).slice(0, 2);
-  const weakness = rows.slice().sort((a, b) => a[2].accuracy - b[2].accuracy || b[2].observations - a[2].observations).slice(0, 2);
-  return { attempted, correct, accuracy: attempted ? correct / attempted : null, strength, weakness };
+  // Every unit averaging 75% or above is a Strength and every unit averaging 50% or below is a Weakness,
+  // judged on the percentage shown (one decimal place).
+  const strength = rows.filter(row => shownPercent(row[2].accuracy) >= 75).sort((a, b) => b[2].accuracy - a[2].accuracy || b[2].observations - a[2].observations);
+  const weakness = rows.filter(row => shownPercent(row[2].accuracy) <= 50).sort((a, b) => a[2].accuracy - b[2].accuracy || b[2].observations - a[2].observations);
+  return { attempted, correct, accuracy: attempted ? correct / attempted : null, strength, weakness, scored: rows.length };
 }
-function addUnitList(parent, title, rows, id) {
+function addUnitList(parent, title, rows, id, empty) {
   const group = document.createElement('div');
   const heading = document.createElement('h4');
   heading.textContent = title;
@@ -85,7 +89,7 @@ function addUnitList(parent, title, rows, id) {
   }
   if (!rows.length) {
     const li = document.createElement('li');
-    li.textContent = 'No unit scores yet.';
+    li.textContent = empty;
     ul.append(li);
   }
   group.append(heading, ul);
@@ -129,8 +133,8 @@ function render() {
     if (subject.attempted) {
       const unitsGroup = document.createElement('div');
       unitsGroup.className = 'account-analytics-units';
-      addUnitList(unitsGroup, 'Strength', subject.strength, subject.id);
-      addUnitList(unitsGroup, 'Weakness', subject.weakness, subject.id);
+      addUnitList(unitsGroup, 'Strength', subject.strength, subject.id, subject.scored ? 'No units at 75% or above yet.' : 'No unit scores yet.');
+      addUnitList(unitsGroup, 'Weakness', subject.weakness, subject.id, subject.scored ? 'No units at 50% or below.' : 'No unit scores yet.');
       card.append(unitsGroup);
     } else {
       const empty = document.createElement('p');
