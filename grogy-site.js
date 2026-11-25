@@ -20,7 +20,7 @@ const coursePatterns = {
 const normalize = value => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const hasCourse = course => Object.hasOwn(courseNames, course);
 const courseBase = ['AP Subjects', null];
-const stops = new Set('a an and ap are as can do does for from get how i in is it me my of on or so that the their there this to use want was what when where which who will with you your'.split(' '));
+const stops = new Set('a an and ap are as can do does did for from get how i in is it me my much many of on or so that the their there this to use want was what when where why which who will with you your'.split(' '));
 const words = value => normalize(value).split(' ').filter(word => word.length > 1 && !stops.has(word));
 const describe = (href, steps, course) => ({
   href: new URL(href, import.meta.url),
@@ -118,63 +118,161 @@ export async function resolveSiteRequest(kind, text, context, followUp = '') {
 }
 
 let libraryPromise;
-let developerPromise;
-const readJson = async (file, asJson = true) => {
-  const response = await fetch(new URL(file, import.meta.url), { signal: AbortSignal.timeout(4500) });
-  if (!response.ok) throw new Error('Source unavailable');
-  return asJson ? response.json() : response.text();
-};
+let sitePagesPromise;
 let postsPromise;
+const notePromises = new Map();
+const noteFiles = {
+  biology: './biology-cheatsheet-notes.html?v=4',
+  chemistry: './chemistry-cheatsheet-notes.html?v=3',
+  'physics-1': './physics-1-review-notes.html?v=2',
+  'calculus-ab': './calculus-ab-review-notes.html?v=1',
+  macroeconomics: './macroeconomics-review-notes.html?v=1'
+};
 const formatted = 'FIVEY:FORMATTED:1\n';
-function paragraphs(body) {
-  if (!body.startsWith(formatted)) return body.split(/\n+/);
-  const doc = new DOMParser().parseFromString(body.slice(formatted.length), 'text/html');
-  // Parse inert markup and read text only. Never insert post markup into the chat.
-  for (const element of doc.querySelectorAll('script,style,template,iframe,object')) element.remove();
-  return doc.body.textContent.split(/\n+/);
+const sourceWords = new Set('article articles blog cite could define developer does explain find fivey give help kayden meaning notes please quote quick reference review say simple source sources study tell topic unit using'.split(' '));
+const inflected = word => word.length > 4 ? word.replace(/(?:ies|s)$/, ending => ending === 'ies' ? 'y' : '') : word;
+const terms = value => words(value).filter(word => !sourceWords.has(word)).map(inflected);
+const cleanText = text => text.trim().replace(/\s+/g, ' ');
+const sentenceSplitter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('en', { granularity: 'sentence' }) : null;
+
+function sentences(text) {
+  const clean = cleanText(text);
+  return sentenceSplitter ? Array.from(sentenceSplitter.segment(clean), part => part.segment.trim()) :
+    clean.split(/(?<=[.!?])\s+(?=[A-Z])/);
 }
 
-function rankedPassages(documents, question) {
-  const query = new Set(words(question).filter(word => !['blog','article','articles','fivey','developer','kayden'].includes(word)));
-  const sourceRequest = /\b(?:blog|article|developer|kayden)\b/i.test(question);
-  if (!query.size && !sourceRequest) return [];
-  const scored = [];
+function shorten(text, max = 205) {
+  if (text.length <= max) return text;
+  const end = text.lastIndexOf(' ', max - 1);
+  return text.slice(0, end > max / 2 ? end : max - 1).trimEnd() + '…';
+}
+
+export function briefExcerpt(text) {
+  return shorten(sentences(text ?? '')[0] ?? '');
+}
+
+async function readPage(file, format = 'text') {
+  const response = await fetch(new URL(file, import.meta.url), { signal: AbortSignal.timeout(4500) });
+  if (!response.ok) throw new Error('Source unavailable');
+  return format === 'json' ? response.json() : response.text();
+}
+
+function publishedParagraphs(body) {
+  if (!body.startsWith(formatted)) return body.split(/\n+/);
+  const template = document.createElement('template');
+  template.innerHTML = body.slice(formatted.length);
+  for (const element of template.content.querySelectorAll('script,style,template,iframe,object')) element.remove();
+  const blocks = Array.from(template.content.querySelectorAll('p,div,li'), element => element.textContent);
+  return blocks.length ? blocks : [template.content.textContent];
+}
+
+function rank(documents, question) {
+  const sequence = terms(question);
+  const query = new Set(sequence);
+  if (!query.size) return [];
+  const phrase = sequence.join(' ');
+  const results = [];
   for (const doc of documents) {
-    const titleWords = new Set(words(doc.title));
-    let titleScore = 0;
-    for (const word of query) if (titleWords.has(word)) titleScore += 2;
-    for (const part of doc.paragraphs) {
-      const sentences = part.trim().match(/[^.!?]+[.!?]?(?:\s|$)|[^.!?]+$/g) ?? [part];
-      for (let index = 0; index < sentences.length; index++) {
-        const excerpt = sentences.slice(Math.max(0, index - 1), index + 2).join('').trim().replace(/\s+/g, ' ');
-        if (excerpt.length < 25) continue;
-        const excerptWords = new Set(words(excerpt));
-        let score = titleScore;
-        for (const word of query) if (excerptWords.has(word)) score++;
-        if (score >= (sourceRequest ? 1 : 2)) scored.push({ ...doc, excerpt: excerpt.length > 540 ? excerpt.slice(0, 537) + '…' : excerpt, score });
+    const heading = terms(doc.title).join(' ');
+    const titleWords = new Set(heading.split(' '));
+    const titleHits = [...query].filter(word => titleWords.has(word)).length;
+    const titlePhrase = query.size > 1 && (' ' + heading + ' ').includes(' ' + phrase + ' ');
+    for (const passage of doc.paragraphs) {
+      for (const sentence of sentences(passage)) {
+        if (sentence.length < 18) continue;
+        const passageText = terms(sentence).join(' ');
+        const sentenceWords = new Set(passageText.split(' '));
+        const phraseHit = query.size > 1 && (' ' + passageText + ' ').includes(' ' + phrase + ' ');
+        const hits = [...query].filter(word => sentenceWords.has(word)).length;
+        const coverage = [...query].filter(word => titleWords.has(word) || sentenceWords.has(word)).length;
+        if (coverage < Math.min(query.size, Math.max(2, Math.ceil(query.size * .4)))) continue;
+        if (!hits && !titlePhrase) continue;
+        if (!phraseHit && !titlePhrase && hits < 2 && query.size > 1 && titleHits === 0) continue;
+        const score = coverage / query.size * 8 + hits * 3 + titleHits * 1.5 + (phraseHit ? 7 : 0) + (titlePhrase ? 5 : 0);
+        results.push({ title: doc.title, href: doc.href, excerpt: shorten(sentence), score });
       }
     }
   }
   const seen = new Set();
-  return scored.sort((a, b) => b.score - a.score).filter(doc => {
-    if (seen.has(doc.href)) return false;
-    seen.add(doc.href);
+  return results.sort((a, b) => b.score - a.score).filter(result => {
+    if (seen.has(result.excerpt) || result.score < (results[0]?.score ?? 0) * .73) return false;
+    seen.add(result.excerpt);
     return true;
   }).slice(0, 2);
 }
 
-export async function findSources(question, client) {
-  libraryPromise ??= readJson('./library.json').catch(() => { libraryPromise = undefined; return {}; });
-  developerPromise ??= readJson('./about.html', false).then(html => {
+function readSections(file, ids) {
+  return readPage(file).then(html => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    return ['why-i-built', 'study-strategy'].flatMap(id => {
+    return ids.flatMap(id => {
       const heading = doc.getElementById(id);
-      if (!heading) return [];
-      const area = heading.closest('section');
-      return [{ title: heading.textContent, href: new URL('./about.html#' + id, import.meta.url).href,
-        paragraphs: Array.from(area.querySelectorAll('p,li'), item => item.textContent) }];
+      const area = heading?.closest('section');
+      if (!area) return [];
+      return [{ title: heading.textContent, href: new URL(file + '#' + id, import.meta.url).href,
+        paragraphs: Array.from(area.querySelectorAll('p,li'), item => cleanText(item.textContent)) }];
     });
-  }).catch(() => { developerPromise = undefined; return []; });
+  }).catch(() => []);
+}
+
+function loadNotes(course) {
+  if (!notePromises.has(course)) {
+    notePromises.set(course, readPage(noteFiles[course]).then(html => {
+      const template = document.createElement('template');
+      template.innerHTML = html;
+      return Array.from(template.content.querySelectorAll('article[data-unit]')).flatMap(unit => {
+        const label = unit.querySelector('h3')?.textContent;
+        if (!label || !/^\d+$/.test(unit.dataset.unit)) return [];
+        const href = new URL(courseUrl(course, 'cheatsheet') + '&unit=' + unit.dataset.unit, import.meta.url).href;
+        return Array.from(unit.querySelectorAll('section.biology-topic')).map(topic => {
+          const heading = topic.querySelector('h4')?.textContent ?? label;
+          const paragraphs = Array.from(topic.querySelectorAll('p,li,td'), item => cleanText(item.textContent)).filter(Boolean);
+          return { title: courseNames[course] + ' · ' + heading, href, paragraphs };
+        });
+      });
+    }).catch(() => { notePromises.delete(course); return []; }));
+  }
+  return notePromises.get(course);
+}
+
+async function exactPracticeSource(question, courses) {
+  const normalized = normalize(question).replace(/^(?:(?:what is|whats) the answer to|solve|explain|answer)\s+/, '');
+  if (normalized.length < 30) return [];
+  const { units, unitPool } = await import('./practice-units.js?v=10');
+  for (const course of courses) {
+    for (const [index, unit] of (units[course] ?? []).entries()) {
+      const item = unitPool(course, index + 1).find(item => {
+        const prompt = normalize(item.prompt);
+        return prompt.length >= 30 && normalized.includes(prompt);
+      });
+      if (item) {
+        const href = new URL('./practice.html?' + new URLSearchParams({ course, mode: 'unit', unit: index + 1 }), import.meta.url).href;
+        return [{ title: courseNames[course] + ' · ' + unit + ' practice', href,
+          excerpt: briefExcerpt(item.explanation) || shorten(item.choices[item.answer]) }];
+      }
+    }
+  }
+  return [];
+}
+
+export async function findSources(question, client, pageCourse) {
+  const named = matchCourse(question);
+  const focused = named.length === 1 ? named[0] : null;
+  const sourceRequest = /\b(?:blog|article|developer|kayden|fivey)\b/i.test(question);
+  const blogRequest = /\bblog\b/i.test(question);
+  const priority = pageCourse && Object.hasOwn(noteFiles, pageCourse) ? [pageCourse] : [];
+  const notes = focused ? Object.hasOwn(noteFiles, focused) ? [focused] : [] :
+    [...priority, ...Object.keys(noteFiles).filter(course => !priority.includes(course))];
+  if (!sourceRequest) {
+    const localNotes = await Promise.all(notes.map(loadNotes));
+    const hits = rank(localNotes.flat(), question);
+    if (hits.length) return hits;
+  }
+
+  libraryPromise ??= readPage('./library.json', 'json').catch(() => { libraryPromise = undefined; return {}; });
+  sitePagesPromise ??= Promise.all([
+    readSections('./about.html', ['why-i-built', 'study-strategy']),
+    readSections('./index.html', ['intro-title', 'what-youll-find', 'how-to-use'])
+  ]).then(groups => groups.flat());
   postsPromise ??= client.rpc('fivey_blog_posts', { p_id: null }).abortSignal(AbortSignal.timeout(4500))
     .then(({ data, error }) => {
       if (error) throw error;
@@ -183,14 +281,23 @@ export async function findSources(question, client) {
       ).map(post => ({
         title: post.title,
         href: new URL('./blog-article.html?' + new URLSearchParams({ post: post.id }), import.meta.url).href,
-        paragraphs: [post.summary, ...paragraphs(typeof post.body === 'string' ? post.body : '')].filter(Boolean)
+        paragraphs: [post.summary, ...publishedParagraphs(typeof post.body === 'string' ? post.body : '')]
+          .filter(paragraph => typeof paragraph === 'string' && paragraph.trim())
       }));
     }).catch(() => { postsPromise = undefined; return []; });
-  const [library, posts, developer] = await Promise.all([libraryPromise, postsPromise, developerPromise]);
+  const [library, posts, pages] = await Promise.all([libraryPromise, postsPromise, sitePagesPromise]);
   const articles = Object.entries(library).flatMap(([id, course]) => (course.articles ?? []).map((post, index) => ({
     title: post.title,
     href: new URL(courseUrl(id, 'article') + '#article-' + (index + 1), import.meta.url).href,
     paragraphs: post.paragraphs ?? []
   })));
-  return rankedPassages([...articles, ...posts, ...developer], question);
+  if (/^\s*(?:what is|what's|tell me about) fivey[?.!\s]*$/i.test(question)) {
+    const intro = pages.find(page => page.href.endsWith('#what-youll-find'));
+    if (intro?.paragraphs[0]) return [{ ...intro, excerpt: briefExcerpt(intro.paragraphs[0]) }];
+  }
+  const hits = rank(blogRequest ? posts : [...articles, ...posts, ...pages], question);
+  if (hits.length || sourceRequest) return hits;
+
+  const courses = focused ? [focused] : [...new Set([pageCourse, ...Object.keys(courseNames)].filter(Boolean))];
+  return exactPracticeSource(question, courses);
 }
