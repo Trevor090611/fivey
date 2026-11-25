@@ -3,6 +3,7 @@ import { environmentalQuestions } from './practice-environmental.js?v=1';
 import { chemistryQuestions } from './practice-chemistry.js?v=1';
 import { psychologyQuestions } from './practice-psychology.js?v=1';
 import { physicsQuestions } from './practice-physics.js?v=1';
+import { macroeconomicsQuestions } from './practice-macroeconomics.js?v=1';
 
 export const units = {
   "biology": [
@@ -81,5 +82,6 @@ export function unitPool(course, unit) {
   if (course === 'chemistry') return chemistryQuestions(unit);
   if (course === 'psychology') return psychologyQuestions(unit);
   if (course === 'physics-1') return physicsQuestions(unit);
+  if (course === 'macroeconomics') return macroeconomicsQuestions(unit);
   return [];
 }
