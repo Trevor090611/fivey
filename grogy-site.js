@@ -39,7 +39,7 @@ export function matchCourse(text) {
 
 export function siteIntent(text) {
   const direct = /\b(?:(?:take|bring|send|direct) me to|(?:navigate|go|jump) to|autopilot)\b|^(?:(?:can|could|would) you |please )?open\b/i.test(text);
-  const asksHow = /\b(?:where (?:can|do|is|are)|how (?:do|can|to) (?:i |we )?(?:get to|open|find|reach|navigate|access)|(?:guide|show) me)\b/i.test(text);
+  const asksHow = /\b(?:where|how (?:do|can|to) (?:i |we )?(?:get to|open|find|reach|navigate|access)|(?:guide|show) me)\b/i.test(text);
   const siteTarget = /\b(?:blog|about us|our experts|settings|account|profile|home(?:page)?|fivey|articles?|courses?|quick review notes|cheatsheets?|study guides?|textbooks?|resources|analytics|progress check(?:s|ing)?|practice questions?|question bank)\b/i.test(text);
   if (direct || (asksHow && siteTarget)) return 'navigate';
   if (/\b(?:quiz me|test me|quiz on|quiz for|practice questions? (?:for|on|from)|question set (?:for|on))\b/i.test(text) ||
@@ -100,6 +100,9 @@ export async function resolveSiteRequest(kind, text, context, followUp = '') {
   if (standard) return describe(standard[1], standard[2]);
   const practice = /\b(?:practice|progress checks?|progress checking|question bank)\b/i.test(text);
   const resource = courseDestinations.find(([pattern]) => pattern.test(text));
+  if (!course && !named.length && practice && !/\bunits?\b/i.test(text)) {
+    return describe('./courses.html', ['AP Subjects', 'Choose a subject', 'Check my Progress!!']);
+  }
   if (!course && (resource || practice || named.length > 1)) return { clarify: 'Which AP subject should I open?' };
   const subjectPage = named.length && /\b(?:page|course|(?:open|find|go to|take me to)\s+(?:the\s+)?(?:ap\s+)?(?:biology|bio|chemistry|chem|environmental science|apes|physics|psychology|psych|calculus|calc|macroeconomics|macro))\b/i.test(text);
   if (!hasCourse(course) || (!resource && !practice && !subjectPage)) return null;

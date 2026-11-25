@@ -1,5 +1,5 @@
 import { getOrbiesBalance, spendOrbies } from './orbies-wallet.js?v=grogy1';
-import { briefExcerpt, courseNames, findSources, resolveSiteRequest, siteIntent } from './grogy-site.js?v=3';
+import { briefExcerpt, courseNames, findSources, resolveSiteRequest, siteIntent } from './grogy-site.js?v=4';
 import { connectClient } from './auth-client.js';
 const widget = document.createElement('aside');
 widget.className = 'fivey-chat';
