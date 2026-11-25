@@ -678,8 +678,8 @@ function setupPractice(selected, count, minutes = 0) {
           const explain = document.createElement('button');
           explain.type = 'button';
           explain.className = 'progress-explain';
-          explain.textContent = 'Explain with Fivey';
-          explain.setAttribute('aria-label', 'Explain question ' + (index + 1) + ' with Fivey');
+          explain.textContent = 'Explain with Grogy';
+          explain.setAttribute('aria-label', 'Explain question ' + (index + 1) + ' with Grogy');
           explain.addEventListener('click', () => {
             document.dispatchEvent(new CustomEvent('fivey:explain-answer', {
               detail: { course, prompt: item.prompt, selected: item.choices[selected], correct: item.choices[item.answer], explanation: item.explanation, whyWrong: item.choiceExplanations?.[selected] }

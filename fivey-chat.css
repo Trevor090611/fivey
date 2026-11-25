@@ -63,3 +63,9 @@
 .fivey-chat .chat-enter-option { display: inline-flex; align-items: center; gap: 7px; min-height: 36px; font-size: 14px; cursor: pointer; }
 .fivey-chat .chat-enter-option input { width: 16px; height: 16px; margin: 0; accent-color: #467335; cursor: pointer; }
 :root[data-fivey-dark] .fivey-chat .chat-enter-option input { accent-color: var(--fivey-cyan); }
+
+.fivey-chat .chat-navigation { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.fivey-chat .chat-navigation button { border-radius: 6px; padding: 5px 9px; }
+.fivey-chat .chat-sources { margin: 0 0 8px; padding-inline-start: 28px; overflow-wrap: anywhere; }
+.fivey-chat .chat-sources a { color: inherit; font-weight: 700; text-underline-offset: 2px; }
+.fivey-chat .chat-sources p { margin-block: 3px 8px; }
