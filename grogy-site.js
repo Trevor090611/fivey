@@ -130,7 +130,9 @@ const noteFiles = {
 };
 const formatted = 'FIVEY:FORMATTED:1\n';
 const sourceWords = new Set('article articles blog cite could define developer does explain find fivey give help kayden meaning notes please quote quick reference review say simple source sources study tell topic unit using'.split(' '));
-const inflected = word => word.length > 4 ? word.replace(/(?:ies|s)$/, ending => ending === 'ies' ? 'y' : '') : word;
+const inflected = word => word.length > 4
+  ? word.replace(/(?:ies|s)$/, ending => ending === 'ies' ? 'y' : '').replace(/^bonding$/, 'bond')
+  : word;
 const terms = value => words(value).filter(word => !sourceWords.has(word)).map(inflected);
 const cleanText = text => text.trim().replace(/\s+/g, ' ');
 const sentenceSplitter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('en', { granularity: 'sentence' }) : null;
@@ -175,6 +177,8 @@ function rank(documents, question) {
   for (const doc of documents) {
     const heading = terms(doc.title).join(' ');
     const titleWords = new Set(heading.split(' '));
+    const rowWords = new Set(terms(doc.label ?? ''));
+    const rowHits = [...query].filter(word => rowWords.has(word)).length;
     const titleHits = [...query].filter(word => titleWords.has(word)).length;
     const titlePhrase = query.size > 1 && (' ' + heading + ' ').includes(' ' + phrase + ' ');
     for (const passage of doc.paragraphs) {
@@ -188,14 +192,14 @@ function rank(documents, question) {
         if (coverage < Math.min(query.size, Math.max(2, Math.ceil(query.size * .4)))) continue;
         if (!hits && !titlePhrase) continue;
         if (!phraseHit && !titlePhrase && hits < 2 && query.size > 1 && titleHits === 0) continue;
-        const score = coverage / query.size * 8 + hits * 3 + titleHits * 1.5 + (phraseHit ? 7 : 0) + (titlePhrase ? 5 : 0);
+        const score = coverage / query.size * 8 + hits * 3 + titleHits * 1.5 + rowHits * 5 + (phraseHit ? 7 : 0) + (titlePhrase ? 5 : 0);
         results.push({ title: doc.title, href: doc.href, excerpt: shorten(sentence), score });
       }
     }
   }
   const seen = new Set();
   return results.sort((a, b) => b.score - a.score).filter(result => {
-    if (seen.has(result.excerpt) || result.score < (results[0]?.score ?? 0) * .73) return false;
+    if (seen.has(result.excerpt) || result.score < (results[0]?.score ?? 0) * .78) return false;
     seen.add(result.excerpt);
     return true;
   }).slice(0, 2);
@@ -223,10 +227,16 @@ function loadNotes(course) {
         const label = unit.querySelector('h3')?.textContent;
         if (!label || !/^\d+$/.test(unit.dataset.unit)) return [];
         const href = new URL(courseUrl(course, 'cheatsheet') + '&unit=' + unit.dataset.unit, import.meta.url).href;
-        return Array.from(unit.querySelectorAll('section.biology-topic')).map(topic => {
+        return Array.from(unit.querySelectorAll('section.biology-topic')).flatMap(topic => {
           const heading = topic.querySelector('h4')?.textContent ?? label;
-          const paragraphs = Array.from(topic.querySelectorAll('p,li,td'), item => cleanText(item.textContent)).filter(Boolean);
-          return { title: courseNames[course] + ' · ' + heading, href, paragraphs };
+          const title = courseNames[course] + ' · ' + heading;
+          return Array.from(topic.querySelectorAll('p,li,td')).flatMap(item => {
+            if (item.matches('td') && item.querySelector('p,li')) return [];
+            const text = cleanText(item.textContent);
+            if (!text) return [];
+            const label = item.closest('tr')?.querySelector('th[scope="row"]')?.textContent;
+            return [{ title, href, label, paragraphs: [text] }];
+          });
         });
       });
     }).catch(() => { notePromises.delete(course); return []; }));
