@@ -1,8 +1,8 @@
 import { getOrbiesBalance, spendOrbies } from './orbies-wallet.js?v=grogy1';
-import { briefExcerpt, courseNames, findSources, resolveSiteRequest, siteIntent } from './grogy-site.js?v=4';
+import { briefExcerpt, courseNames, findPracticeSources, findSources, resolveSiteRequest, siteIntent } from './grogy-site.js?v=5';
 import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
-import { localPracticeMessages } from './grogy-conversation.js?v=1';
+import { localChatMessages } from './grogy-conversation.js?v=2';
 const questionCost = 1;
 const costLabel = questionCost + (questionCost === 1 ? ' Orbie' : ' Orbies');
 const widget = document.createElement('aside');
@@ -53,13 +53,12 @@ const messages = [];
 const geminiEndpoint = new URL('/functions/v1/fivey-gemini', authConfig.url);
 let activePractice;
 let modelWorker;
-let localOnly = false;
 
 function toggle(isOpen) {
   panel.hidden = !isOpen;
   if (isOpen && !introduced) {
     introduced = true;
-    addMessage('Grogy', 'Hi, I’m Grogy, your AP tutor on Fivey. I give short answers from Fivey’s notes, practice explanations, articles, and blog. Ask for a quiz on a unit to open its practice questions. If you need to find something on Fivey, I can show you which buttons to click or take you there with your permission.');
+    addMessage('Grogy', 'Hi, I’m Grogy, your AP tutor on Fivey. I can chat, explain AP topics, and use Fivey’s study material when it helps. Ask for a quiz on a unit to open its practice questions. If you need to find something on Fivey, I can show you which buttons to click or take you there with your permission.');
   }
   open.hidden = isOpen;
   open.setAttribute('aria-expanded', String(isOpen));
@@ -222,7 +221,7 @@ function formatPracticeAnswer(question) {
     (why ? '\n\n**Why:** ' + why : '') + '\n\nSource: Fivey’s practice answer key.';
 }
 
-function askLocalModel(practice) {
+function askLocalModel(context) {
   if (!navigator.gpu) return Promise.resolve(null);
   modelWorker ??= new Worker(new URL('./fivey-worker.js', import.meta.url), { type: 'module' });
   return new Promise(resolve => {
@@ -248,34 +247,42 @@ function askLocalModel(practice) {
     worker.addEventListener('message', onMessage);
     worker.addEventListener('error', onError);
     try {
-      worker.postMessage(localPracticeMessages(practice, messages));
+      worker.postMessage(localChatMessages(context, messages));
     } catch {
       settle(null);
     }
   });
 }
 
-async function explainPractice(practice, session) {
-  if (!localOnly) {
-    try {
-      const response = await fetch(geminiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: authConfig.key,
-          Authorization: 'Bearer ' + session.access_token
-        },
-        body: JSON.stringify({ messages, practice }),
-        signal: AbortSignal.timeout(34000)
-      });
-      const result = await response.json();
-      if (response.ok && typeof result.answer === 'string' && result.answer.trim()) return result.answer.trim();
-      if (response.status === 503 && result.code === 'GEMINI_NOT_CONFIGURED') localOnly = true;
-    } catch {
-      // Continue on-device if the hosted model cannot complete this request.
-    }
+async function generateReply(context, session, actionOnly = false) {
+  try {
+    const response = await fetch(geminiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: authConfig.key,
+        Authorization: 'Bearer ' + session.access_token
+      },
+      body: JSON.stringify({ messages, ...context }),
+      signal: AbortSignal.timeout(actionOnly ? 3500 : 34000)
+    });
+    const result = await response.json();
+    if (response.ok && typeof result.answer === 'string' && result.answer.trim()) return result.answer.trim();
+  } catch {
+    // The browser model can still reply if the hosted request fails.
   }
-  return askLocalModel(practice);
+  return actionOnly ? null : askLocalModel({ ...context, course: courseNames[context.course] });
+}
+
+function optionalSources(question, client) {
+  let timer;
+  return Promise.race([
+    Promise.all([
+      findPracticeSources(question, pageCourse).catch(() => []),
+      findSources(question, client, pageCourse).catch(() => [])
+    ]).then(([practice, notes]) => [...practice, ...notes].slice(0, 2)),
+    new Promise(resolve => { timer = setTimeout(() => resolve([]), 1800); })
+  ]).finally(() => clearTimeout(timer));
 }
 
 function clearAutopilot() {
@@ -306,54 +313,22 @@ function offerAutopilot(destination) {
   log.scrollTop = log.scrollHeight;
 }
 
-async function handleSiteRequest(text, explicitKind, account) {
-  const kind = explicitKind || siteFollowUp.kind;
-  const query = explicitKind ? text : siteFollowUp.query + ' ' + text;
-  siteFollowUp = undefined;
-  const result = await resolveSiteRequest(kind, query, siteContext, explicitKind ? '' : text);
-  if (result?.course) siteContext.course = result.course;
-  if (result?.clarify) {
-    siteFollowUp = { kind, query: query.slice(-1500) };
-    addMessage('Grogy', result.clarify);
-  } else if (result) {
-    if (!await payForReply(account)) return;
-    if (result.kind === 'quiz') {
-      location.assign(result.href);
-    } else {
-      offerAutopilot(result);
-    }
-  } else {
-    addMessage('Grogy', 'Tell me the page or course you want to open. For example, the Developer’s Personal Blog or AP Chemistry Quick Review Notes.');
-  }
-  finish('');
-}
-
 async function ask(review) {
   const draft = input.value.trim();
   if (pending || (!draft && !review)) return;
 
-  if (!review && autopilot && /^(?:yes(?:,? please)?|take me there|go ahead|open it|sure|okay|ok)[.!]?$/i.test(draft)) {
-    const { destination } = autopilot;
-    clearAutopilot();
-    location.assign(destination.href);
-    return;
-  }
-  if (!review && autopilot && /^(?:no(?:,? thanks)?|stay here|cancel)[.!]?$/i.test(draft)) {
-    clearAutopilot();
-    addMessage('You', draft);
-    addMessage('Grogy', 'Okay, we’ll stay here.');
-    input.value = '';
-    return;
-  }
-
+  const accepted = !review && autopilot && /^(?:yes(?:,? please)?|take me there|go ahead|open it|sure|okay|ok)[.!]?$/i.test(draft);
+  const declined = !review && autopilot && /^(?:no(?:,? thanks)?|stay here|cancel)[.!]?$/i.test(draft);
+  const confirmedDestination = accepted ? autopilot.destination : null;
   const newTopic = !review && /^new topic(?:[\s:—-]|$)/i.test(draft);
   const questionText = newTopic ? draft.replace(/^new topic[\s:—-]*/i, '') : draft;
-  const intent = review ? '' : siteIntent(questionText);
-  const reference = review || intent ? null : practiceReference(questionText);
+  const intent = review || accepted || declined ? '' : siteIntent(questionText);
+  const reference = review || intent || accepted || declined ? null : practiceReference(questionText);
   const clarification = !review && siteFollowUp &&
     /^(?:ap\s+)?(?:bio(?:logy)?|chem(?:istry)?|environmental science|apes|physics(?:\s*1)?|psych(?:ology)?|calc(?:ulus)?(?:\s*ab)?|macro(?:economics)?|unit\s*#?\d+|\d+)(?:\s+unit\s*#?\d+)?[.!]?$/i.test(draft);
+  const previousSiteRequest = siteFollowUp;
   clearAutopilot();
-  if (!intent && !clarification) siteFollowUp = undefined;
+  siteFollowUp = undefined;
 
   pending = { draft };
   setBusy(true);
@@ -361,66 +336,57 @@ async function ask(review) {
   try {
     const { client, session } = await getChatSession();
     const account = session.user.id;
-    if (getOrbiesBalance(account) < questionCost) return insufficientOrbies();
+    if (!accepted && !declined && getOrbiesBalance(account) < questionCost) return insufficientOrbies();
     addMessage('You', review ? 'Explain the correct answer to this practice question.' : draft);
     if (!review) input.value = '';
 
-    if (newTopic) activePractice = undefined;
+    if (newTopic || (reference && !reference.question)) activePractice = undefined;
     const checkedQuestion = review ?? reference?.question;
-    const expandsCurrent = checkedQuestion && !review && activePractice?.prompt === checkedQuestion.prompt &&
-      /\b(?:why|explain|detail|more|walk me through|break down)\b/i.test(questionText);
-    if (checkedQuestion && !expandsCurrent) {
+    if (checkedQuestion) activePractice = checkedQuestion;
+    const route = (intent || clarification)
+      ? await resolveSiteRequest(intent || previousSiteRequest.kind,
+        intent ? questionText : previousSiteRequest.query + ' ' + questionText,
+        siteContext, intent ? '' : questionText).catch(() => null)
+      : null;
+    const isAction = Boolean(accepted || declined || route);
+    const sources = !isAction && !activePractice && questionText
+      ? await optionalSources(questionText, client)
+      : [];
+    const answer = await generateReply({
+      course: activePractice?.course ?? pageCourse,
+      practice: activePractice,
+      sources: sources.map(({ title, excerpt }) => ({ title, excerpt }))
+    }, session, isAction);
+
+    if (accepted) {
+      finish('');
+      location.assign(confirmedDestination.href);
+      return;
+    }
+    if (declined) {
+      addMessage('Grogy', 'Okay, we’ll stay here.');
+      finish('');
+      return;
+    }
+    if (route?.course) siteContext.course = route.course;
+    if (route?.clarify) {
+      siteFollowUp = { kind: intent || previousSiteRequest.kind,
+        query: intent ? questionText : (previousSiteRequest.query + ' ' + questionText).slice(-1500) };
+      addMessage('Grogy', route.clarify);
+    } else if (route) {
       if (!await payForReply(account)) return;
-      activePractice = checkedQuestion;
-      addMessage('Grogy', formatPracticeAnswer(checkedQuestion));
-      finish('');
-      return;
-    }
-
-    if (reference && !checkedQuestion && document.querySelector('.progress-quiz:not([hidden])')) {
-      addMessage('Grogy', 'I couldn’t find question ' + reference.number + ' in this set. Check its number or paste the question.');
-      finish('');
-      return;
-    }
-    if (reference && !checkedQuestion && !/\b(?:is|says|reads):/i.test(questionText) && questionText.length < 100) {
-      addMessage('Grogy', 'Paste question ' + reference.number + ' or open its practice set so I can see it.');
-      finish('');
-      return;
-    }
-
-    if (intent || clarification) {
-      await handleSiteRequest(questionText, intent, account);
-      return;
-    }
-
-    if (expandsCurrent) activePractice = checkedQuestion;
-    if (activePractice) {
-      const elaboration = await explainPractice(activePractice, session);
-      if (!elaboration) {
-        const key = activePractice.explanation || activePractice.whyWrong || activePractice.correct;
-        addMessage('Grogy', 'I couldn’t generate a follow-up right now. Here’s Fivey’s full answer-key explanation:\n\n' + key);
-        finish('');
-        return;
-      }
+      if (route.kind === 'quiz') location.assign(route.href);
+      else offerAutopilot(route);
+    } else if (answer) {
       if (!await payForReply(account)) return;
-      addMessage('Grogy', elaboration);
-      finish('');
+      const message = addMessage('Grogy', answer);
+      if (sources.length) showSources(sources, message);
+    } else if (activePractice) {
+      addMessage('Grogy', 'The model couldn’t reply right now. Here’s Fivey’s answer key:\n\n' + formatPracticeAnswer(activePractice));
+    } else {
+      fail('Grogy couldn’t reach a model right now. Try again in a moment.');
       return;
     }
-
-    if (newTopic && !questionText) {
-      addMessage('Grogy', 'Ready for a new topic. What would you like to ask?');
-      finish('');
-      return;
-    }
-    const sources = await findSources(questionText, client, pageCourse);
-    if (!sources.length) {
-      addMessage('Grogy', 'I couldn’t find a matching answer on Fivey. Try naming the AP subject or unit, or ask about a question in an open practice set.');
-      finish('');
-      return;
-    }
-    if (!await payForReply(account)) return;
-    showSources(sources, addMessage('Grogy', 'From Fivey:'));
     finish('');
   } catch (error) {
     fail(error?.message === 'Sign in again to ask Grogy.' ? error.message :

@@ -260,11 +260,18 @@ async function exactPracticeSource(question, courses) {
       if (item) {
         const href = new URL('./practice.html?' + new URLSearchParams({ course, mode: 'unit', unit: index + 1 }), import.meta.url).href;
         return [{ title: courseNames[course] + ' · ' + unit + ' practice', href,
-          excerpt: briefExcerpt(item.explanation) || shorten(item.choices[item.answer]) }];
+          excerpt: cleanText(item.explanation || item.choices[item.answer]).slice(0, 750) }];
       }
     }
   }
   return [];
+}
+
+export function findPracticeSources(question, pageCourse) {
+  const named = matchCourse(question);
+  const courses = named.length === 1 ? named :
+    [...new Set([pageCourse, ...Object.keys(courseNames)].filter(Boolean))];
+  return exactPracticeSource(question, courses);
 }
 
 export async function findSources(question, client, pageCourse) {
@@ -311,6 +318,5 @@ export async function findSources(question, client, pageCourse) {
   const hits = rank(blogRequest ? posts : [...articles, ...posts, ...pages], question);
   if (hits.length || sourceRequest) return hits;
 
-  const courses = focused ? [focused] : [...new Set([pageCourse, ...Object.keys(courseNames)].filter(Boolean))];
-  return exactPracticeSource(question, courses);
+  return [];
 }
