@@ -50,12 +50,54 @@
 .fivey-chat .chat-log {
   flex: 1 1 auto;
   min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   overflow: auto;
   padding: 8px 14px;
   border-block: 1px solid #d4d9cd;
 }
-.fivey-chat .chat-message { margin: 0 0 8px; padding: 8px; border-radius: 7px; white-space: pre-wrap; overflow-wrap: anywhere; background: #edf1e9; }
-.fivey-chat .chat-message[data-speaker="You"] { background: #eaf4d2; }
+.fivey-chat .chat-message, .fivey-chat .chat-typing {
+  align-self: flex-start;
+  min-width: 0;
+  max-width: min(88%, 50ch);
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 16px 16px 16px 5px;
+  background: #edf1e9;
+}
+.fivey-chat .chat-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+.fivey-chat .chat-message[data-speaker="You"] {
+  align-self: flex-end;
+  border-radius: 16px 16px 5px 16px;
+  background: #d9f0aa;
+}
+:root[data-fivey-dark] .fivey-chat .chat-log .chat-message,
+:root[data-fivey-dark] .fivey-chat .chat-typing { background: #192943; color: #fff; }
+:root[data-fivey-dark] .fivey-chat .chat-log .chat-message[data-speaker="You"] { background: #14536a; }
+.fivey-chat .chat-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  flex-shrink: 0;
+}
+.fivey-chat .chat-typing[hidden] { display: none; }
+.fivey-chat .chat-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: grogy-thinking 850ms ease-in-out infinite;
+}
+@keyframes grogy-thinking {
+  0%, 100% { transform: translateY(2px); }
+  50% { transform: translateY(-4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fivey-chat .chat-typing span { animation: none; }
+}
+.fivey-chat .chat-cost { margin-inline-start: 5px; font-size: 12px; font-weight: 650; }
 .fivey-chat .chat-status { margin: 0; padding: 0 14px 10px; font-size: 13px; color: #4e5d52; }
 .fivey-chat .chat-form textarea { resize: vertical; max-height: 100px; }
 
@@ -69,3 +111,5 @@
 .fivey-chat .chat-sources { margin: 0 0 8px; padding-inline-start: 28px; overflow-wrap: anywhere; }
 .fivey-chat .chat-sources a { color: inherit; font-weight: 700; text-underline-offset: 2px; }
 .fivey-chat .chat-sources p { margin-block: 3px 8px; }
+
+.fivey-chat .chat-speaker { display: block; margin-bottom: 3px; font-size: 12px; }

@@ -28,6 +28,15 @@ function updateWallet(account, change) {
   return navigator.locks ? navigator.locks.request(key, update) : update();
 }
 
+export function spendOrbies(account, amount) {
+  if (!account || !Number.isSafeInteger(amount) || amount <= 0) throw new Error('Invalid Orbies payment');
+  return updateWallet(account, wallet => {
+    if (wallet.balance < amount) return false;
+    wallet.balance -= amount;
+    return true;
+  });
+}
+
 export function qualifiesForChest(mode, correct, total) {
   return mode === 'unit' && total > 0 && correct * 100 > total * 85;
 }

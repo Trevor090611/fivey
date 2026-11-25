@@ -528,6 +528,23 @@ function setupPractice(selected, count, minutes = 0) {
   let active = false;
   const save = () => sessionStorage.setItem(key, JSON.stringify(attempt));
 
+  document.addEventListener('fivey:read-practice-question', ({ detail }) => {
+    if (!detail || quiz.hidden || !attempt?.set || !Number.isInteger(detail.number)) return;
+    const item = attempt.set[detail.number - 1];
+    if (!item) return;
+    const selected = attempt.answers[detail.number - 1];
+    detail.question = {
+      course,
+      number: detail.number,
+      prompt: item.prompt,
+      context: item.context,
+      correct: item.choices[item.answer],
+      explanation: item.explanation,
+      selected: item.choices[selected],
+      whyWrong: selected !== item.answer ? item.choiceExplanations?.[selected] : undefined
+    };
+  });
+
   async function startSet() {
     status.textContent = 'Loading practice questions…';
     try {
