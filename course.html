@@ -188,6 +188,14 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 .panel-description{font-size:.875rem;margin-bottom:12px}
 .practice-button[hidden]{display:none}
 .progress-actions{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:14px}
+/* Hover label for the AP score Calculator button, styled like the footer's blog hint. */
+.score-calculator-link{position:relative;display:inline-block}
+.score-calculator-hint{position:absolute;left:0;bottom:calc(100% + 9px);z-index:20;width:max-content;max-width:min(260px,73vw);padding:9px 12px;border:1px solid #356b36;border-radius:10px;background:var(--white,#fffef8);color:var(--ink,#19271f);box-shadow:0 6px 20px #0003;font:650 14px/1.4 system-ui,sans-serif;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .17s,transform .17s,visibility .17s;pointer-events:none}
+.score-calculator-hint::after{content:"";position:absolute;top:100%;left:22px;width:9px;height:9px;background:inherit;border-right:1px solid #356b36;border-bottom:1px solid #356b36;transform:translateY(-5px) rotate(45deg)}
+.score-calculator-link:is(:hover,:focus-within) .score-calculator-hint{opacity:1;visibility:visible;transform:none}
+:root[data-fivey-dark] .score-calculator-hint{border-color:#62e7ff;background-color:#0d1722;color:#fff}
+:root[data-fivey-dark] .score-calculator-hint::after{border-color:#62e7ff}
+@media (prefers-reduced-motion:reduce){.score-calculator-hint{transition:none}}
 .panel #college-board-links{flex-direction:column;align-items:flex-start;padding:0;margin-top:14px;list-style:none}
 #college-board-links li{min-width:0;margin:0}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
@@ -287,6 +295,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     <a class="practice-button" id="practice-button" href="./courses.html">Check my Progress!!</a>
     <a class="practice-button" id="full-length-button" href="./courses.html">Full Length Practice Test</a>
     <a class="practice-button" id="analytics-button">Analytics</a>
+    <span class="score-calculator-link"><a class="practice-button" id="score-calculator-button" aria-describedby="score-calculator-hint">AP score Calculator</a><span class="score-calculator-hint" id="score-calculator-hint" role="tooltip">Predict the score you may get on MCQ section of AP exam according to how well you did on Fivey!</span></span>
   </div>
 </section>
 <section class="panel" id="course-resources" aria-labelledby="course-resources-title">
@@ -556,7 +565,7 @@ if (selected) {
     if (analyticsView) {
       const panel = document.querySelector('#analytics-panel');
       panel.hidden = false;
-      import('./course-analytics.js?v=2')
+      import('./course-analytics.js?v=3')
         .then(({ showAnalytics }) => showAnalytics(panel, id, name))
         .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
     }
@@ -581,11 +590,24 @@ if (selected) {
     analyticsButton.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      import('./course-analytics.js?v=2')
+      import('./course-analytics.js?v=3')
         .then(({ openAnalytics }) => openAnalytics(id, name, analyticsButton.href))
         .catch(() => location.assign(analyticsButton.href));
     });
-    import('./course-analytics.js?v=2').then(({ markAnalyticsButton }) => markAnalyticsButton(analyticsButton, id)).catch(() => {});
+    // The AP score Calculator costs 30 Orbies the first time, the same way.
+    const calculatorButton = document.querySelector('#score-calculator-button');
+    calculatorButton.href = './score-calculator.html?course=' + encodeURIComponent(id);
+    calculatorButton.addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      import('./course-analytics.js?v=3')
+        .then(({ openAnalytics }) => openAnalytics(id, name, calculatorButton.href, 'score-calculator'))
+        .catch(() => location.assign(calculatorButton.href));
+    });
+    import('./course-analytics.js?v=3').then(({ markAnalyticsButton }) => {
+      markAnalyticsButton(analyticsButton, id);
+      markAnalyticsButton(calculatorButton, id, 'score-calculator');
+    }).catch(() => {});
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
