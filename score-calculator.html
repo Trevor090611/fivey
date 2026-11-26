@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+<meta charset="utf-8">
+<script src="./theme.js?v=1"></script>
+<script src="./entrances.js?v=4"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AP score Calculator | Fivey</title>
+<link rel="stylesheet" href="./brand.css?v=fb47b45">
+<link rel="stylesheet" href="./auth.css?v=magenta2">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8;--accent:#a4e568}
+:root[data-fivey-dark]{--accent:#62e7ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+.wrap{width:min(960px,calc(100% - 40px));margin-inline:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+nav a{font-size:14px;font-weight:700}
+main{flex:1;padding-block:clamp(44px,8vw,90px)}
+.card{max-width:620px;margin:auto;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:clamp(22px,5vw,40px)}
+h1{font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.045em;margin:0 0 6px}
+#subject{margin:0 0 24px;color:var(--muted);font-weight:700}
+.practice-button{display:inline-block;padding:10px 16px;border-radius:6px;font:inherit;font-weight:750;text-decoration:none;cursor:pointer}
+.prediction{display:flex;align-items:center;gap:20px;padding:20px;border:2px solid var(--accent);border-radius:12px;margin-bottom:18px}
+.prediction-score{flex:none;display:grid;place-items:center;width:84px;height:84px;border-radius:50%;background:#ff9b9b;color:#000;font-size:46px;font-weight:800;line-height:1}
+/* The circle's color follows the score, the same in light and dark themes; the number stays black. */
+.prediction-score[data-score="5"]{background:#a4e568}
+.prediction-score[data-score="4"]{background:#ffe14d}
+.prediction-score[data-score="3"]{background:#ffa53d}
+.prediction-score[data-score="2"],.prediction-score[data-score="1"]{background:#ff9b9b}
+/* Celebration for a predicted 5 (see entrance() in the script). */
+/* Gas is light green on the light theme and cyan on the dark theme. */
+:root{--puff-core:rgb(232 250 212 / 95%);--puff:rgb(164 229 104 / 58%);--puff-edge:rgb(186 238 140 / 22%)}
+:root[data-fivey-dark]{--puff-core:rgb(214 251 255 / 85%);--puff:rgb(98 231 255 / 52%);--puff-edge:rgb(98 231 255 / 18%)}
+.celebration{position:fixed;inset:0;z-index:50;overflow:hidden;pointer-events:none}
+.celebration span{position:absolute;top:0;left:0;display:block}
+.celebration .confetti{border-radius:2px}
+.celebration .spark{width:9px;height:9px;border-radius:50%;box-shadow:0 0 8px currentColor}
+.celebration .puff{border-radius:50%;background:radial-gradient(circle,var(--puff-core) 0,var(--puff) 35%,var(--puff-edge) 55%,transparent 72%);filter:blur(4px)}
+.prediction{position:relative}
+.prediction-score{position:relative;transition:background-color .3s}
+.prediction-halo,.prediction-wave{position:absolute;border-radius:50%;pointer-events:none}
+.prediction-halo{inset:-10px;border:3px dashed #a4e568}
+.prediction-wave{inset:0;border:3px solid #a4e568}
+.prediction-word{display:inline-block}
+.prediction-shine{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.prediction-shine span{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgb(255 255 255 / 65%) 50%,transparent 70%);transform:translateX(-110%)}
+.prediction-label{margin:0;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.prediction-title{margin:2px 0 0;font-size:clamp(20px,4vw,26px);font-weight:750;line-height:1.25}
+.prediction-basis{margin:0 0 14px}
+.prediction-note{margin:0;color:var(--muted);font-size:14px}
+.no-exams{display:flex;align-items:center;gap:12px 16px}
+.no-exams p{flex:1 1 auto;margin:0;font-weight:650}
+.no-exams .practice-button{flex:none}
+.analytics-locked h2{margin:0 0 8px;font-size:20px}
+[hidden]{display:none!important}
+@media(max-width:480px){.prediction,.no-exams{flex-direction:column;align-items:flex-start}}
+</style>
+<script type="module" src="./auth-gate.js?v=orbies2"></script>
+</head>
+<body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav><a id="back-link" href="./courses.html">← All courses</a></nav></div></header>
+<main class="wrap"><section class="card" aria-labelledby="title"><h1 id="title">AP score Calculator</h1><p id="subject"></p><div id="calculator" aria-live="polite"></div></section></main>
+<script type="module">
+// Predicts an AP score for the multiple-choice section from the user's Practice Exams
+// that had every unit selected (saved by progress.js under fivey-practice-exams-v1).
+import { analyticsAccount } from './auth-gate.js?v=orbies2';
+import { isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=3';
+
+const courses = { biology: 'AP Biology', 'environmental-science': 'AP Environmental Science', chemistry: 'AP Chemistry', 'physics-1': 'AP Physics 1', psychology: 'AP Psychology', 'calculus-ab': 'AP Calculus AB', macroeconomics: 'AP Macroeconomics' };
+// Approximate multiple-choice cutoffs: the lowest percentage for each AP score.
+const cutoffs = [[70, 5], [55, 4], [40, 3], [25, 2], [0, 1]];
+const percent = new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 1 });
+const count = new Intl.NumberFormat();
+
+const course = new URLSearchParams(location.search).get('course');
+const name = courses[course];
+const box = document.querySelector('#calculator');
+function element(tag, props = {}, ...children) {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children);
+  return node;
+}
+
+function readExams() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('fivey-practice-exams-v1:' + analyticsAccount + ':' + course) || '[]');
+    return (Array.isArray(saved) ? saved : []).filter(exam => exam?.allUnits && Number(exam.total) > 0 && Number(exam.correct) >= 0);
+  } catch {
+    return [];
+  }
+}
+
+// ---- Celebration for a predicted 5 ----
+// About six seconds: a green glow builds around the card, the result box drops in with a tilt
+// and lands with gas venting from both sides, the circle counts up 1 → 5 (changing color) inside
+// a spinning halo, then lands on 5 with shockwaves, sparks, a second gas burst, glowing pulses and confetti cannons,
+// while the text reveals word by word and a band of light sweeps across. It plays once per visit
+// and is skipped for people who ask their device to reduce motion.
+let celebrated = false;
+const confettiColors = ['#a4e568', '#62e7ff', '#ffe14d', '#ff7eb6', '#ffa53d', '#8f7bff'];
+const random = (min, max) => min + Math.random() * (max - min);
+const reduceMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches || !document.body.animate;
+
+// A full-screen layer for effects; it removes itself when its animations are done.
+function effectLayer(build) {
+  const layer = element('div', { className: 'celebration' });
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.append(layer);
+  const animations = build(layer);
+  Promise.allSettled(animations.map(animation => animation.finished)).then(() => layer.remove());
+}
+
+// Gas vents out of the left and right sides of the box: puffs start along the whole height of
+// each edge and fan out in different directions (up to 60° above or below level), growing,
+// thinning and fading as they drift apart. `stream` spreads the puffs out over time like a jet.
+function gas(rect, { count = 52, stream = 1100, reach = [130, 360], scale = [1.6, 2.8] } = {}) {
+  effectLayer(layer => Array.from({ length: count }, (_, index) => {
+    const side = index % 2 ? 1 : -1;
+    const size = random(30, 70);
+    const x = (side < 0 ? rect.left + 6 : rect.right - 6) - size / 2;
+    const y = rect.top + rect.height * random(0.05, 0.95) - size / 2;
+    const puff = element('span', { className: 'puff' });
+    Object.assign(puff.style, { width: size + 'px', height: size + 'px' });
+    layer.append(puff);
+    // A direction in a fan around level, tilted slightly upward because gas rises.
+    const angle = random(-60, 50) * Math.PI / 180;
+    const distance = random(reach[0], reach[1]);
+    const dx = side * Math.cos(angle) * distance;
+    const dy = -Math.sin(angle) * distance;
+    return puff.animate([
+      { transform: `translate(${x}px, ${y}px) scale(.25)`, opacity: 0 },
+      { transform: `translate(${x + dx * .18}px, ${y + dy * .18}px) scale(.85)`, opacity: .95, offset: .12 },
+      { transform: `translate(${x + dx * .6}px, ${y + dy * .6 - random(10, 40)}px) scale(${scale[0]})`, opacity: .55, offset: .5 },
+      { transform: `translate(${x + dx}px, ${y + dy - random(30, 90)}px) scale(${random(scale[0], scale[1])})`, opacity: 0 }
+    ], { duration: random(2000, 3200), delay: random(0, stream), easing: 'cubic-bezier(.2,.65,.35,1)', fill: 'both' });
+  }));
+}
+
+// Glowing sparks fly out of the circle.
+function sparks(rect) {
+  const cx = rect.left + rect.width / 2 - 4.5;
+  const cy = rect.top + rect.height / 2 - 4.5;
+  effectLayer(layer => Array.from({ length: 28 }, (_, index) => {
+    const spark = element('span', { className: 'spark' });
+    spark.style.background = spark.style.color = confettiColors[index % 4];
+    layer.append(spark);
+    const angle = (index / 28) * Math.PI * 2 + random(-.1, .1);
+    const distance = random(95, 180);
+    return spark.animate([
+      { transform: `translate(${cx}px, ${cy}px) scale(1.3)`, opacity: 1 },
+      { transform: `translate(${cx + Math.cos(angle) * distance}px, ${cy + Math.sin(angle) * distance}px) scale(.15)`, opacity: 0 }
+    ], { duration: random(1000, 1500), easing: 'cubic-bezier(.08,.7,.3,1)', fill: 'forwards' });
+  }));
+}
+
+// Confetti fired up from both bottom corners, then a gentle rain from the top.
+function confetti() {
+  const piece = layer => {
+    const node = element('span', { className: 'confetti' });
+    const size = random(6, 13);
+    Object.assign(node.style, { width: size + 'px', height: size * random(.4, 1) + 'px', background: confettiColors[Math.floor(random(0, confettiColors.length))] });
+    layer.append(node);
+    return node;
+  };
+  effectLayer(layer => {
+    const animations = [];
+    for (let index = 0; index < 120; index++) {
+      const side = index % 2 ? 1 : -1;
+      const startX = side < 0 ? -12 : innerWidth + 12;
+      const peakX = startX - side * random(innerWidth * .12, innerWidth * .55);
+      const peakY = random(innerHeight * .04, innerHeight * .45);
+      animations.push(piece(layer).animate([
+        { transform: `translate(${startX}px, ${innerHeight + 12}px) rotate(0deg)`, easing: 'cubic-bezier(.1,.65,.35,1)' },
+        { transform: `translate(${peakX}px, ${peakY}px) rotate(${random(-400, 400)}deg)`, offset: .32, easing: 'cubic-bezier(.45,0,.85,.55)' },
+        { transform: `translate(${peakX - side * random(40, 180)}px, ${innerHeight + 40}px) rotate(${random(-1200, 1200)}deg)` }
+      ], { duration: random(3000, 4400), delay: random(0, 300), fill: 'both' }));
+    }
+    for (let index = 0; index < 110; index++) {
+      const x = random(0, innerWidth);
+      animations.push(piece(layer).animate([
+        { transform: `translate(${x}px, -24px) rotate(0deg)` },
+        { transform: `translate(${x + random(-140, 140)}px, ${innerHeight + 40}px) rotate(${random(-1440, 1440)}deg)` }
+      ], { duration: random(3200, 4800), delay: random(700, 2400), easing: 'cubic-bezier(.25,.5,.45,1)', fill: 'both' }));
+    }
+    return animations;
+  });
+}
+
+function entrance(result, basis, note) {
+  if (reduceMotion()) return;
+  const card = result.closest('.card');
+  const circle = result.querySelector('.prediction-score');
+  const [label, title] = result.querySelectorAll('.prediction-label, .prediction-title');
+  // Steps are scheduled on the animation clock so they stay in sync with the animations,
+  // even if the tab is hidden and the browser slows down its timers.
+  const at = (ms, run) => card.animate([], { duration: ms }).finished.then(run, () => {});
+  const play = (node, frames, options) => node.animate(frames, { fill: 'backwards', easing: 'cubic-bezier(.2,.8,.2,1)', ...options });
+  const land = 3500;
+
+  // 1. A soft green glow builds around the card, peaks as the 5 lands, then fades.
+  card.animate([
+    { boxShadow: '0 0 0 0 rgb(164 229 104 / 0%)' },
+    { boxShadow: '0 0 100px 14px rgb(164 229 104 / 55%)', offset: .55 },
+    { boxShadow: '0 0 0 0 rgb(164 229 104 / 0%)' }
+  ], { duration: 6200, delay: 400, easing: 'ease-in-out' });
+
+  // 2. The box drops in, tilted back, and settles; gas bursts out of its sides as it lands.
+  play(result, [
+    { opacity: 0, transform: 'perspective(800px) translateY(-80px) rotateX(42deg) scale(.88)' },
+    { opacity: 1, transform: 'perspective(800px) translateY(9px) rotateX(-5deg) scale(1.01)', offset: .72 },
+    { opacity: 1, transform: 'none' }
+  ], { duration: 1300, delay: 500 });
+  at(1450, () => gas(result.getBoundingClientRect()));
+
+  // 3. The circle appears inside a spinning halo and counts up 1 → 5, changing color each step.
+  // The number is hidden from screen readers here; the sentence beside it says the score.
+  circle.setAttribute('aria-hidden', 'true');
+  const number = element('span', { textContent: '1' });
+  const halo = element('span', { className: 'prediction-halo' });
+  circle.replaceChildren(number, halo);
+  circle.dataset.score = '1';
+  play(circle, [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 1800 });
+  halo.animate([
+    { opacity: 0, transform: 'rotate(0deg) scale(.8)' },
+    { opacity: 1, transform: 'rotate(220deg) scale(1)', offset: .2 },
+    { opacity: 1, transform: 'rotate(560deg) scale(1)', offset: .88 },
+    { opacity: 0, transform: 'rotate(640deg) scale(1.5)' }
+  ], { duration: land - 1800 + 200, delay: 1800, fill: 'both' }).finished.then(() => halo.remove(), () => halo.remove());
+  [2, 3, 4, 5].forEach((value, index) => at(2300 + index * 400, () => {
+    number.textContent = String(value);
+    circle.dataset.score = String(value);
+    if (value < 5) circle.animate([{ transform: 'scale(1.2)' }, { transform: 'none' }], { duration: 280, easing: 'ease-out' });
+  }));
+
+  // 4. It lands on 5: a big pop, two shockwaves, sparks, glowing pulses and confetti cannons.
+  circle.animate([{ transform: 'scale(1.55)' }, { transform: 'scale(.88)', offset: .55 }, { transform: 'none' }], { duration: 800, delay: land, easing: 'ease-out' });
+  for (const delay of [land, land + 240]) {
+    const wave = element('span', { className: 'prediction-wave' });
+    circle.append(wave);
+    wave.animate([{ opacity: .9, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(3.4)' }], { duration: 1100, delay, easing: 'cubic-bezier(.1,.6,.3,1)', fill: 'both' })
+      .finished.then(() => wave.remove(), () => wave.remove());
+  }
+  at(land, () => {
+    sparks(circle.getBoundingClientRect());
+    gas(result.getBoundingClientRect(), { count: 44, stream: 400, reach: [200, 440], scale: [2, 3.4] });
+    confetti();
+  });
+  circle.animate([{ boxShadow: '0 0 0 0 rgb(164 229 104 / 80%)' }, { boxShadow: '0 0 0 30px rgb(164 229 104 / 0%)' }], { duration: 1400, delay: land + 300, iterations: 3, easing: 'ease-out' });
+
+  // 5. The text arrives: the label widens into place, then the sentence word by word.
+  play(label, [{ opacity: 0, letterSpacing: '.6em', filter: 'blur(4px)' }, { opacity: 1, letterSpacing: '.04em', filter: 'blur(0)' }], { duration: 1000, delay: land + 150 });
+  const words = title.textContent.split(' ').map(word => element('span', { className: 'prediction-word', textContent: word }));
+  title.replaceChildren(...words.flatMap((word, index) => (index ? [' ', word] : [word])));
+  words.forEach((word, index) => play(word, [
+    { opacity: 0, transform: 'translateY(16px)', filter: 'blur(6px)' },
+    { opacity: 1, transform: 'none', filter: 'blur(0)' }
+  ], { duration: 800, delay: land + 450 + index * 95 }));
+
+  // 6. A band of light sweeps across the box, then the details fade up.
+  const band = element('span');
+  const shine = element('span', { className: 'prediction-shine' }, band);
+  shine.setAttribute('aria-hidden', 'true');
+  result.append(shine);
+  band.animate([{ transform: 'translateX(-110%)' }, { transform: 'translateX(110%)' }], { duration: 1500, delay: land + 1300, easing: 'ease-in-out' })
+    .finished.then(() => shine.remove(), () => shine.remove());
+  play(basis, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 800, delay: land + 1700 });
+  play(note, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 800, delay: land + 1950 });
+}
+
+function render() {
+  const exams = readExams();
+  if (!exams.length) {
+    const link = element('a', { className: 'practice-button', href: './full-length.html?' + new URLSearchParams({ course }) + '#practice-exams-panel', textContent: 'Take me there!' });
+    box.replaceChildren(element('div', { className: 'no-exams' }, element('p', { textContent: 'Finish Practice Exams on Fivey to get a score prediction!' }), link));
+    return;
+  }
+  const correct = exams.reduce((sum, exam) => sum + Number(exam.correct), 0);
+  const total = exams.reduce((sum, exam) => sum + Number(exam.total), 0);
+  const accuracy = correct / total;
+  const shown = Math.round(accuracy * 1000) / 10;
+  const score = cutoffs.find(([minimum]) => shown >= minimum)[1];
+  const result = element('div', { className: 'prediction' },
+    element('div', { className: 'prediction-score', textContent: String(score) }),
+    element('div', {},
+      element('p', { className: 'prediction-label', textContent: 'Predicted AP score' }),
+      element('p', { className: 'prediction-title', textContent: `You may get a ${score} on the ${name} multiple-choice section.` })));
+  const exam = exams.length === 1 ? 'Practice Exam' : 'Practice Exams';
+  const basis = element('p', { className: 'prediction-basis', textContent: `Based on your ${count.format(exams.length)} ${exam} with all units selected: ${count.format(correct)} of ${count.format(total)} questions correct (${percent.format(accuracy)}).` });
+  const note = element('p', { className: 'prediction-note', textContent: 'This is an estimate for the multiple-choice section only, using approximate cutoffs: 70% or above is a 5, 55% to 69.9% a 4, 40% to 54.9% a 3, 25% to 39.9% a 2, and below 25% a 1. Unanswered questions count as incorrect.' });
+  result.querySelector('.prediction-score').dataset.score = String(score);
+  box.replaceChildren(result, basis, note);
+  if (score === 5 && !celebrated) {
+    celebrated = true;
+    entrance(result, basis, note);
+  }
+}
+
+if (!name) {
+  box.textContent = 'Choose a subject from the course library to use the AP score Calculator.';
+} else {
+  document.title = 'AP score Calculator · ' + name + ' | Fivey';
+  document.querySelector('#subject').textContent = name;
+  const back = document.querySelector('#back-link');
+  back.href = './course.html?' + new URLSearchParams({ course });
+  back.textContent = '← Back to ' + name;
+  if (isAnalyticsUnlocked(analyticsAccount, course, 'score-calculator')) render();
+  else box.replaceChildren(lockedNotice(analyticsAccount, course, name, render, 'h2', 'score-calculator'));
+  // Coming back with the Back button shows the latest exams.
+  window.addEventListener('pageshow', event => {
+    if (event.persisted && isAnalyticsUnlocked(analyticsAccount, course, 'score-calculator')) render();
+  });
+}
+</script>
+</body>
+</html>
