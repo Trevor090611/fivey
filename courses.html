@@ -82,14 +82,25 @@ function element(tag, text, className) {
   return node;
 }
 
+// The About Us Study Tools buttons link here with ?tool=… so each subject opens that feature.
+const tools = {
+  guides: { title: 'Choose a subject for Study Guides', link: id => './course.html?' + new URLSearchParams({ course: id, view: 'guides' }), label: 'Study guides →' },
+  practice: { title: 'Choose a subject for Practice Questions', link: id => './practice.html?' + new URLSearchParams({ course: id }), label: 'Practice questions →' },
+  score: { title: 'Choose a subject for the AP score Calculator', link: id => './score-calculator.html?' + new URLSearchParams({ course: id }), label: 'AP score Calculator →' },
+  exams: { title: 'Choose a subject for Past Exam Papers', link: id => './full-length.html?' + new URLSearchParams({ course: id }), label: 'Past exams →' }
+};
+const tool = tools[new URLSearchParams(location.search).get('tool')];
+if (tool) document.querySelector('#directory-title').textContent = tool.title;
+
 for (const [id, name, category, tint] of courses) {
   const card = element('a', '', 'card');
   card.dataset.category = category.toLowerCase();
-  card.href = './course.html?course=' + encodeURIComponent(id);
-  card.setAttribute('aria-label', name + ' guides and articles, ' + category);
+  card.href = tool ? tool.link(id) : './course.html?course=' + encodeURIComponent(id);
+  const label = tool ? tool.label : 'Guides & articles →';
+  card.setAttribute('aria-label', name + ' ' + (tool ? label.replace(' →', '').toLowerCase() : 'guides and articles') + ', ' + category);
   const tag = element('span', category, 'tag');
   tag.style.setProperty('--tint', tint);
-  card.append(tag, element('strong', name), element('small', 'Guides & articles →'));
+  card.append(tag, element('strong', name), element('small', label));
   document.querySelector('#directory').append(card);
 }
 </script>

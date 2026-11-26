@@ -41,6 +41,23 @@ h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em;margin
 .about-panel a{display:inline-block;margin-top:18px;font-weight:750;text-underline-offset:4px}
 main #about-tabs .about-tab[data-fivey-entrance],
 main .about-panel :is(h2,p)[data-fivey-entrance]{animation:none;opacity:1}
+/* Study Tools: one row per feature, screenshot and text alternating sides. */
+.tool-list{width:min(1120px,100%);margin:clamp(40px,6vw,72px) auto 0;display:grid;gap:clamp(56px,8vw,96px);text-align:left}
+.tool{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:center}
+.tool:nth-child(even) .tool-shot{order:2}
+.tool-shot{margin:0;padding:clamp(12px,2.4vw,26px);border:1px solid var(--line);border-radius:22px;background:var(--white);box-shadow:0 18px 50px rgb(25 39 31 / 12%)}
+.tool-shot img{display:block;width:100%;height:auto;border-radius:12px;box-shadow:0 6px 22px rgb(0 0 0 / 14%)}
+.tool-shot .shot-dark{display:none}
+:root[data-fivey-dark] .tool-shot .shot-light{display:none}
+:root[data-fivey-dark] .tool-shot .shot-dark{display:block}
+.tool-shot-chat{width:100%;max-width:420px;justify-self:center}
+.tool h3{margin:0;font-size:clamp(25px,3.3vw,36px);line-height:1.12;letter-spacing:-.035em;text-wrap:balance}
+.about-panel .tool p{max-width:none;margin:14px 0 0;font-size:clamp(16px,1.7vw,18px)}
+.tool-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.about-panel .tool-actions a{margin-top:0}
+.tool-actions .practice-button{display:inline-block;padding:10px 16px;border-radius:8px;font:inherit;font-weight:750;text-decoration:none;cursor:pointer}
+.about-panel .tool .tool-note{font-size:15px}
+@media(max-width:760px){.tool{grid-template-columns:1fr}.tool:nth-child(even) .tool-shot{order:0}}
 footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color:var(--muted)}
 @view-transition{navigation:auto}
 ::view-transition-group(root){background:#f8f7ef}
@@ -81,6 +98,64 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
       <h2>Study Tools</h2>
       <p>Review each AP unit with original study guides and Quick Review Notes, then test your understanding with AI-powered practice questions in Progress Check.</p>
       <a href="./courses.html">Explore AP courses</a>
+      <div class="tool-list">
+        <article class="tool" id="tool-study-guides">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/study-guides.jpg" width="800" height="500" loading="lazy" alt="The AP Biology Quick Review Notes, organized by unit in tables"><img class="shot-dark" src="./study-tools/study-guides-dark.jpg" width="800" height="500" loading="lazy" alt="The AP Biology Quick Review Notes, organized by unit in tables"></figure>
+          <div>
+            <h3>Original study guides from the developer</h3>
+            <p>Every study guide on Fivey was written by the developer while preparing for his own AP exams, with no AI-generated content. Detailed Study Guides and Quick Review Notes break each course down unit by unit, with tables and diagrams that make the key ideas easy to review.</p>
+            <div class="tool-actions"><a class="practice-button" href="./courses.html?tool=guides">Study Guides</a></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-practice-questions">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/practice-questions.jpg" width="800" height="500" loading="lazy" alt="An AP Biology practice question about enzyme activity, with a graph of product over time and the Orbies balance in the header"><img class="shot-dark" src="./study-tools/practice-questions-dark.jpg" width="800" height="500" loading="lazy" alt="An AP Biology practice question about enzyme activity, with a graph of product over time and the Orbies balance in the header"></figure>
+          <div>
+            <h3>Free practice questions that earn you Orbies</h3>
+            <p>Practice with original AP-style multiple-choice questions, many with graphs and data, and get an explanation for every answer. Work through one unit at a time with Practice By Units, or mix every unit together with Practice All Units. Score above 85% on a unit set to open a chest of Orbies.</p>
+            <div class="tool-actions"><a class="practice-button" href="./courses.html?tool=practice">Practice Questions</a></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-grogy">
+          <figure class="tool-shot tool-shot-chat"><img class="shot-light" src="./study-tools/grogy.jpg" width="513" height="555" loading="lazy" alt="The Grogy chat answering “Explain to me why Question 3 is wrong” about an enzyme inhibitor percentage question"><img class="shot-dark" src="./study-tools/grogy-dark.jpg" width="513" height="555" loading="lazy" alt="The Grogy chat answering “Explain to me why Question 3 is wrong” about an enzyme inhibitor percentage question"></figure>
+          <div>
+            <h3>Ask Grogy when you are stuck</h3>
+            <p>Grogy is Fivey’s AI tutor. Ask about a concept you are struggling with, or ask why you got a practice question wrong, and Grogy walks you through the right answer step by step, pointing you to Fivey’s study material when it helps. Each answer costs one Orbie.</p>
+            <div class="tool-actions"><button class="practice-button" type="button" data-open-grogy>Ask Grogy</button></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-analytics">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/analytics.jpg" width="800" height="500" loading="lazy" alt="AP Biology Analytics showing questions attempted, current accuracy, Strength units and a Weakness unit"><img class="shot-dark" src="./study-tools/analytics-dark.jpg" width="800" height="500" loading="lazy" alt="AP Biology Analytics showing questions attempted, current accuracy, Strength units and a Weakness unit"></figure>
+          <div>
+            <h3>See your strengths and weaknesses with Analytics</h3>
+            <p>Analytics keeps track of every practice set you finish: how many questions you have attempted, your accuracy, and which units are Strengths (75% or above) or Weaknesses (50% or below). Practice More then sends you straight to your weakest units. Unlock Analytics once for 20 Orbies in each AP subject.</p>
+            <div class="tool-actions"><span data-analytics-links></span></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-score-calculator">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/score-calculator.jpg" width="800" height="500" loading="lazy" alt="The AP score Calculator predicting a 5 on the AP Biology multiple-choice section, with confetti"><img class="shot-dark" src="./study-tools/score-calculator-dark.jpg" width="800" height="500" loading="lazy" alt="The AP score Calculator predicting a 5 on the AP Biology multiple-choice section, with confetti"></figure>
+          <div>
+            <h3>Predict your AP score</h3>
+            <p>The AP score Calculator turns your Practice Exam results into a predicted score for the multiple-choice section, so you know where you stand before exam day. Score a 5 and the page celebrates with you. Unlock it once for 30 Orbies in each AP subject.</p>
+            <div class="tool-actions"><a class="practice-button" href="./courses.html?tool=score">AP score Calculator</a></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-blog">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/blog.jpg" width="800" height="500" loading="lazy" alt="The Developer’s Personal Blog with the entry “How I studied for my AP exams (Tips and Tricks!)”"><img class="shot-dark" src="./study-tools/blog-dark.jpg" width="800" height="500" loading="lazy" alt="The Developer’s Personal Blog with the entry “How I studied for my AP exams (Tips and Tricks!)”"></figure>
+          <div>
+            <h3>Read the developer’s personal blog</h3>
+            <p>The developer shares how he studied for his AP exams, tips that helped him most, and how Fivey can fit into your study plan. Leave a comment under any entry to join the conversation.</p>
+            <div class="tool-actions"><a class="practice-button" href="./blog.html">Developer’s Personal Blog</a></div>
+          </div>
+        </article>
+        <article class="tool" id="tool-past-exams">
+          <figure class="tool-shot"><img class="shot-light" src="./study-tools/past-exams.jpg" width="800" height="500" loading="lazy" alt="The AP Biology Full Length Practice Test page with the official past exam link and Practice Exam setup"><img class="shot-dark" src="./study-tools/past-exams-dark.jpg" width="800" height="500" loading="lazy" alt="The AP Biology Full Length Practice Test page with the official past exam link and Practice Exam setup"></figure>
+          <div>
+            <h3>Practice with past exams</h3>
+            <p>Find released AP exam questions and scoring materials for each subject, and take full-length timed Practice Exams built from the units you choose, up to the 60-question standard exam format.</p>
+            <div class="tool-actions"><a class="practice-button" href="./courses.html?tool=exams">Past Exam Papers</a></div>
+          </div>
+        </article>
+      </div>
     </section>
     <section class="about-panel" id="mission" aria-labelledby="tab-mission">
       <h2>Mission &amp; Vision</h2>
@@ -167,6 +242,39 @@ footer{border-top:1px solid var(--line);padding:22px 0 30px;font-size:14px;color
       showAboutPanel(next);
     });
   });
+</script>
+<script type="module">
+  // Study Tools buttons: open Grogy in place, and show Analytics only for subjects the user has unlocked.
+  import { analyticsAccount } from './auth-gate.js?v=orbies2';
+  import { isAnalyticsUnlocked } from './analytics-unlock.js?v=3';
+
+  document.querySelector('[data-open-grogy]')?.addEventListener('click', () => document.querySelector('.fivey-chat .chat-open')?.click());
+
+  const subjects = [
+    ['biology', 'AP Biology'], ['environmental-science', 'AP Environmental Science'], ['chemistry', 'AP Chemistry'],
+    ['physics-1', 'AP Physics 1'], ['psychology', 'AP Psychology'], ['calculus-ab', 'AP Calculus AB'], ['macroeconomics', 'AP Macroeconomics']
+  ];
+  const analyticsLinks = document.querySelector('[data-analytics-links]');
+  function showAnalyticsLinks() {
+    const unlocked = subjects.filter(([id]) => isAnalyticsUnlocked(analyticsAccount, id));
+    if (!unlocked.length) {
+      const note = document.createElement('p');
+      note.className = 'tool-note';
+      note.textContent = 'Unlock Analytics for 20 Orbies on any AP subject\u2019s page, and a button to it will appear here.';
+      analyticsLinks.replaceChildren(note);
+      return;
+    }
+    analyticsLinks.replaceChildren(...unlocked.map(([id, name]) => {
+      const link = document.createElement('a');
+      link.className = 'practice-button';
+      link.href = './course.html?' + new URLSearchParams({ course: id, view: 'analytics' });
+      link.textContent = name + ' Analytics';
+      return link;
+    }));
+  }
+  showAnalyticsLinks();
+  window.addEventListener('fivey:analytics-unlocked', showAnalyticsLinks);
+  window.addEventListener('pageshow', showAnalyticsLinks);
 </script>
 <footer class="fivey-site-footer">
   <nav aria-label="Footer navigation" class="fivey-site-footer-links">
