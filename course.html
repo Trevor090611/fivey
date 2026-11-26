@@ -556,8 +556,8 @@ if (selected) {
     if (analyticsView) {
       const panel = document.querySelector('#analytics-panel');
       panel.hidden = false;
-      import('./progress.js?v=analytics4')
-        .then(({ renderAnalytics }) => renderAnalytics(panel))
+      import('./course-analytics.js?v=1')
+        .then(({ showAnalytics }) => showAnalytics(panel, id, name))
         .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
     }
   } else {
@@ -575,7 +575,16 @@ if (selected) {
     }
     document.querySelector('#resources-description').textContent = `All the resources you need to prepare for ${name}`;
     document.querySelector('#view-resources').href = courseHref + '&view=resources';
-    document.querySelector('#analytics-button').href = courseHref + '&view=analytics';
+    const analyticsButton = document.querySelector('#analytics-button');
+    analyticsButton.href = courseHref + '&view=analytics';
+    // Analytics costs 20 Orbies the first time; course-analytics.js asks before spending them.
+    analyticsButton.addEventListener('click', event => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      import('./course-analytics.js?v=1')
+        .then(({ openAnalytics }) => openAnalytics(id, name, analyticsButton.href))
+        .catch(() => location.assign(analyticsButton.href));
+    });
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
