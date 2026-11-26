@@ -81,22 +81,24 @@ const courses = [
 const years = [2026, 2025, 2024, 2023];
 // Years where a course's exam had two free-response sets (Set 1 and Set 2).
 const twoSets = {
-  'environmental-science': [2023, 2024, 2025],
+  'environmental-science': [2021, 2022, 2023, 2024, 2025],
   psychology: [2023, 2024, 2025],
   macroeconomics: [2023, 2024, 2025]
 };
 
 // Older years that AP Central no longer hosts, kept in this site's past-exams folder
-// as past-exams/<course>/<year>-question-paper.pdf and <year>-answer-key.pdf.
+// as past-exams/<course>/<year>-question-paper.pdf and <year>-answer-key.pdf
+// (<year>-set-<n>-... for years with two sets).
 const hostedYears = {
   biology: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014],
-  chemistry: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014]
+  chemistry: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014],
+  'environmental-science': [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010]
 };
 
 // kind is 'frq' (the question paper) or 'sg' (the scoring guidelines, i.e. the answer key).
 function pdf(kind, course, year, set) {
   if (hostedYears[course]?.includes(year)) {
-    return './past-exams/' + course + '/' + year + (kind === 'frq' ? '-question-paper' : '-answer-key') + '.pdf';
+    return './past-exams/' + course + '/' + year + (set ? '-set-' + set : '') + (kind === 'frq' ? '-question-paper' : '-answer-key') + '.pdf';
   }
   return 'https://apcentral.collegeboard.org/media/pdf/ap' + String(year).slice(2) + '-' + kind + '-' + course + (set ? '-set-' + set : '') + '.pdf';
 }
