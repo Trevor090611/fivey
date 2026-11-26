@@ -311,6 +311,23 @@ const shownPercent = accuracy => Math.round(accuracy * 1000) / 10;
 
 function unitAverage(stats) { const legacyAttempted = Number(stats.legacyAttempted ?? stats.attempted) || 0; const legacyCorrect = Number(stats.legacyCorrect ?? stats.correct) || 0; const setCount = Number(stats.unitSetCount) || 0; const setAccuracyTotal = Number(stats.unitSetAccuracyTotal) || 0; const allUnitsAttempted = Number(stats.allUnitsAttempted) || 0; const allUnitsCorrect = Number(stats.allUnitsCorrect) || 0; const observations = legacyAttempted + setCount + allUnitsAttempted; const correct = legacyCorrect + setAccuracyTotal + allUnitsCorrect; return { accuracy: observations ? correct / observations : 0, observations }; } async function recordSet(results, practiceMode) { const key = analyticsKey(); if (!key) throw new Error('Account unavailable'); const update = () => { const totals = readTotals(key); const grouped = new Map(); totals.attempted += results.length; totals.correct += results.filter(result => result.correct).length; for (const result of results) { const unit = String(result.unit); if (!units[course][Number(unit) - 1]) continue; const stats = totals.units[unit] ??= { attempted: 0, correct: 0 }; if (stats.legacyAttempted === undefined) { stats.legacyAttempted = Number(stats.attempted) || 0; stats.legacyCorrect = Number(stats.correct) || 0; } stats.attempted++; if (result.correct) stats.correct++; if (practiceMode === 'unit') { const group = grouped.get(unit) ?? { attempted: 0, correct: 0 }; group.attempted++; if (result.correct) group.correct++; grouped.set(unit, group); } else { stats.allUnitsAttempted = (Number(stats.allUnitsAttempted) || 0) + 1; if (result.correct) stats.allUnitsCorrect = (Number(stats.allUnitsCorrect) || 0) + 1; } } for (const [unit, score] of grouped) { const stats = totals.units[unit]; stats.unitSetCount = (Number(stats.unitSetCount) || 0) + 1; stats.unitSetAccuracyTotal = (Number(stats.unitSetAccuracyTotal) || 0) + score.correct / score.attempted; } localStorage.setItem(key, JSON.stringify(totals)); }; if (navigator.locks) await navigator.locks.request(key, update); else update(); }
 
+// Saves each Practice Exam's score so the AP score Calculator can predict a score
+// from the exams that covered every unit.
+function recordPracticeExam(correct, total, selected) {
+  if (!analyticsAccount || !total) return;
+  const key = 'fivey-practice-exams-v1:' + analyticsAccount + ':' + course;
+  const run = params.get('run');
+  const allUnits = units[course].every((_, index) => selected.includes(index + 1));
+  try {
+    const saved = JSON.parse(localStorage.getItem(key) || '[]');
+    const exams = (Array.isArray(saved) ? saved : []).filter(exam => exam?.run !== run);
+    exams.push({ run, at: Date.now(), correct, total, allUnits });
+    localStorage.setItem(key, JSON.stringify(exams.slice(-200)));
+  } catch {
+    // The prediction just won't include this exam.
+  }
+}
+
 export function renderAnalytics(panel) {
   const key = analyticsKey();
   if (!key || !supported.has(course)) return;
@@ -740,6 +757,7 @@ function setupPractice(selected, count, minutes = 0) {
         const checked = field.querySelector(':checked');
         return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : [];
       });
+      if (params.get('mode') === 'timed' && params.get('from') === 'exams') recordPracticeExam(score, set.length, selected);
       const recording = recordSet(results, mode).catch(() => {
         status.textContent = message + ' Your analytics could not be saved.';
       });
