@@ -3,13 +3,13 @@ const cheatsheetResources = {
     title: 'AP Biology Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/14w1dgW13poVhaWKMHBkG7wpN9p16jnjn0Yo1EokiG-A/edit?usp=sharing',
     pdf: './ap-biology-cheatsheet.pdf',
-    notes: { url: './biology-cheatsheet-notes.html?v=4', panelCount: 9, initialUnit: '2' },
+    notes: { url: './biology-cheatsheet-notes.html?v=points1', panelCount: 9, initialUnit: '2' },
   },
   chemistry: {
     title: 'AP Chemistry Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/1bwzhE7XlEAXK11_nU6kJwHHd5xDCE4n_RnEuCuGD0-4/edit?usp=sharing',
     pdf: './ap-chemistry-cheatsheet.pdf',
-    notes: { url: './chemistry-cheatsheet-notes.html?v=3', panelCount: 10, initialUnit: '1' },
+    notes: { url: './chemistry-cheatsheet-notes.html?v=points1', panelCount: 10, initialUnit: '1' },
   },
   'environmental-science': {
     title: 'AP Environmental Science Quick Review Notes',
@@ -19,20 +19,20 @@ const cheatsheetResources = {
     title: 'AP Physics 1 Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/1TwLLOIhCTd7YQyft9FYmTQDYh91fV_oAaGKqA5-6BkU/edit?usp=sharing',
     pdf: './ap-physics-1-quick-review-notes.pdf',
-    notes: { url: './physics-1-review-notes.html?v=2', panelCount: 9, initialUnit: '1' },
+    notes: { url: './physics-1-review-notes.html?v=points1', panelCount: 9, initialUnit: '1' },
   },
   psychology: { title: 'AP Psychology Quick Review Notes' },
   'calculus-ab': {
     title: 'AP Calculus AB Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/11JDSqengBdLU9_k09d50si_mEBoWk2abz5lYVMcEdIw/edit?usp=sharing',
     pdf: './ap-calculus-ab-quick-review-notes.pdf',
-    notes: { url: './calculus-ab-review-notes.html?v=1', panelCount: 10, initialUnit: '1' },
+    notes: { url: './calculus-ab-review-notes.html?v=points1', panelCount: 10, initialUnit: '1' },
   },
   macroeconomics: {
     title: 'AP Macroeconomics Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/1KyMk7dy_WS5mAK52yzM9_e9rOoIavtWL6NeFZOBADSw/edit?usp=sharing',
     pdf: './ap-macroeconomics-quick-review-notes.pdf',
-    notes: { url: './macroeconomics-review-notes.html?v=1', panelCount: 7, initialUnit: '1' },
+    notes: { url: './macroeconomics-review-notes.html?v=points1', panelCount: 7, initialUnit: '1' },
   },
 };
 

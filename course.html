@@ -231,10 +231,11 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 #analytics-status:empty{display:none}.analytics-insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.analytics-insight{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--white)}.analytics-insight h3{margin:0 0 8px;font-size:18px}.analytics-insight ul{margin:0;padding-left:20px}.analytics-insight li+li{margin-top:8px}.analytics-insight .practice-button{display:inline-block;margin-top:14px}@media(max-width:620px){.analytics-insights{grid-template-columns:1fr}}
 .analytics-insights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0}.analytics-insight{padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--white)}.analytics-insight h3{margin:0 0 8px;font-size:18px}.analytics-insight ul{margin:0;padding-left:20px}.analytics-insight li+li{margin-top:8px}.analytics-insight .practice-button{display:inline-block;margin-top:14px}@media(max-width:620px){.analytics-insights{grid-template-columns:1fr}}.analytics-insight .practice-button[hidden]{display:none}
  
-.apes-review-notes .biology-topic th { width: 28%; }
-.apes-review-notes ul { margin: 0; padding-inline-start: 1.2rem; }
-.apes-review-notes li + li { margin-block-start: .35rem; }
-.apes-review-notes li::marker { color: var(--notes-accent); }
+:is(.apes-review-notes,.point-form-notes) .biology-topic th { width: 28%; }
+:is(.apes-review-notes,.point-form-notes) ul { margin: 0; padding-inline-start: 1.2rem; }
+:is(.apes-review-notes,.point-form-notes) li + li { margin-block-start: .35rem; }
+:is(.apes-review-notes,.point-form-notes) li::marker { color: var(--notes-accent); }
+.point-form-notes .review-original-marker { list-style: none; }
 .apes-review-callout {
   display: inline-block;
   padding: .16rem .4rem;
@@ -243,9 +244,9 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
   background: var(--notes-wash);
 }
 @media (max-width: 660px) {
-  .apes-review-notes .biology-topic :is(table,tbody,tr,th,td) { display: block; width: 100%; }
-  .apes-review-notes .biology-topic td { border-top: 0; padding-top: 0; }
-  .apes-review-notes .biology-topic th { width: 100%; }
+  :is(.apes-review-notes,.point-form-notes) .biology-topic :is(table,tbody,tr,th,td) { display: block; width: 100%; }
+  :is(.apes-review-notes,.point-form-notes) .biology-topic td { border-top: 0; padding-top: 0; }
+  :is(.apes-review-notes,.point-form-notes) .biology-topic th { width: 100%; }
 }
 </style>
 <link rel="stylesheet" href="./fivey-chat.css?v=13">
@@ -333,7 +334,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     </span>
   </nav>
 </footer>
-<script src="./cheatsheet-resources.js?v=9"></script>
+<script src="./cheatsheet-resources.js?v=10"></script>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
