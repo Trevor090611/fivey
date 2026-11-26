@@ -57,6 +57,12 @@ function mergeValue(key, saved, local) {
     const list = value => (Array.isArray(parse(value, null)) ? parse(value, null) : []);
     return JSON.stringify([...new Set([...list(saved), ...list(local)])]);
   }
+  if (key.startsWith('fivey-practice-exams-v1:')) {
+    const list = value => (Array.isArray(parse(value, null)) ? parse(value, null) : []);
+    const byRun = new Map();
+    for (const exam of [...list(saved), ...list(local)]) if (exam?.run) byRun.set(exam.run, exam);
+    return JSON.stringify([...byRun.values()].sort((a, b) => (Number(a.at) || 0) - (Number(b.at) || 0)).slice(-200));
+  }
   if (key.startsWith('fivey-welcome-seen-v1:')) return saved === '1' || local === '1' ? '1' : local;
   if (key.startsWith('fivey-study-plan-v1:')) {
     const empty = value => !Array.isArray(parse(value, null)) || parse(value, null).length === 0;
