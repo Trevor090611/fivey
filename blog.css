@@ -41,7 +41,22 @@ header a { color:inherit; text-decoration:none; font-weight:700; }
 .blog-status { margin:10px 0 0; color:var(--muted); }
 .blog-status:empty { display:none; }
 .blog-thread { display:grid; list-style:none; padding:0; margin:14px 0; }
-.blog-comment { min-width:0; border-top:1px solid var(--line); padding:13px 0; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; }
+.blog-comment { min-width:0; border-top:1px solid var(--line); padding:13px 0; display:grid; grid-template-columns:40px minmax(0,1fr) auto; gap:12px; align-items:start; }
+/* Each commenter's profile photo, or their initial when they have none. */
+.blog-comment-avatar { width:40px; height:40px; display:block; border-radius:50%; object-fit:cover; background:var(--paper); border:1px solid var(--line); }
+.blog-comment-avatar.is-initial { display:grid; place-items:center; background:var(--blog-accent); color:#fff; border-color:transparent; font-weight:800; font-size:17px; }
+:root[data-fivey-dark] .blog-comment-avatar.is-initial { color:#000; }
+.blog-comment-content { min-width:0; }
+.blog-comment-name { display:flex; align-items:center; gap:6px; min-width:0; }
+/* The developer's yellow crown, labeled "The Developer" on hover or keyboard focus. */
+.blog-developer-badge { position:relative; display:inline-flex; flex:none; width:20px; height:20px; cursor:default; border-radius:4px; }
+.blog-developer-badge svg { width:100%; height:100%; display:block; }
+.blog-developer-badge:focus-visible { outline:2px solid var(--blog-accent); outline-offset:2px; }
+.blog-developer-hint { position:absolute; left:50%; bottom:calc(100% + 9px); z-index:20; width:max-content; padding:6px 10px; border:1px solid var(--blog-accent); border-radius:8px; background:var(--white); color:var(--ink); box-shadow:0 6px 18px #0003; font:700 13px/1.2 system-ui,sans-serif; white-space:nowrap; pointer-events:none; opacity:0; visibility:hidden; transform:translate(-50%,4px); transition:opacity .15s,transform .15s,visibility .15s; }
+.blog-developer-hint::after { content:""; position:absolute; top:100%; left:50%; width:8px; height:8px; background:inherit; border-right:1px solid var(--blog-accent); border-bottom:1px solid var(--blog-accent); transform:translate(-50%,-4px) rotate(45deg); }
+.blog-developer-badge:is(:hover,:focus-visible) .blog-developer-hint { opacity:1; visibility:visible; transform:translate(-50%,0); }
+:root[data-fivey-dark] .blog-developer-hint { background:#0d1722; color:#fff; }
+@media (prefers-reduced-motion:reduce) { .blog-developer-hint { transition:none; } }
 .blog-comment p { margin:5px 0 0; white-space:pre-wrap; overflow-wrap:anywhere; }
 .blog-comment strong { overflow-wrap:anywhere; }
 .blog-like { display:grid; grid-template-columns:auto auto; grid-template-rows:auto auto; align-items:center; justify-items:center; column-gap:5px; }
@@ -60,12 +75,25 @@ header a { color:inherit; text-decoration:none; font-weight:700; }
 .blog-card .blog-like button.developer-liked { color:#db2844; background:transparent; }
 .blog-card .blog-like button:focus-visible { outline:2px solid var(--blog-accent); }
 .blog-like-count { grid-column:1; font-size:14px; }
-.blog-developer-avatar { grid-column:2; grid-row:1; width:25px; height:25px; display:block; border-radius:50%; object-fit:cover; border:1px solid var(--blog-accent); }
+/* The developer's photo beside a comment they liked, with a small heart badge. */
+.blog-developer-like { grid-column:2; grid-row:1; position:relative; display:block; width:26px; height:26px; }
+.blog-developer-avatar { width:26px; height:26px; display:block; border-radius:50%; object-fit:cover; border:1px solid var(--blog-accent); }
+.blog-developer-like-heart { position:absolute; right:-5px; bottom:-4px; display:grid; place-items:center; width:15px; height:15px; border-radius:50%; background:var(--white); color:#db2844; font-size:11px; line-height:1; box-shadow:0 0 0 1px var(--line); }
+:root[data-fivey-dark] .blog-developer-like-heart { background:#000; color:#ff5269; }
 .blog-owner { margin-bottom:22px; }
 .blog-owner summary { cursor:pointer; font-weight:750; }
 .blog-owner form { margin-top:12px; }
 .blog-owner label { display:grid; gap:4px; font-weight:650; }
 [hidden] { display:none !important; }
+/* The site-wide button style (auth.css) uses !important, so the like hearts need it too:
+   a plain heart, red when liked, like the dark theme below. */
+:root:not([data-fivey-dark]) .blog-card .blog-like button {
+  border:0 !important;
+  background:transparent !important;
+  color:var(--ink) !important;
+}
+:root:not([data-fivey-dark]) .blog-card .blog-like button:is(.is-liked,.developer-liked),
+:root:not([data-fivey-dark]) .blog-card .blog-like button:not(:disabled):hover { color:#db2844 !important; }
 :root[data-fivey-dark] .blog-card .blog-like button {
   border:0 !important;
   background:transparent !important;
