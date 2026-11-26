@@ -1,7 +1,7 @@
 import { getOrbiesBalance, orbiesKey } from './orbies-wallet.js';
 import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
-import { syncAccountData } from './account-data.js?v=2';
+import { syncAccountData } from './account-data.js?v=3';
 
 export let analyticsAccount = null;
 export let authenticatedClient = null;
