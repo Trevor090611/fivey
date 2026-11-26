@@ -3,22 +3,15 @@
 [hidden] { display: none !important; }
 
 body.reward-page {
-  --rarity-bg: #d9efff;
   --rarity-ink: #172e40;
   --control-ink: #17394d;
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--rarity-bg);
   color: var(--rarity-ink);
   font: 16px/1.5 "DM Sans", system-ui, sans-serif;
   transition: background-color .3s, color .3s;
 }
-.reward-page[data-rarity="1"] { --rarity-bg: #dcf4cd; --rarity-ink: #1e391b; }
-.reward-page[data-rarity="3"] { --rarity-bg: #39215f; --rarity-ink: #fff7ff; --control-ink: #39215f; }
-.reward-page[data-rarity="4"] { --rarity-bg: #ffd9da; --rarity-ink: #4c2430; }
-.reward-page[data-rarity="5"] { --rarity-bg: #ffd857; --rarity-ink: #46300b; }
-
 .reward-page > header {
   background: transparent;
   color: inherit;
@@ -218,7 +211,6 @@ body.reward-page {
 }
 .reward-page.is-opening #reward-title,
 .reward-page.is-opening .reward-stars,
-.reward-page.is-opening #reward-return,
 .reward-page.is-opening #reward-status { visibility: hidden; }
 
 .reward-reveal {
@@ -226,7 +218,6 @@ body.reward-page {
   position: fixed;
   z-index: 10000;
   inset: 0;
-  background: var(--rarity-bg);
   color: var(--rarity-ink);
   text-align: center;
   animation: reward-reveal .78s both ease-out;
@@ -272,19 +263,32 @@ body.reward-page {
 
 /* The stage lighting changes with rarity. The wooden chest model is shared. */
 body.reward-page {
-  --stage-top: #1b2752;
-  --stage-mid: #3f67a0;
-  --stage-floor: #101634;
-  --stage-glow: #8ee6ff;
+  --stage-top: #000;
+  --stage-mid: #131319;
+  --stage-floor: #000;
+  --stage-glow: #fff5c4;
   --rarity-ink: #fffaf5;
   isolation: isolate;
-  background: radial-gradient(ellipse at 50% 40%, var(--stage-mid), transparent 60%),
+  overflow-x: clip;
+  background: radial-gradient(ellipse at 50% 40%, var(--stage-mid), transparent 68%),
     linear-gradient(var(--stage-top), var(--stage-floor));
 }
-body.reward-page[data-rarity="1"] { --stage-top: #112c2e; --stage-mid: #417c62; --stage-floor: #101e24; --stage-glow: #aaf8a5; }
-body.reward-page[data-rarity="3"] { --stage-top: #241337; --stage-mid: #6635ad; --stage-floor: #211043; --stage-glow: #d69bff; }
-body.reward-page[data-rarity="4"] { --stage-top: #50213e; --stage-mid: #af5276; --stage-floor: #37204d; --stage-glow: #ffb2ce; }
-body.reward-page[data-rarity="5"] { --stage-top: #853f69; --stage-mid: #c78753; --stage-floor: #17423e; --stage-glow: #ffe59b; }
+body.reward-page[data-rarity="2"] {
+  --stage-top: #b9efaa; --stage-mid: #edffd8; --stage-floor: #73c888;
+  --stage-glow: #fcffda; --rarity-ink: #18391d;
+}
+body.reward-page[data-rarity="3"] {
+  --stage-top: #52ecf7; --stage-mid: #bbfdff; --stage-floor: #18aecd;
+  --stage-glow: #eeffff; --rarity-ink: #073843;
+}
+body.reward-page[data-rarity="4"] {
+  --stage-top: #260b50; --stage-mid: #a941ee; --stage-floor: #371069;
+  --stage-glow: #f4b2ff;
+}
+body.reward-page[data-rarity="5"] {
+  --stage-top: #e99b15; --stage-mid: #fff8b7; --stage-floor: #ffc933;
+  --stage-glow: #fffde0; --rarity-ink: #412600;
+}
 .reward-page::before {
   content: "";
   position: fixed;

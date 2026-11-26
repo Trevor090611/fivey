@@ -1,5 +1,5 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
-import { clickChest, clicksToOpen, getChest } from './orbies-wallet.js?v=chest80';
+import { clickChest, clicksToOpen, getChest } from './orbies-wallet.js?v=chest20';
 
 const id = new URLSearchParams(location.search).get('chest');
 const page = document.body;
@@ -11,7 +11,6 @@ const rotor = button.querySelector('.chest-rotor');
 const lid = button.querySelector('.chest-lid');
 const prompt = document.querySelector('#chest-prompt');
 const status = document.querySelector('#reward-status');
-const returnLink = document.querySelector('#reward-return');
 const reveal = document.querySelector('#reward-reveal');
 const amount = document.querySelector('#reward-amount');
 const revealReturn = document.querySelector('#reward-reveal-return');
@@ -31,7 +30,7 @@ function renderRarity(chest) {
     stars.dataset.count = String(chest.stars);
     stars.setAttribute('aria-label', chest.stars + ' out of 5 stars');
   }
-  page.dataset.rarity = chest.clicks ? String(chest.stars) : 'starting';
+  page.dataset.rarity = String(chest.stars);
 }
 
 function play(target, keyframes, options) {
@@ -88,11 +87,19 @@ try {
   if (!chest) {
     unavailable.hidden = false;
   } else {
-    returnLink.href = './practice.html?' + new URLSearchParams({
+    revealReturn.href = './practice.html?' + new URLSearchParams({
       course: chest.course,
       ...(chest.practiceSetup ?? { mode: 'unit', unit: chest.unit, count: chest.total })
     });
-    revealReturn.href = returnLink.href;
+    revealReturn.addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('fivey-orbies-arrival', JSON.stringify({
+          account: analyticsAccount, chest: id, destination: revealReturn.search
+        }));
+      } catch {
+        // Returning to practice still works when session storage is unavailable.
+      }
+    });
     renderRarity(chest);
     if (chest.clicks === clicksToOpen) {
       showReward(chest);

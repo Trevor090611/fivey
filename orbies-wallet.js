@@ -60,7 +60,7 @@ export function clickChest(account, id) {
     if (!chest) throw new Error('Chest unavailable');
     if (chest.clicks >= clicksToOpen) return chest;
     chest.clicks++;
-    if (Math.random() < .3) chest.stars = Math.min(chest.stars + 1, payouts.length - 1);
+    if (Math.random() < .2) chest.stars = Math.min(chest.stars + 1, payouts.length - 1);
     if (chest.clicks === clicksToOpen) {
       chest.reward = payouts[chest.stars];
       wallet.balance += chest.reward;
