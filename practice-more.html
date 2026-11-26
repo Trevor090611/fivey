@@ -27,6 +27,8 @@ select{width:100%;min-height:48px;padding:10px 12px;border:1px solid #9ba697;bor
 .practice-button:hover{background:#d9f783;color:var(--ink);transform:translateY(-5px)}
 #status{margin-top:18px;color:#8a3428}
 [hidden]{display:none!important}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
 </head>
@@ -39,6 +41,7 @@ import { units } from './practice-units.js?v=5';
 const courses={biology:'AP Biology','environmental-science':'AP Environmental Science',chemistry:'AP Chemistry','physics-1':'AP Physics 1',psychology:'AP Psychology','calculus-ab':'AP Calculus AB',macroeconomics:'AP Macroeconomics'};
 const params=new URLSearchParams(location.search);
 const course=params.get('course');
+if (['psychology', 'macroeconomics'].includes(course)) document.querySelector('main').dataset.category = 'humanities';
 const allowed=Array.isArray(units?.[course])?units[course]:[];
 const requested=[...new Set((params.get('units')||'').split(',').map(Number).filter(Number.isInteger))].filter(id=>id>0&&id<=allowed.length);
 const unitSelect=document.querySelector('#unit-select');

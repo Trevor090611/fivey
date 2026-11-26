@@ -57,6 +57,8 @@ h1{font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.045em;margin
 .analytics-locked h2{margin:0 0 8px;font-size:20px}
 [hidden]{display:none!important}
 @media(max-width:480px){.prediction,.no-exams{flex-direction:column;align-items:flex-start}}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
 </head>
@@ -77,6 +79,7 @@ const percent = new Intl.NumberFormat(undefined, { style: 'percent', maximumFrac
 const count = new Intl.NumberFormat();
 
 const course = new URLSearchParams(location.search).get('course');
+if (['psychology', 'macroeconomics'].includes(course)) document.querySelector('main').dataset.category = 'humanities';
 const name = courses[course];
 const box = document.querySelector('#calculator');
 function element(tag, props = {}, ...children) {

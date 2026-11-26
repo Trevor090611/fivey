@@ -200,7 +200,8 @@ footer{border-top:1px solid var(--line);padding:12px 0;font-size:14px;color:var(
 #college-board-links li{min-width:0;margin:0}
 .practice-button{display:inline-block;padding:8px 12px;border:1px solid #63775e;border-radius:6px;background:#d9f783;color:#19271f;font-weight:750;text-decoration:none}
 main[data-category="humanities"] .panel{background:#fff}
-main[data-category="humanities"] .panel .practice-button{--button-fill:#fff1b8}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 .chemistry-credits{display:none}
 body:has(.hero[data-course="chemistry"]) .chemistry-credits{display:block;padding-bottom:12px;font-size:12px}
 .macro-port{filter:saturate(.7) brightness(.8);mix-blend-mode:normal}

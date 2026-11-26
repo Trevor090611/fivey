@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+<meta charset="utf-8">
+<script src="./theme.js?v=1"></script>
+<script src="./entrances.js?v=4"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Past Exam Papers | Fivey</title>
+<link rel="stylesheet" href="./brand.css?v=fb47b45">
+<style>
+:root{color-scheme:light;--ink:#19271f;--muted:#4e5d52;--paper:#f8f7ef;--line:#d4d9cd;--white:#fffef8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif}
+a{color:inherit}
+a:focus-visible{outline:3px solid #467335;outline-offset:5px}
+.wrap{width:min(1120px,calc(100% - 40px));margin-inline:auto}
+header{border-bottom:1px solid var(--line)}
+.bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+nav a{font-size:14px;font-weight:700}
+.hero{padding:clamp(40px,8vw,92px) 0;background:var(--ink);color:var(--white)}
+h1,h2,p{margin:0}
+h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em}
+.tag{display:inline-block;margin-bottom:14px;border-radius:4px;background:var(--tint,#d9f783);color:var(--ink);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
+main{flex:1}
+#intro{padding-top:34px}
+#intro p{max-width:760px;color:var(--muted)}
+.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding-block:22px 72px}
+.year{min-width:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
+.year h2{font-size:30px;line-height:1.1;letter-spacing:-.03em}
+.sets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
+.sets h3{margin:0;font-size:17px;letter-spacing:-.01em}
+.sets .year-actions{margin-top:10px}
+.years.with-sets{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
+.year-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.year-actions .practice-button{display:inline-block;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
+#status{padding-block:34px 72px}
+[hidden]{display:none}
+@view-transition{navigation:auto}
+::view-transition-group(root){background:#f8f7ef}
+::view-transition-old(root){animation:300ms ease-in both fivey-fade-out;mix-blend-mode:normal}
+::view-transition-new(root){animation:400ms ease-out 300ms both fivey-fade-in;mix-blend-mode:normal}
+@keyframes fivey-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes fivey-fade-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){@view-transition{navigation:none}}
+</style>
+<link rel="stylesheet" href="./fivey-chat.css?v=13">
+<script type="module" src="./fivey-chat.js?v=18"></script>
+<link rel="stylesheet" href="./auth.css?v=magenta2">
+<script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
+</head>
+<body>
+<p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+<header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html?tool=exams" id="back">← All courses</a></nav></div></header>
+<main>
+<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Past Exam Papers</h1></div></section>
+<div class="wrap" id="intro" hidden><p>Official free-response questions and their scoring guidelines, released by the College Board. Each button opens the PDF in a new tab, where you can read or download it.</p></div>
+<div class="wrap years" id="years" hidden></div>
+<p class="wrap" id="status" role="status" hidden></p>
+<noscript><p class="wrap">Enable JavaScript to view past exam papers for this course.</p></noscript>
+</main>
+<script>
+const courses = [
+  ['biology', 'AP Biology', '#d9f783'],
+  ['environmental-science', 'AP Environmental Science', '#d9f783'],
+  ['chemistry', 'AP Chemistry', '#d9f783'],
+  ['physics-1', 'AP Physics 1', '#d9f783'],
+  ['psychology', 'AP Psychology', '#fff1b8'],
+  ['calculus-ab', 'AP Calculus AB', '#d9f783'],
+  ['macroeconomics', 'AP Macroeconomics', '#fff1b8']
+];
+// Years the College Board currently publishes on AP Central, newest first.
+const years = [2026, 2025, 2024, 2023];
+// Years where a course's exam had two free-response sets (Set 1 and Set 2).
+const twoSets = {
+  'environmental-science': [2023, 2024, 2025],
+  psychology: [2023, 2024, 2025],
+  macroeconomics: [2023, 2024, 2025]
+};
+
+// kind is 'frq' (the question paper) or 'sg' (the scoring guidelines, i.e. the answer key).
+function pdf(kind, course, year, set) {
+  return 'https://apcentral.collegeboard.org/media/pdf/ap' + String(year).slice(2) + '-' + kind + '-' + course + (set ? '-set-' + set : '') + '.pdf';
+}
+
+function button(label, href, description) {
+  const link = document.createElement('a');
+  link.className = 'practice-button';
+  link.href = href;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  link.textContent = label;
+  link.setAttribute('aria-label', label + ', ' + description + ' (PDF, opens in a new tab)');
+  return link;
+}
+
+function actions(course, year, set, description) {
+  const row = document.createElement('div');
+  row.className = 'year-actions';
+  row.append(
+    button('Question Paper', pdf('frq', course, year, set), description),
+    button('Answer Key', pdf('sg', course, year, set), description)
+  );
+  return row;
+}
+
+// One box per year. Years with two free-response sets show Set 1 and Set 2 side by side.
+function yearBox(course, name, year) {
+  const box = document.createElement('section');
+  box.className = 'year';
+  const title = document.createElement('h2');
+  title.textContent = year;
+  box.append(title);
+  if (twoSets[course]?.includes(year)) {
+    const sets = document.createElement('div');
+    sets.className = 'sets';
+    for (const set of [1, 2]) {
+      const group = document.createElement('div');
+      const label = document.createElement('h3');
+      label.textContent = 'Set ' + set;
+      group.append(label, actions(course, year, set, name + ' ' + year + ' Set ' + set));
+      sets.append(group);
+    }
+    box.append(sets);
+  } else {
+    box.append(actions(course, year, undefined, name + ' ' + year));
+  }
+  return box;
+}
+
+const id = new URLSearchParams(location.search).get('course');
+const selected = courses.find(([courseId]) => courseId === id);
+if (selected) {
+  const [, name, tint] = selected;
+  if (['psychology', 'macroeconomics'].includes(id)) document.querySelector('main').dataset.category = 'humanities';
+  document.title = name + ' Past Exam Papers | Fivey';
+  const tag = document.querySelector('#tag');
+  tag.textContent = name;
+  tag.style.setProperty('--tint', tint);
+  tag.hidden = false;
+  const back = document.querySelector('#back');
+  back.href = './full-length.html?course=' + encodeURIComponent(id);
+  back.textContent = '← Full Length Practice Test';
+  const list = document.querySelector('#years');
+  // Subjects with two sets get wider boxes, two per row.
+  list.classList.toggle('with-sets', id in twoSets);
+  for (const year of years) list.append(yearBox(id, name, year));
+  document.querySelector('#intro').hidden = false;
+  list.hidden = false;
+} else {
+  const status = document.querySelector('#status');
+  status.textContent = 'Choose a subject from the course library to view its past exam papers.';
+  status.hidden = false;
+}
+</script>
+</body>
+</html>

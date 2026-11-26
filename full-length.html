@@ -38,10 +38,13 @@ details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 #practice-exam-setup label{display:block}
 #practice-exam-setup details label{padding-block:4px}
 #practice-exam-setup select{max-width:100%;font:inherit;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--white);color:var(--ink)}
+#official-exam{display:inline-block;margin-top:6px;padding:8px 12px;border-radius:6px;font-weight:750;text-decoration:none}
 #practice-exam-setup button{justify-self:start;font:inherit;font-weight:750;padding:8px 12px;cursor:pointer}
 #practice-exam-status:empty{display:none}
 #practice-exams:not(:empty){margin-top:12px}
 [hidden]{display:none}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 @media(max-width:620px){.columns{grid-template-columns:1fr}}
 @view-transition{navigation:auto}
 ::view-transition-group(root){background:#f8f7ef}
@@ -66,8 +69,7 @@ details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 <div class="wrap columns" id="exam-sections" hidden>
   <section class="panel" aria-labelledby="official-title">
     <h2 id="official-title">Official AP Past Exam</h2>
-    <p>Find released free-response questions and scoring materials for this course on AP Central.</p>
-    <p><a id="official-exam" href="https://apcentral.collegeboard.org/courses/past-exam-questions">View released AP exam materials</a></p>
+    <a class="practice-button" id="official-exam" href="./past-exam-papers.html">Explore Past Exam Papers By Year!</a>
   </section>
   <section class="panel" id="practice-exams-panel" aria-labelledby="practice-title">
     <h2 id="practice-title">Practice Exams</h2>
@@ -127,6 +129,7 @@ const id = new URLSearchParams(location.search).get('course');
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
+  if (category === 'Humanities') document.querySelector('main').dataset.category = 'humanities';
   document.title = name + ' Full Length Practice Test | Fivey';
   const tag = document.querySelector('#tag');
   tag.textContent = name;
@@ -135,8 +138,7 @@ if (selected) {
   const back = document.querySelector('#practice-back');
   back.href = './course.html?course=' + encodeURIComponent(id);
   back.textContent = '← ' + name;
-  document.querySelector('#official-exam').href =
-    'https://apcentral.collegeboard.org/courses/ap-' + id + '/exam/past-exam-questions';
+  document.querySelector('#official-exam').href = './past-exam-papers.html?course=' + encodeURIComponent(id);
   document.querySelector('#exam-sections').hidden = false;
   loadPracticeExams(id).catch(() => {
     const message = document.createElement('p');

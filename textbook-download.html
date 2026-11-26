@@ -159,6 +159,8 @@ body:has(.download-backdrop[data-course="chemistry"]){background:#191a35}
   --hero-texture:linear-gradient(#aee5fa33 1px,transparent 1px),linear-gradient(90deg,#aee5fa33 1px,transparent 1px);
   --hero-texture-size:28px 28px;
 }
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
 </head>
 <body>
@@ -229,6 +231,7 @@ const courseEquations = {
 
 const params = new URLSearchParams(location.search);
 const course = params.get('course');
+if (['psychology', 'macroeconomics'].includes(course)) document.querySelector('main').dataset.category = 'humanities';
 const isCheatsheet = params.get('type') === 'cheatsheet';
 const textbookUrl = Object.hasOwn(textbookDownloads, course) ? textbookDownloads[course] : null;
 const art = document.getElementById(course + '-art');

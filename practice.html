@@ -82,6 +82,8 @@ details p{margin-top:12px;white-space:pre-wrap;overflow-wrap:anywhere}
 #question-set-exit button:is(:hover,:focus-visible){background-size:100% 100%;color:var(--hover-text)}
 #question-set-exit button:focus-visible{outline:2px solid var(--exit-focus);outline-offset:3px}
 @media(prefers-reduced-motion:reduce){#question-set-exit button{transition:none}}
+main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
+:root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
 <link rel="stylesheet" href="./fivey-chat.css?v=13">
 <script type="module" src="./fivey-chat.js?v=18"></script>
@@ -149,6 +151,7 @@ const id = new URLSearchParams(location.search).get('course');
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
+  if (category === 'Humanities') document.querySelector('main').dataset.category = 'humanities';
   const options = new URLSearchParams(location.search);
   const page = options.get('mode') === 'timed' && options.get('from') === 'exams'
     ? 'Practice Exam'
