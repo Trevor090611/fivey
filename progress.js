@@ -10,11 +10,27 @@ const section = document.querySelector('#progress-check');
 const supported = new Set(Object.keys(units));
 const sizes = [20, 30, 40, 50, 60];
 const unitSizes = [5, 10, 15, 20, 25, 30];
+// College Board Section I counts and timing for the May 2027 AP exams.
+const standardExams = {
+  biology: { count: 60, minutes: 90 },
+  chemistry: { count: 60, minutes: 90 },
+  'physics-1': { count: 42, minutes: 85 },
+  'calculus-ab': { count: 42, minutes: 100 },
+  psychology: { count: 75, minutes: 90 },
+  macroeconomics: { count: 60, minutes: 70 },
+  'environmental-science': { count: 80, minutes: 90 }
+};
 
-function timeLimits() {
+function baseTimeLimits() {
   if (course === 'chemistry' || course === 'biology') return [30, 45, 60, 75, 90];
   if (course === 'physics-1' || course === 'calculus-ab') return [40, 60, 80, 100, 120];
   return [24, 36, 48, 60, 72];
+}
+
+function includeStandardOption(options, value) {
+  return value && !options.includes(value)
+    ? [...options, value].sort((a, b) => a - b)
+    : options;
 }
 
 function practiceUrl(options = {}) {
@@ -184,13 +200,23 @@ function setupMixedPractice(form, status, fromExams = false) {
     label.append(input, ' ' + unitLabel(id));
     form.querySelector('#mixed-units').append(label);
   }
-  for (const size of sizes) form.elements.count.add(new Option(size + ' questions', size, false, count === size));
-  for (const limit of timeLimits()) form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
+  const standard = fromExams ? standardExams[course] : undefined;
+  const limits = baseTimeLimits();
+  for (const size of includeStandardOption(sizes, standard?.count)) {
+    const label = size + ' questions' + (size === standard?.count ? ' — Standard Exam Format' : '');
+    form.elements.count.add(new Option(label, size, false, count === size));
+  }
+  for (const limit of includeStandardOption(limits, standard?.minutes)) {
+    form.elements.minutes.add(new Option(limit + ' minutes', limit, false, minutes === limit));
+  }
   const questionCount = form.elements.count;
+  const timeLimit = form.elements.minutes;
   const updateRecommendation = () => {
-    for (const option of form.elements.minutes.options) {
+    const size = Number(questionCount.value);
+    const recommended = size === standard?.count ? standard.minutes : limits[sizes.indexOf(size)];
+    for (const option of timeLimit.options) {
       const label = option.value + ' minutes';
-      option.textContent = option.index === questionCount.selectedIndex ? label + ' (Recommended)' : label;
+      option.textContent = Number(option.value) === recommended ? label + ' (Recommended)' : label;
     }
   };
   questionCount.addEventListener('change', updateRecommendation);
@@ -219,6 +245,7 @@ function showPractice() {
   const unit = Number(params.get('unit'));
   const count = Number(params.get('count'));
   const minutes = Number(params.get('minutes'));
+  const standard = params.get('from') === 'exams' ? standardExams[course] : undefined;
   const selected = [...new Set((params.get('units') || '').split(',').map(Number))];
   const back = document.querySelector('#practice-back');
   // Courses with a question bank show the bank card first; its Open button leads to the practice options.
@@ -258,7 +285,9 @@ function showPractice() {
     heading.textContent = 'Practice All Units';
     description.textContent = 'Select one or more units, a question count, and a time limit.';
     setupMixedPractice(section.querySelector('#mixed-setup'), section.querySelector('.progress-status'));
-  } else if (mode === 'timed' && selected.every(id => available.includes(id)) && sizes.includes(count) && timeLimits().includes(minutes) && validRun()) {
+  } else if (mode === 'timed' && selected.every(id => available.includes(id)) &&
+    includeStandardOption(sizes, standard?.count).includes(count) &&
+    includeStandardOption(baseTimeLimits(), standard?.minutes).includes(minutes) && validRun()) {
     heading.textContent = 'Timed Practice';
     description.textContent = selected.map(unitLabel).join(' · ');
     setupPractice(selected, count, minutes);
