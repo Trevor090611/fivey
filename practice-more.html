@@ -31,10 +31,13 @@ main[data-category="humanities"],body:has(main[data-category="humanities"]) .fiv
 :root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
 <script type="module" src="./auth-gate.js?v=orbies2"></script>
+<link rel="stylesheet" href="./biology-banners.css?v=1">
+<script type="module" src="./biology-banners.js?v=1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav><a id="back-link" href="./courses.html">← Back to analytics</a></nav></div></header>
+<section data-biology-banner="review" data-banner-title="title" aria-labelledby="title" hidden><div class="wrap"></div></section>
 <main class="wrap"><section class="card" aria-labelledby="title"><h1 id="title">Practice More</h1><p id="description">Choose a unit from your Weakness list and set the number of questions.</p><form id="practice-form"><label for="unit-select">Weakness unit</label><select id="unit-select" required></select><label for="count-select">Questions per set</label><select id="count-select"><option value="5">5 questions</option><option value="10">10 questions</option><option value="15">15 questions</option><option value="20">20 questions</option></select><button class="practice-button" type="submit">Start practice</button></form><p id="status" role="status" hidden></p></section></main>
 <script type="module">
 import { units } from './practice-units.js?v=5';
