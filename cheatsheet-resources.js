@@ -13,7 +13,7 @@ const cheatsheetResources = {
   },
   'environmental-science': {
     title: 'AP Environmental Science Quick Review Notes',
-    notes: { url: './environmental-science-review-notes.html?v=1', panelCount: 10, initialUnit: '1' },
+    notes: { url: './environmental-science-review-notes.html?v=2', panelCount: 10, initialUnit: '1' },
   },
   'physics-1': {
     title: 'AP Physics 1 Quick Review Notes',
