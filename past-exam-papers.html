@@ -79,8 +79,17 @@ const twoSets = {
   macroeconomics: [2023, 2024, 2025]
 };
 
+// Older years that AP Central no longer hosts, kept in this site's past-exams folder
+// as past-exams/<course>/<year>-question-paper.pdf and <year>-answer-key.pdf.
+const hostedYears = {
+  biology: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014]
+};
+
 // kind is 'frq' (the question paper) or 'sg' (the scoring guidelines, i.e. the answer key).
 function pdf(kind, course, year, set) {
+  if (hostedYears[course]?.includes(year)) {
+    return './past-exams/' + course + '/' + year + (kind === 'frq' ? '-question-paper' : '-answer-key') + '.pdf';
+  }
   return 'https://apcentral.collegeboard.org/media/pdf/ap' + String(year).slice(2) + '-' + kind + '-' + course + (set ? '-set-' + set : '') + '.pdf';
 }
 
@@ -145,7 +154,7 @@ if (selected) {
   const list = document.querySelector('#years');
   // Subjects with two sets get wider boxes, two per row.
   list.classList.toggle('with-sets', id in twoSets);
-  for (const year of years) list.append(yearBox(id, name, year));
+  for (const year of [...years, ...(hostedYears[id] || [])]) list.append(yearBox(id, name, year));
   document.querySelector('#intro').hidden = false;
   list.hidden = false;
 } else {
