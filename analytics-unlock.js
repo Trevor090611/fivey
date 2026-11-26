@@ -62,8 +62,31 @@ function addStyles() {
 :root[data-fivey-dark] .analytics-locked{border-color:#62e7ff}
 .analytics-locked h3{margin:0 0 8px;font-size:20px}
 .analytics-locked p{margin:0 0 12px}
+.analytics-lock-icon{display:inline-block;width:1em;height:1em;margin-left:.45em;vertical-align:-.15em}
 `;
   document.head.append(style);
+}
+
+// A small padlock drawn in the button's text color, shown after "Analytics" while it is locked.
+export function lockIcon() {
+  addStyles();
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'analytics-lock-icon');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  svg.innerHTML = '<rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor"/><path d="M8 11V7a4 4 0 0 1 8 0v4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>';
+  return svg;
+}
+
+// Shows the padlock on a button while the subject is locked and removes it once unlocked.
+export function showLockState(button, account, course) {
+  const locked = !isAnalyticsUnlocked(account, course);
+  const icon = button.querySelector('.analytics-lock-icon');
+  if (locked && !icon) button.append(lockIcon());
+  if (!locked) icon?.remove();
+  if (locked) button.setAttribute('aria-label', button.textContent.trim() + ' (locked)');
+  else button.removeAttribute('aria-label');
 }
 
 // Asks the user to spend the Orbies. Resolves true if the subject ends up unlocked.
@@ -146,6 +169,7 @@ export function lockedNotice(account, course, name, onUnlock, headingLevel = 'h3
   const unlock = document.createElement('button');
   unlock.type = 'button';
   unlock.textContent = `Unlock for ${analyticsCost} Orbies`;
+  unlock.append(lockIcon());
   unlock.addEventListener('click', async () => {
     if (await askToUnlock(account, course, name)) onUnlock();
   });
