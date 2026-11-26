@@ -2,10 +2,21 @@
 // Analytics page shows an unlock box instead of the results.
 // Uses the same auth-gate.js URL as course.html so sign-in runs only once.
 import { analyticsAccount } from './auth-gate.js?v=orbies2';
-import { askToUnlock, isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=1';
+import { askToUnlock, isAnalyticsUnlocked, lockedNotice, showLockState } from './analytics-unlock.js?v=2';
 
 export async function openAnalytics(course, name, href) {
   if (isAnalyticsUnlocked(analyticsAccount, course) || await askToUnlock(analyticsAccount, course, name)) location.assign(href);
+}
+
+// Puts a padlock on the Analytics button while this subject is locked, and keeps it current.
+export function markAnalyticsButton(button, course) {
+  const update = () => showLockState(button, analyticsAccount, course);
+  update();
+  window.addEventListener('fivey:analytics-unlocked', update);
+  window.addEventListener('pageshow', update);
+  window.addEventListener('storage', event => {
+    if (event.key === null || event.key === 'fivey-analytics-unlocks-v1:' + analyticsAccount) update();
+  });
 }
 
 export function showAnalytics(panel, course, name) {
