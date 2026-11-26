@@ -7,6 +7,9 @@ if (params.get('course') === 'biology') {
       banner.querySelector('.wrap').append(title);
       banner.hidden = false;
     }
+    if (banner.dataset.landingBanner && !params.get('mode')) {
+      banner.dataset.biologyBanner = banner.dataset.landingBanner;
+    }
     banner.classList.add('biology-photo-banner');
   }
 }
