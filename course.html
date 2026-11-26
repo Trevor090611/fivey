@@ -556,7 +556,7 @@ if (selected) {
     if (analyticsView) {
       const panel = document.querySelector('#analytics-panel');
       panel.hidden = false;
-      import('./course-analytics.js?v=1')
+      import('./course-analytics.js?v=2')
         .then(({ showAnalytics }) => showAnalytics(panel, id, name))
         .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
     }
@@ -581,10 +581,11 @@ if (selected) {
     analyticsButton.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      import('./course-analytics.js?v=1')
+      import('./course-analytics.js?v=2')
         .then(({ openAnalytics }) => openAnalytics(id, name, analyticsButton.href))
         .catch(() => location.assign(analyticsButton.href));
     });
+    import('./course-analytics.js?v=2').then(({ markAnalyticsButton }) => markAnalyticsButton(analyticsButton, id)).catch(() => {});
     document.querySelector('#course-actions').hidden = false;
   }
   document.querySelector('#resources').hidden = false;
