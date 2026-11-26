@@ -11,7 +11,10 @@ const cheatsheetResources = {
     pdf: './ap-chemistry-cheatsheet.pdf',
     notes: { url: './chemistry-cheatsheet-notes.html?v=3', panelCount: 10, initialUnit: '1' },
   },
-  'environmental-science': { title: 'AP Environmental Science Quick Review Notes' },
+  'environmental-science': {
+    title: 'AP Environmental Science Quick Review Notes',
+    notes: { url: './environmental-science-review-notes.html?v=1', panelCount: 10, initialUnit: '1' },
+  },
   'physics-1': {
     title: 'AP Physics 1 Quick Review Notes',
     googleDoc: 'https://docs.google.com/document/d/1TwLLOIhCTd7YQyft9FYmTQDYh91fV_oAaGKqA5-6BkU/edit?usp=sharing',

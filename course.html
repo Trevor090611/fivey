@@ -315,7 +315,7 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
     </span>
   </nav>
 </footer>
-<script src="./cheatsheet-resources.js?v=7"></script>
+<script src="./cheatsheet-resources.js?v=8"></script>
 <script>
 const courses = [
   ['biology', 'AP Biology', 'STEM', '#d9f783'],
@@ -448,7 +448,9 @@ function renderCheatsheet(id) {
         return mountCheatsheet(notes, { ...resource.notes, initialUnit });
       })
       .catch(() => {
-        status.textContent = 'The notes could not load. You can still open the Google Doc or download the PDF above.';
+        status.textContent = resource.googleDoc || resource.pdf
+          ? 'The notes could not load. Check the available resources above.'
+          : 'The notes could not load. Refresh the page to try again.';
       });
   }
 }
