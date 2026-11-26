@@ -140,7 +140,7 @@ export function askToUnlock(account, course, name, feature = 'analytics') {
       title.textContent = 'Not enough Orbies';
       body.replaceChildren(
         paragraph(`Unlocking ${featureTitle(name)} costs ${cost} Orbies. You have ${format.format(balance)}.`),
-        paragraph('Score above 85% on a unit practice set to earn a chest of Orbies.')
+        paragraph('Score 80% or higher in Practice By Units or Practice All Units to earn an Orbies chest.')
       );
       const ok = button('OK', () => dialog.close());
       actions.replaceChildren(ok);

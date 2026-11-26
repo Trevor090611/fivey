@@ -7,8 +7,8 @@
   <script src="./theme.js?v=1"></script>
   <link rel="stylesheet" href="./brand.css?v=fb47b45">
   <link rel="stylesheet" href="./auth.css?v=magenta2">
-  <link rel="stylesheet" href="./orbies-reward.css?v=2">
-  <script type="module" src="./orbies-reward.js?v=2"></script>
+  <link rel="stylesheet" href="./orbies-reward.css?v=3">
+  <script type="module" src="./orbies-reward.js?v=3"></script>
 <link rel="stylesheet" href="./site-footer.css?v=2">
 </head>
 <body class="reward-page" data-rarity="starting">
@@ -21,11 +21,13 @@
   <main class="reward-main">
     <p id="reward-unavailable" hidden>This chest is unavailable. <a href="./courses.html">Browse courses</a> to start a practice set.</p>
     <section id="reward" aria-labelledby="reward-title" hidden>
-      <h1 id="reward-title">Congratulations! You scored above 85% in this question set! :D</h1>
+      <h1 id="reward-title">You earned an Orbies chest!</h1>
       <div class="reward-stage">
         <p class="reward-stars" id="reward-stars" role="img" aria-label="1 out of 5 stars"></p>
         <button type="button" id="reward-chest" class="reward-chest">
           <span class="chest-shadow" aria-hidden="true"></span>
+          <span class="chest-light" aria-hidden="true"></span>
+          <span class="chest-sweep" aria-hidden="true"></span>
           <span class="chest-rotor" aria-hidden="true">
             <span class="chest-model">
               <span class="chest-base">
@@ -64,6 +66,7 @@
   </nav>
 </footer>
   <section class="reward-reveal" id="reward-reveal" aria-labelledby="reward-amount" hidden>
+    <span class="reward-rays" aria-hidden="true"></span>
     <img src="./orbies-coin.png?v=1" alt="" width="240" height="240">
     <h2 id="reward-amount" tabindex="-1"></h2>
     <a class="reward-return" id="reward-reveal-return" href="./courses.html">Practice another set</a>

@@ -269,3 +269,82 @@ body.reward-page {
   .reward-page, .reward-page > header { transition: none; }
   #reward, .reward-reveal { animation: none; }
 }
+
+/* The stage lighting changes with rarity. The wooden chest model is shared. */
+body.reward-page {
+  --stage-top: #1b2752;
+  --stage-mid: #3f67a0;
+  --stage-floor: #101634;
+  --stage-glow: #8ee6ff;
+  --rarity-ink: #fffaf5;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 50% 40%, var(--stage-mid), transparent 60%),
+    linear-gradient(var(--stage-top), var(--stage-floor));
+}
+body.reward-page[data-rarity="1"] { --stage-top: #112c2e; --stage-mid: #417c62; --stage-floor: #101e24; --stage-glow: #aaf8a5; }
+body.reward-page[data-rarity="3"] { --stage-top: #241337; --stage-mid: #6635ad; --stage-floor: #211043; --stage-glow: #d69bff; }
+body.reward-page[data-rarity="4"] { --stage-top: #50213e; --stage-mid: #af5276; --stage-floor: #37204d; --stage-glow: #ffb2ce; }
+body.reward-page[data-rarity="5"] { --stage-top: #853f69; --stage-mid: #c78753; --stage-floor: #17423e; --stage-glow: #ffe59b; }
+.reward-page::before {
+  content: "";
+  position: fixed;
+  inset: 50% 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-conic-gradient(#fff2 0% 25%, transparent 0% 50%) 50% / 68px 68px;
+  mask-image: linear-gradient(transparent, #000 60%);
+  transform: perspective(240px) rotateX(41deg) scale(1.75);
+  transform-origin: 50% 100%;
+}
+.chest-light, .chest-sweep {
+  position: absolute;
+  inset: 14% 6% 23%;
+  opacity: 0;
+  border-radius: 50%;
+}
+.chest-light { background: radial-gradient(ellipse, var(--stage-glow), transparent 67%); }
+.chest-sweep {
+  inset: 35% 12% 39%;
+  border-bottom: 3px solid #fff5cf;
+  box-shadow: 0 8px 20px var(--stage-glow);
+}
+.is-opening .chest-light { animation: chest-light 1.15s both ease-in; }
+.is-opening .chest-sweep { animation: chest-sweep .55s .22s ease-out twice; }
+.is-releasing .chest-light { animation: chest-release .48s both ease-out; }
+@keyframes chest-light {
+  from { opacity: .2; transform: scale(.7); }
+  to { opacity: .88; transform: scale(1.7); }
+}
+@keyframes chest-sweep {
+  0% { opacity: 0; transform: translateY(24px) rotate(-12deg) scale(.78); }
+  35% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-30px) rotate(10deg) scale(1.1); }
+}
+@keyframes chest-release {
+  from { opacity: .9; transform: scale(1.65); }
+  to { opacity: .2; transform: scale(2); }
+}
+.reward-reveal {
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, var(--stage-mid), var(--stage-top) 75%);
+}
+.reward-rays {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(580px, 120vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 14deg, var(--stage-glow) 0deg 8deg, transparent 15deg 42deg);
+  mask-image: radial-gradient(#000, transparent 67%);
+  opacity: .34;
+  transform: translate(-50%, -50%);
+}
+.reward-reveal:not([hidden]) img { animation: reward-coin .55s both cubic-bezier(.2,.73,.3,1.12); }
+@keyframes reward-coin {
+  from { transform: translate(-50%, -50%) translateY(30px) scale(.58); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-opening .chest-light, .is-opening .chest-sweep, .is-releasing .chest-light,
+  .reward-reveal:not([hidden]) img { animation: none; }
+}

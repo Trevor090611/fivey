@@ -1,5 +1,5 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
-import { clickChest, clicksToOpen, getChest } from './orbies-wallet.js';
+import { clickChest, clicksToOpen, getChest } from './orbies-wallet.js?v=chest80';
 
 const id = new URLSearchParams(location.search).get('chest');
 const page = document.body;
@@ -67,20 +67,18 @@ async function openChest(chest, gainedStar) {
     react(false);
     await reaction?.finished.catch(() => {});
   }
-  // Each turn takes half as long as the previous one.
   const spin = play(rotor, [
-    { transform: 'rotateY(0deg)', offset: 0 },
-    { transform: 'rotateY(360deg)', offset: 8 / 15 },
-    { transform: 'rotateY(720deg)', offset: 12 / 15 },
-    { transform: 'rotateY(1080deg)', offset: 14 / 15 },
-    { transform: 'rotateY(1440deg)', offset: 1 }
-  ], { duration: 1600, easing: 'linear' });
+    { transform: 'translateY(0) rotateY(0deg) scale(1)' },
+    { transform: 'translateY(-18px) rotateY(135deg) scale(1.08)', offset: .48 },
+    { transform: 'translateY(-26px) rotateY(720deg) scale(1.17)' }
+  ], { duration: 1150, easing: 'ease-in', fill: 'forwards' });
   await spin?.finished.catch(() => {});
   const opening = play(lid, [
     { transform: 'rotateX(0deg)' },
     { transform: 'rotateX(104deg)' }
   ], { duration: 480, easing: 'cubic-bezier(.24,.68,.35,1)', fill: 'forwards' });
   button.classList.add('is-open');
+  page.classList.add('is-releasing');
   await opening?.finished.catch(() => {});
   showReward(chest);
 }
@@ -92,9 +90,7 @@ try {
   } else {
     returnLink.href = './practice.html?' + new URLSearchParams({
       course: chest.course,
-      mode: 'unit',
-      unit: chest.unit,
-      count: chest.total
+      ...(chest.practiceSetup ?? { mode: 'unit', unit: chest.unit, count: chest.total })
     });
     revealReturn.href = returnLink.href;
     renderRarity(chest);

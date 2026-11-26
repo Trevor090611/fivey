@@ -38,13 +38,13 @@ export function spendOrbies(account, amount) {
 }
 
 export function qualifiesForChest(mode, correct, total) {
-  return mode === 'unit' && total > 0 && correct * 100 > total * 85;
+  return (mode === 'unit' || mode === 'allUnits') && total > 0 && correct * 5 >= total * 4;
 }
 
-export async function createChest(account, course, unit, total) {
+export async function createChest(account, course, unit, total, practiceSetup) {
   const id = crypto.randomUUID();
   await updateWallet(account, wallet => {
-    wallet.chests[id] = { course, unit, total, clicks: 0, stars: 1 };
+    wallet.chests[id] = { course, unit, total, practiceSetup, clicks: 0, stars: 1 };
   });
   return id;
 }
@@ -60,7 +60,7 @@ export function clickChest(account, id) {
     if (!chest) throw new Error('Chest unavailable');
     if (chest.clicks >= clicksToOpen) return chest;
     chest.clicks++;
-    if (Math.random() < .2) chest.stars = Math.min(chest.stars + 1, payouts.length - 1);
+    if (Math.random() < .3) chest.stars = Math.min(chest.stars + 1, payouts.length - 1);
     if (chest.clicks === clicksToOpen) {
       chest.reward = payouts[chest.stars];
       wallet.balance += chest.reward;
