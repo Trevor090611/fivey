@@ -600,6 +600,9 @@ function setupPractice(selected, count, minutes = 0) {
           answers: {},
           finished: false
         };
+      }
+      if (!attempt.choiceOrders) {
+        attempt.choiceOrders = attempt.set.map(item => shuffle(item.choices.map((_, index) => index)));
         save();
       }
       const size = attempt.set.length;
@@ -652,13 +655,14 @@ function setupPractice(selected, count, minutes = 0) {
         field.append(context, renderPracticePlot(item.plot));
       }
 
-      for (const choice of shuffle(item.choices.map((text, value) => ({ text, value })))) {
+      for (const [position, choiceIndex] of attempt.choiceOrders[index].entries()) {
+        const letter = 'ABCD'[position];
         const label = document.createElement('label');
         const input = document.createElement('input');
         input.type = 'radio';
         input.name = 'question-' + index;
-        input.value = String(choice.value);
-        input.checked = attempt?.answers[index] === choice.value;
+        input.value = String(choiceIndex);
+        input.checked = attempt?.answers[index] === choiceIndex;
         input.addEventListener('change', () => {
           if (minutes && Date.now() >= attempt.deadline) {
             input.checked = false;
@@ -667,10 +671,10 @@ function setupPractice(selected, count, minutes = 0) {
             finish(true);
             return;
           }
-          attempt.answers[index] = choice.value;
+          attempt.answers[index] = choiceIndex;
           save();
         });
-        label.append(input, document.createTextNode(choice.text));
+        label.append(input, document.createTextNode(letter + '. ' + item.choices[choiceIndex]));
         field.append(label);
       }
 
