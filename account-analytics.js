@@ -1,5 +1,6 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies3';
 import { units } from './practice-units.js?v=5';
+import { isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=1';
 
 const subjects = [
   ['biology', 'AP Biology'],
@@ -99,10 +100,11 @@ function addUnitList(parent, title, rows, id, empty) {
 function render() {
   if (!analyticsAccount || !section || !list) return;
   const selected = new Set(readPlan().map(item => item.subject));
+  // Unlocked subjects are ranked by accuracy; locked ones follow in name order and show no results.
   const ranked = subjects
     .filter(([, name]) => selected.has(name))
-    .map(([id, name]) => ({ id, name, ...readAnalytics(id) }))
-    .sort((a, b) => (b.accuracy ?? -1) - (a.accuracy ?? -1) || b.attempted - a.attempted || a.name.localeCompare(b.name));
+    .map(([id, name]) => isAnalyticsUnlocked(analyticsAccount, id) ? { id, name, ...readAnalytics(id) } : { id, name, locked: true })
+    .sort((a, b) => Number(Boolean(a.locked)) - Number(Boolean(b.locked)) || (b.accuracy ?? -1) - (a.accuracy ?? -1) || (b.attempted ?? 0) - (a.attempted ?? 0) || a.name.localeCompare(b.name));
   list.replaceChildren();
   if (!ranked.length) {
     const empty = document.createElement('p');
@@ -116,6 +118,11 @@ function render() {
     card.className = 'account-analytics-card';
     const heading = document.createElement('h3');
     heading.textContent = (index + 1) + '. ' + subject.name;
+    if (subject.locked) {
+      card.append(heading, lockedNotice(analyticsAccount, subject.id, subject.name, render, 'h4'));
+      list.append(card);
+      continue;
+    }
     const metrics = document.createElement('dl');
     for (const [label, value] of [
       ['Total Questions Attempted', subject.attempted.toLocaleString()],
@@ -148,7 +155,8 @@ function render() {
 
 render();
 window.addEventListener('fivey:study-plan-updated', render);
+window.addEventListener('fivey:analytics-unlocked', render);
 window.addEventListener('pageshow', render);
 window.addEventListener('storage', event => {
-  if (event.key === null || event.key === planKey || subjects.some(([id]) => event.key === 'fivey-practice-analytics-v1:' + analyticsAccount + ':' + id)) render();
+  if (event.key === null || event.key === planKey || event.key === 'fivey-analytics-unlocks-v1:' + analyticsAccount || subjects.some(([id]) => event.key === 'fivey-practice-analytics-v1:' + analyticsAccount + ':' + id)) render();
 });
