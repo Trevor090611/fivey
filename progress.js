@@ -1,5 +1,5 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
-import { createChest, qualifiesForChest } from './orbies-wallet.js';
+import { createChest, qualifiesForChest } from './orbies-wallet.js?v=chest80';
 import { units, unitPool } from './practice-units.js?v=13';
 import { renderPracticePlot } from './practice-plot.js?v=1';
 
@@ -790,13 +790,17 @@ function setupPractice(selected, count, minutes = 0) {
         const checked = field.querySelector(':checked');
         return checked ? [{ unit: item.unit, correct: Number(checked.value) === item.answer }] : [];
       });
-      if (params.get('mode') === 'timed' && params.get('from') === 'exams') recordPracticeExam(score, set.length, selected);
+      const practiceExam = params.get('mode') === 'timed' && params.get('from') === 'exams';
+      if (practiceExam) recordPracticeExam(score, set.length, selected);
       const recording = recordSet(results, mode).catch(() => {
         status.textContent = message + ' Your analytics could not be saved.';
       });
-      if (analyticsAccount && analyticsAccount !== 'guest' && qualifiesForChest(mode, score, set.length)) {
+      if (!practiceExam && analyticsAccount && analyticsAccount !== 'guest' && qualifiesForChest(mode, score, set.length)) {
         const openReward = async () => {
-          const id = await createChest(analyticsAccount, course, selected[0], set.length);
+          const practiceSetup = minutes
+            ? { mode: 'mixed', units: selected.join(','), count, minutes }
+            : mode === 'unit' ? { mode: 'unit', unit: selected[0], count } : { count };
+          const id = await createChest(analyticsAccount, course, selected[0], set.length, practiceSetup);
           await recording;
           const rewardUrl = './orbies-reward.html?' + new URLSearchParams({ chest: id });
           if (!matchMedia('(prefers-reduced-motion: reduce)').matches && document.body.animate) {
