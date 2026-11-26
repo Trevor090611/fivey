@@ -161,7 +161,7 @@ if (selected) {
   const [, name, category, tint] = selected;
   // Subject banner illustration (AP Biology has its own photo banners).
   if (id !== 'biology') {
-    const banner = Object.assign(document.createElement('img'), { className: 'hero-banner', src: './banners/' + id + '-practice.svg', alt: '', decoding: 'async' });
+    const banner = Object.assign(document.createElement('img'), { className: 'hero-banner', src: './banners/' + id + (new URLSearchParams(location.search).get('mode') ? '-questions' : '-practice') + '.svg', alt: '', decoding: 'async' });
     banner.setAttribute('aria-hidden', 'true');
     document.querySelector('.hero').prepend(banner);
     document.querySelector('.hero').classList.add('has-banner');

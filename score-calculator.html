@@ -28,6 +28,14 @@ h1{font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.045em;margin
 /* The circle's color follows the score, the same in light and dark themes; the number stays black. */
 .prediction-score[data-score="5"]{background:#a4e568}
 .prediction-score[data-score="4"]{background:#ffe14d}
+/* Subject banner above the card (AP Biology uses its photo banner instead). */
+.subject-banner{position:relative;overflow:hidden;background:#19271f;color:#fffef8;padding-block:clamp(48px,8vw,88px)}
+:root[data-fivey-dark] .subject-banner{background:var(--fivey-navy)}
+.subject-banner .wrap{position:relative;z-index:1}
+.subject-banner h1{max-width:55%;margin:0;font-size:clamp(36px,6vw,75px);line-height:1.08;color:#fffef8}
+:root[data-fivey-dark] .subject-banner[data-category="humanities"] h1{color:#ff4fd8!important}
+.hero-banner{position:absolute;top:0;right:0;width:min(64%,960px);height:100%;object-fit:cover;object-position:right center;mask-image:linear-gradient(90deg,transparent 0%,#000 42%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 42%);pointer-events:none;user-select:none}
+@media(max-width:760px){.subject-banner h1{max-width:none}.hero-banner{width:78%;opacity:.5}}
 .prediction-score[data-score="3"]{background:#ffa53d}
 .prediction-score[data-score="2"],.prediction-score[data-score="1"]{background:#ff9b9b}
 /* Celebration for a predicted 5 (see entrance() in the script). */
@@ -83,6 +91,17 @@ const count = new Intl.NumberFormat();
 
 const course = new URLSearchParams(location.search).get('course');
 if (['psychology', 'macroeconomics'].includes(course)) document.querySelector('main').dataset.category = 'humanities';
+// Subject banner illustration; AP Biology has its own photo banner (biology-banners.js).
+if (Object.hasOwn(courses, course) && course !== 'biology') {
+  const section = document.querySelector('[data-biology-banner]');
+  const banner = Object.assign(document.createElement('img'), { className: 'hero-banner', src: './banners/' + course + '-calculator.svg', alt: '', decoding: 'async' });
+  banner.setAttribute('aria-hidden', 'true');
+  section.classList.add('subject-banner');
+  if (['psychology', 'macroeconomics'].includes(course)) section.dataset.category = 'humanities';
+  section.prepend(banner);
+  section.querySelector('.wrap').append(document.getElementById('title'));
+  section.hidden = false;
+}
 const name = courses[course];
 const box = document.querySelector('#calculator');
 function element(tag, props = {}, ...children) {
