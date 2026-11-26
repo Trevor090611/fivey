@@ -1,4 +1,5 @@
 import { authenticatedClient as client } from './auth-gate.js?v=blog1';
+import { authConfig } from './auth-config.js?v=2';
 
 const list = document.querySelector('#blog-posts');
 const pageStatus = document.querySelector('#blog-status');
@@ -21,6 +22,40 @@ async function rpc(name, args) {
   const { data, error } = await client.rpc('fivey_blog_' + name, args);
   if (error) throw error;
   return data;
+}
+
+// Public profile photos live in the public-profile-photos bucket; the comments function
+// returns each photo's path (with a ?v= version so a changed photo is reloaded).
+function publicPhoto(path) {
+  return path ? authConfig.url + '/storage/v1/object/public/public-profile-photos/' + path : '';
+}
+
+// The commenter's profile photo, or the first letter of their name when they have none.
+// The developer falls back to the site's photo of them (me.jpeg), as their likes do.
+function commentAvatar(comment) {
+  const initial = node('span', 'blog-comment-avatar is-initial', (comment.author || '?').trim().charAt(0).toUpperCase() || '?');
+  initial.setAttribute('aria-hidden', 'true');
+  const url = publicPhoto(comment.author_photo) || (comment.author_is_developer ? './me.jpeg' : '');
+  if (!url) return initial;
+  const photo = node('img', 'blog-comment-avatar');
+  photo.src = url;
+  photo.alt = '';
+  photo.loading = 'lazy';
+  photo.addEventListener('error', () => photo.replaceWith(initial), { once: true });
+  return photo;
+}
+
+// A yellow crown after the developer's name, labeled "The Developer" on hover or focus.
+function developerCrown() {
+  const badge = node('span', 'blog-developer-badge');
+  badge.tabIndex = 0;
+  badge.setAttribute('role', 'img');
+  badge.setAttribute('aria-label', 'The Developer');
+  badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 18.5 1.8 7.6l5.7 4.3L12 4l4.5 7.9 5.7-4.3L21 18.5Z" fill="#ffc81f" stroke="#a56f00" stroke-width="1.4" stroke-linejoin="round"/><rect x="3" y="19.2" width="18" height="2.6" rx="1" fill="#ffc81f" stroke="#a56f00" stroke-width="1.2"/></svg>';
+  const hint = node('span', 'blog-developer-hint', 'The Developer');
+  hint.setAttribute('aria-hidden', 'true');
+  badge.append(hint);
+  return badge;
 }
 
 function discussion(postId) {
@@ -55,7 +90,8 @@ function discussion(postId) {
     // Fetch one extra row to find out whether the “View More” button is needed.
     while (rows.length <= shown) {
       const limit = Math.min(30, shown + 1 - rows.length);
-      const page = await rpc('comments', { p_post: postId, p_offset: rows.length, p_limit: limit });
+      // Names are read live from each account, so a changed name shows on old comments too.
+      const page = await rpc('comments_with_profiles', { p_post: postId, p_offset: rows.length, p_limit: limit });
       rows.push(...page);
       if (page.length < limit) break;
     }
@@ -87,8 +123,11 @@ function discussion(postId) {
 
   function commentRow(comment) {
     const item = node('li', 'blog-comment');
-    const content = node('div');
-    content.append(node('strong', null, comment.author), node('p', null, comment.body));
+    const content = node('div', 'blog-comment-content');
+    const name = node('div', 'blog-comment-name');
+    name.append(node('strong', null, comment.author));
+    if (comment.author_is_developer) name.append(developerCrown());
+    content.append(name, node('p', null, comment.body));
     const reaction = node('div', 'blog-like');
     const filled = comment.liked || comment.developer_liked;
     const heart = node(
@@ -106,18 +145,24 @@ function discussion(postId) {
     count.setAttribute('aria-label', comment.likes + ' likes');
     reaction.append(heart, count);
     if (comment.developer_liked) {
+      // The developer's profile photo with a small heart, like a creator's like on YouTube.
+      const liked = node('span', 'blog-developer-like');
+      liked.title = 'Liked by the developer';
       const avatar = node('img', 'blog-developer-avatar');
-      avatar.src = './me.jpeg';
+      avatar.src = publicPhoto(comment.developer_photo) || './me.jpeg';
       avatar.alt = 'Liked by the developer';
-      avatar.title = avatar.alt;
-      reaction.append(avatar);
+      avatar.addEventListener('error', () => { avatar.src = './me.jpeg'; }, { once: true });
+      const badge = node('span', 'blog-developer-like-heart', '♥');
+      badge.setAttribute('aria-hidden', 'true');
+      liked.append(avatar, badge);
+      reaction.append(liked);
     }
     heart.addEventListener('click', () => update(
       () => rpc('like_comment', { p_comment: comment.id, p_liked: !comment.liked }),
       '',
       () => Array.from(thread.querySelectorAll('button')).find(button => button.dataset.comment === comment.id)?.focus()
     ));
-    item.append(content, reaction);
+    item.append(commentAvatar(comment), content, reaction);
     return item;
   }
 
