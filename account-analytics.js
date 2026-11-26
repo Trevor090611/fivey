@@ -1,6 +1,6 @@
 import { analyticsAccount } from './auth-gate.js?v=orbies3';
 import { units } from './practice-units.js?v=5';
-import { isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=2';
+import { isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=3';
 
 const subjects = [
   ['biology', 'AP Biology'],
