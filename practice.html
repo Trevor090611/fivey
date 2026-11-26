@@ -18,6 +18,11 @@ header{border-bottom:1px solid var(--line)}
 .bar{min-height:70px;display:flex;justify-content:space-between;align-items:center;gap:16px}
 nav a{font-size:14px;font-weight:700}
 .hero{padding:clamp(40px,8vw,92px) 0;background:var(--ink);color:var(--white)}
+.hero{position:relative;overflow:hidden}
+.hero .wrap{position:relative;z-index:1}
+.hero-banner{position:absolute;top:0;right:0;width:min(64%,960px);height:100%;object-fit:cover;object-position:right center;mask-image:linear-gradient(90deg,transparent 0%,#000 42%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 42%);pointer-events:none;user-select:none}
+.hero.has-banner h1{max-width:55%}
+@media(max-width:760px){.hero.has-banner h1{max-width:none}.hero-banner{width:78%;opacity:.5}}
 h1,h2,p{margin:0}
 h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em}
 .tag{display:inline-block;margin-bottom:14px;border-radius:4px;background:var(--tint,#d9f783);color:var(--ink);padding:3px 8px;font:700 13px/1.5 ui-monospace,monospace}
@@ -154,6 +159,13 @@ const id = new URLSearchParams(location.search).get('course');
 const selected = courses.find(([courseId]) => courseId === id);
 if (selected) {
   const [, name, category, tint] = selected;
+  // Subject banner illustration (AP Biology has its own photo banners).
+  if (id !== 'biology') {
+    const banner = Object.assign(document.createElement('img'), { className: 'hero-banner', src: './banners/' + id + '-practice.svg', alt: '', decoding: 'async' });
+    banner.setAttribute('aria-hidden', 'true');
+    document.querySelector('.hero').prepend(banner);
+    document.querySelector('.hero').classList.add('has-banner');
+  }
   if (category === 'Humanities') document.querySelector('main').dataset.category = 'humanities';
   const options = new URLSearchParams(location.search);
   const page = options.get('mode') === 'timed' && options.get('from') === 'exams'
