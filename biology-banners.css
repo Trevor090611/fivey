@@ -1,0 +1,33 @@
+[data-biology-banner="progress"] { --biology-banner: url("./biology-banner-progress.webp"); }
+[data-biology-banner="full-exam"] { --biology-banner: url("./biology-banner-full-exam.webp"); }
+[data-biology-banner="questions"] { --biology-banner: url("./biology-banner-questions.webp"); }
+[data-biology-banner="past-exams"] { --biology-banner: url("./biology-banner-past-exams.webp"); }
+[data-biology-banner="review"] { --biology-banner: url("./biology-banner-review.webp"); }
+[data-biology-banner="calculator"] { --biology-banner: url("./biology-banner-calculator.webp"); }
+.hero.biology-photo-banner,
+.biology-photo-banner {
+  color: #fffef8;
+  background: #072825;
+  background-image: linear-gradient(90deg, #061d1ae8, #061d1aaf 49%, #061d1a32 90%), var(--biology-banner);
+  background-size: cover;
+  background-position: center, center 52%;
+  text-align: left;
+  padding-block: clamp(48px, 8vw, 88px);
+}
+.biology-photo-banner h1 {
+  max-width: 19ch;
+  margin: 0;
+  font-size: clamp(36px, 6vw, 75px);
+  line-height: 1.08;
+  text-shadow: 0 2px 16px #000c;
+}
+.biology-photo-banner::before,
+.biology-photo-banner .hero-art,
+.biology-photo-banner .hero-equations { display: none; }
+@media (max-width: 620px) {
+  .hero.biology-photo-banner,
+  .biology-photo-banner {
+    background-image: linear-gradient(90deg, #061d1adc, #061d1a6e), var(--biology-banner);
+    background-position: center, 65% center;
+  }
+}

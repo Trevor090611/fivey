@@ -49,12 +49,14 @@ main[data-category="humanities"],body:has(main[data-category="humanities"]) .fiv
 <script type="module" src="./fivey-chat.js?v=18"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
 <script type="module" src="./auth-gate.js?v=orbies-chest1"></script>
+<link rel="stylesheet" href="./biology-banners.css?v=1">
+<script type="module" src="./biology-banners.js?v=1"></script>
 </head>
 <body>
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
 <header><div class="wrap bar"><a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a><nav aria-label="Main navigation"><a href="./courses.html?tool=exams" id="back">← All courses</a></nav></div></header>
 <main>
-<section class="hero" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Past Exam Papers</h1></div></section>
+<section class="hero" data-biology-banner="past-exams" aria-labelledby="title"><div class="wrap"><span class="tag" id="tag" hidden></span><h1 id="title">Past Exam Papers</h1></div></section>
 <div class="wrap" id="intro" hidden><p>Official free-response questions and their scoring guidelines, released by the College Board. Each button opens the PDF in a new tab, where you can read or download it.</p></div>
 <div class="wrap years" id="years" hidden></div>
 <p class="wrap" id="status" role="status" hidden></p>
