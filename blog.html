@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="./brand.css?v=fb47b45">
 <link rel="stylesheet" href="./auth.css?v=magenta2">
 <link rel="stylesheet" href="./site-footer.css?v=2">
-<link rel="stylesheet" href="./blog.css?v=profiles1">
-<script type="module" src="./blog.js?v=profiles1"></script>
+<link rel="stylesheet" href="./blog.css?v=categories1">
+<script type="module" src="./blog.js?v=categories1"></script>
 </head>
 <body data-blog="list">
 <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
@@ -18,9 +18,16 @@
   <section class="hero blog-banner" aria-labelledby="blog-title">
     <div class="wrap"><h1 id="blog-title">Developer's Personal Blog</h1></div>
   </section>
-  <div class="wrap blog-content">
-    <p class="blog-status" id="blog-status" role="status">Loading blog…</p>
-    <div id="blog-posts"></div>
+  <div class="wrap blog-layout">
+    <nav class="blog-categories" aria-label="Blog categories">
+      <button type="button" data-category="ap-exam-tips" aria-controls="blog-posts">AP Exam Tips</button>
+      <button type="button" data-category="college-applications" aria-controls="blog-posts">College Application Insights</button>
+    </nav>
+    <div class="blog-content">
+      <h2 class="blog-section-title" id="blog-section-title" tabindex="-1">AP Exam Tips</h2>
+      <p class="blog-status" id="blog-status" role="status">Loading blog…</p>
+      <div id="blog-posts" aria-labelledby="blog-section-title"></div>
+    </div>
   </div>
 </main>
 <footer class="fivey-site-footer">

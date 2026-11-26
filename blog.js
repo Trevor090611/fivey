@@ -5,6 +5,15 @@ const list = document.querySelector('#blog-posts');
 const pageStatus = document.querySelector('#blog-status');
 const articlePage = document.body.dataset.blog === 'article';
 
+// Every post belongs to one category. Posts saved before categories existed count as AP Exam Tips.
+const categories = { 'ap-exam-tips': 'AP Exam Tips', 'college-applications': 'College Application Insights' };
+const defaultCategory = 'ap-exam-tips';
+const categoryOf = post => (Object.hasOwn(categories, post.category ?? '') ? post.category : defaultCategory);
+let allPosts = [];
+let currentCategory = Object.hasOwn(categories, new URLSearchParams(location.search).get('category') ?? '')
+  ? new URLSearchParams(location.search).get('category')
+  : defaultCategory;
+
 function node(tag, className, text) {
   const element = document.createElement(tag);
   if (className) element.className = className;
@@ -578,6 +587,14 @@ function ownerForm() {
   file.type = 'file';
   file.accept = '.txt,.md,text/plain,text/markdown';
   const editor = articleEditor();
+  const category = node('select');
+  category.required = true;
+  for (const [value, text] of Object.entries(categories)) {
+    const option = node('option', null, text);
+    option.value = value;
+    category.append(option);
+  }
+  category.value = currentCategory;
   const summary = node('textarea');
   summary.maxLength = 1500;
   summary.rows = 3;
@@ -589,7 +606,7 @@ function ownerForm() {
   const publish = node('button', null, 'Publish Entry');
   publish.type = 'submit';
 
-  for (const [text, field] of [['Article title', title], ['Import text file', file], ['Summary', summary]]) {
+  for (const [text, field] of [['Article title', title], ['Category', category], ['Import text file', file], ['Summary', summary]]) {
     const label = node('label', null, text);
     label.append(field);
     if (field === summary) form.append(editor.section);
@@ -600,7 +617,7 @@ function ownerForm() {
   let summarizedText = '';
 
   function disable(disabled) {
-    for (const control of [title, file, summary, generate, publish]) control.disabled = disabled;
+    for (const control of [title, category, file, summary, generate, publish]) control.disabled = disabled;
     editor.disable(disabled);
   }
 
@@ -674,13 +691,17 @@ function ownerForm() {
       await rpc('publish', {
         p_title: title.value.trim(),
         p_summary: summary.value.trim(),
-        p_body: body
+        p_body: body,
+        p_category: category.value
       });
+      const publishedTo = category.value;
       form.reset();
+      category.value = publishedTo;
       editor.write('');
       summarizedText = '';
-      status.textContent = 'Entry published.';
+      status.textContent = 'Entry published in ' + categories[publishedTo] + '.';
       await loadPosts();
+      showCategory(publishedTo);
     } catch {
       status.textContent = 'The entry could not be published. Try again.';
     } finally {
@@ -709,20 +730,58 @@ async function loadPosts() {
     }
     document.querySelector('#blog-title').textContent = post.title;
     document.title = post.title + ' | Fivey';
-    list.replaceChildren(postCard(post, true));
-  } else if (posts.length) {
+    const label = node('a', 'blog-category-label', categories[categoryOf(post)]);
+    label.href = './blog.html?' + new URLSearchParams({ category: categoryOf(post) });
+    list.replaceChildren(label, postCard(post, true));
+  } else {
+    allPosts = posts;
+    renderCategory();
+  }
+}
+
+// Shows the posts in the selected category and marks its button in the menu.
+function renderCategory() {
+  document.querySelector('#blog-section-title').textContent = categories[currentCategory];
+  for (const button of document.querySelectorAll('.blog-categories button')) {
+    button.setAttribute('aria-current', String(button.dataset.category === currentCategory));
+  }
+  const posts = allPosts.filter(post => categoryOf(post) === currentCategory);
+  if (posts.length) {
     list.replaceChildren(...posts.map(post => postCard(post)));
   } else {
     const empty = node('article', 'blog-card');
     empty.append(node('h2', null, 'First entry coming soon'));
+    empty.append(node('p', 'blog-summary', 'There are no ' + categories[currentCategory] + ' articles yet. Check back soon!'));
     list.replaceChildren(empty);
   }
+}
+
+function showCategory(category, moveFocus = false) {
+  currentCategory = category;
+  const url = new URL(location.href);
+  url.searchParams.set('category', category);
+  history.replaceState(null, '', url);
+  renderCategory();
+  if (moveFocus) {
+    const heading = document.querySelector('#blog-section-title');
+    heading.focus({ preventScroll: true });
+    heading.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+  }
+}
+
+if (!articlePage) {
+  for (const button of document.querySelectorAll('.blog-categories button')) {
+    button.setAttribute('aria-current', String(button.dataset.category === currentCategory));
+    button.addEventListener('click', () => showCategory(button.dataset.category, true));
+  }
+  document.querySelector('#blog-section-title').textContent = categories[currentCategory];
 }
 
 if (client) {
   try {
     await loadPosts();
-    if (!articlePage && await rpc('is_owner')) list.before(ownerForm());
+    // The publish form sits above the category heading, since it can post to either category.
+    if (!articlePage && await rpc('is_owner')) document.querySelector('#blog-section-title').before(ownerForm());
   } catch {
     pageStatus.textContent = 'The blog could not be loaded. Refresh to try again.';
   }

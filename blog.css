@@ -148,3 +148,21 @@ header a { color:inherit; text-decoration:none; font-weight:700; }
 :is(.blog-editor-field,.blog-article-body) table { max-width:100%; border-collapse:collapse; }
 :is(.blog-editor-field,.blog-article-body) :is(th,td) { min-width:3ch; border:1px solid var(--line); padding:.35em .55em; }
 :is(.blog-editor-field,.blog-article-body) a { color:inherit; text-decoration:underline; text-decoration-color:var(--blog-accent); }
+
+.blog-publish-form > label select { display:block; width:100%; border:1px solid var(--blog-accent); border-radius:7px; background:var(--paper); color:var(--ink); font:inherit; padding:10px 12px; }
+
+/* Category menu: a vertical list on the left of the blog list page. */
+.blog-layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:clamp(24px,4vw,52px); align-items:start; padding:clamp(24px,5vw,56px) 0 62px; }
+.blog-layout .blog-content { width:auto; padding:0; }
+.blog-categories { position:sticky; top:20px; display:grid; gap:12px; }
+.blog-categories button { width:100%; min-height:48px; padding:10px 14px; border-radius:8px; font:inherit; font-weight:750; text-align:left; cursor:pointer; }
+/* The selected category stays filled, the way a hovered button looks. */
+.blog-categories button[aria-current="true"] { background-size:100% 100% !important; }
+:root[data-fivey-dark] .blog-categories button[aria-current="true"] { background-size:100% 100% !important; color:var(--paper) !important; }
+.blog-section-title { margin:0 0 18px; font-size:clamp(24px,3.4vw,34px); line-height:1.15; letter-spacing:-.03em; }
+.blog-section-title:focus { outline:none; }
+.blog-category-label { display:inline-block; margin:0 0 10px; color:var(--blog-accent); font-size:13px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+@media (max-width:760px) {
+  .blog-layout { grid-template-columns:1fr; }
+  .blog-categories { position:static; }
+}
