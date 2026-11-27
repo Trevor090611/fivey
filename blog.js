@@ -6,7 +6,12 @@ const pageStatus = document.querySelector('#blog-status');
 const articlePage = document.body.dataset.blog === 'article';
 
 // Every post belongs to one category. Posts saved before categories existed count as AP Exam Tips.
-const categories = { 'ap-exam-tips': 'AP Exam Tips', 'college-applications': 'College Application Insights' };
+// Listed in menu order. AP Exam Tips stays the section shown first (defaultCategory).
+const categories = {
+  casual: 'Casual Blog Entries',
+  'ap-exam-tips': 'AP Exam Tips',
+  'college-applications': 'College Application Insights'
+};
 const defaultCategory = 'ap-exam-tips';
 const categoryOf = post => (Object.hasOwn(categories, post.category ?? '') ? post.category : defaultCategory);
 let allPosts = [];
