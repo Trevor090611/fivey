@@ -147,6 +147,17 @@
     .stool-leg-right { inset:18% 3% 3% 64%; clip-path:polygon(0 0,48% 0,100% 100%,37% 96%); background:linear-gradient(74deg,#9e6336 11%,#d99b5d 38%,#f3c794 52%,#c3864c 58%); }
     .stool-leg-middle { inset:15% 39% 0 40%; border:1px solid #875c3b; border-radius:10% 10% 30% 26%; transform:skewX(-4deg); background:linear-gradient(90deg,#ac6d3e,#e9ae73 55%,#f0c18d 65%,#c1844b 70%); }
     .stool-top { inset:0 0 auto; height:28%; border:1px solid #795034; border-radius:50% 46% 44% 37% / 49% 42% 56% 51%; background:linear-gradient(176deg,#d28f50 40%,#a96f43 43%,#e2a568 49%,#e8b27c 70%,#bb7946 100%); }
+    .cat-portrait[data-equipped-seat="doormat"] { --pet-seat-bottom:28px; }
+    .cat-portrait[data-equipped-seat="doormat"] .cat-box-layer, .cat-portrait .doormat-art { display:none; }
+    .cat-portrait[data-equipped-seat="doormat"] .doormat-art { display:block; }
+    .doormat-art {
+      position:absolute; left:var(--box-center); bottom:13px; width:min(182px, 88%);
+      aspect-ratio:4 / 1; translate:-50% 0; border-radius:50%; pointer-events:none;
+      background: radial-gradient(ellipse at 50% 44%, #95cd6e 0 33%, #fff4bc 33.5% 35%,
+        #ffa454 35.5% 53%, #fff8e9 53.5% 55%, #ffefc5 55.5% 72%, #fff8eb 72.5% 74%, #ffa655 74.5%);
+      box-shadow:0 3px 0 #d68645, 0 5px 10px #0008, inset 0 -2px 0 #f39547;
+    }
+    .cat-seat-preview .doormat-art { bottom:50%; width:90%; translate:-50% 50%; }
   </style>
 </head>
 <body>
@@ -178,6 +189,7 @@
           <span class="box-side"></span><span class="box-face"></span><span class="box-left-flap"></span><span class="box-front-flap"></span>
         </div>
         <div class="stool-art" aria-hidden="true"><span class="stool-leg-left"></span><span class="stool-leg-right"></span><span class="stool-brace"></span><span class="stool-leg-middle"></span><span class="stool-top"></span></div>
+        <div class="doormat-art" aria-hidden="true"></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -216,8 +228,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cat-name1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat1';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cozy-seat2';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat2';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, watchCatHunger } from './grogy-cat.js?v=cozy-seat1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -413,7 +425,8 @@
     const seatScene = portrait.closest('.cat-portrait');
     const seatCatalog = [
       { id: 'cardbox', name: 'Cardbox', art: '.cat-box-layer' },
-      { id: 'wooden-stool', name: 'Wooden Stool', art: '.stool-art' }
+      { id: 'wooden-stool', name: 'Wooden Stool', art: '.stool-art' },
+      { id: 'doormat', name: 'Doormat', art: '.doormat-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
