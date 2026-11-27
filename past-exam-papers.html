@@ -35,6 +35,7 @@ main{flex:1}
 .sets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
 .sets h3{margin:0;font-size:17px;letter-spacing:-.01em}
 .sets .year-actions{margin-top:10px}
+.year .no-key{flex-basis:100%;margin:0;color:var(--muted);font-size:14px}
 .years.with-sets{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}
 main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
 :root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
@@ -83,26 +84,43 @@ const years = [2026, 2025, 2024, 2023];
 const twoSets = {
   'environmental-science': [2021, 2022, 2023, 2024, 2025],
   psychology: [2023, 2024, 2025],
-  macroeconomics: [2023, 2024, 2025]
+  macroeconomics: [2019, 2021, 2022, 2023, 2024, 2025]
+};
+// Years with a main exam and an alternate exam (Form A and Form B).
+const formB = {
+  macroeconomics: [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011]
+};
+// Hosted years whose answer key is not available anywhere.
+const noAnswerKey = {
+  macroeconomics: [2001]
 };
 
 // Older years that AP Central no longer hosts, kept in this site's past-exams folder
 // as past-exams/<course>/<year>-question-paper.pdf and <year>-answer-key.pdf
-// (<year>-set-<n>-... for years with two sets).
+// (<year>-set-<n>-... for years with two sets, <year>-form-b-... for Form B).
 const hostedYears = {
   biology: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014],
   chemistry: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014],
   'environmental-science': [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010],
   'calculus-ab': [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013],
-  'physics-1': [2022, 2021, 2019, 2018, 2017, 2016, 2015]
+  'physics-1': [2022, 2021, 2019, 2018, 2017, 2016, 2015],
+  macroeconomics: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008,
+    2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999]
 };
 
+// The exams given in a year, as [file suffix, label]: one exam, Set 1 and Set 2, or Form A and Form B.
+function exams(course, year) {
+  if (twoSets[course]?.includes(year)) return [['-set-1', 'Set 1'], ['-set-2', 'Set 2']];
+  if (formB[course]?.includes(year)) return [['', 'Form A'], ['-form-b', 'Form B']];
+  return [['', '']];
+}
+
 // kind is 'frq' (the question paper) or 'sg' (the scoring guidelines, i.e. the answer key).
-function pdf(kind, course, year, set) {
+function pdf(kind, course, year, suffix) {
   if (hostedYears[course]?.includes(year)) {
-    return './past-exams/' + course + '/' + year + (set ? '-set-' + set : '') + (kind === 'frq' ? '-question-paper' : '-answer-key') + '.pdf';
+    return './past-exams/' + course + '/' + year + suffix + (kind === 'frq' ? '-question-paper' : '-answer-key') + '.pdf';
   }
-  return 'https://apcentral.collegeboard.org/media/pdf/ap' + String(year).slice(2) + '-' + kind + '-' + course + (set ? '-set-' + set : '') + '.pdf';
+  return 'https://apcentral.collegeboard.org/media/pdf/ap' + String(year).slice(2) + '-' + kind + '-' + course + suffix + '.pdf';
 }
 
 function button(label, href, description) {
@@ -116,36 +134,39 @@ function button(label, href, description) {
   return link;
 }
 
-function actions(course, year, set, description) {
+function actions(course, year, suffix, description) {
   const row = document.createElement('div');
   row.className = 'year-actions';
-  row.append(
-    button('Question Paper', pdf('frq', course, year, set), description),
-    button('Answer Key', pdf('sg', course, year, set), description)
-  );
+  row.append(button('Question Paper', pdf('frq', course, year, suffix), description));
+  if (noAnswerKey[course]?.includes(year)) {
+    row.append(Object.assign(document.createElement('p'), { className: 'no-key', textContent: 'No answer key is available for this year.' }));
+  } else {
+    row.append(button('Answer Key', pdf('sg', course, year, suffix), description));
+  }
   return row;
 }
 
-// One box per year. Years with two free-response sets show Set 1 and Set 2 side by side.
+// One box per year. Years with two exams show them side by side (Set 1 and Set 2, or Form A and Form B).
 function yearBox(course, name, year) {
   const box = document.createElement('section');
   box.className = 'year';
   const title = document.createElement('h2');
   title.textContent = year;
   box.append(title);
-  if (twoSets[course]?.includes(year)) {
+  const list = exams(course, year);
+  if (list.length > 1) {
     const sets = document.createElement('div');
     sets.className = 'sets';
-    for (const set of [1, 2]) {
+    for (const [suffix, text] of list) {
       const group = document.createElement('div');
       const label = document.createElement('h3');
-      label.textContent = 'Set ' + set;
-      group.append(label, actions(course, year, set, name + ' ' + year + ' Set ' + set));
+      label.textContent = text;
+      group.append(label, actions(course, year, suffix, name + ' ' + year + ' ' + text));
       sets.append(group);
     }
     box.append(sets);
   } else {
-    box.append(actions(course, year, undefined, name + ' ' + year));
+    box.append(actions(course, year, '', name + ' ' + year));
   }
   return box;
 }
@@ -172,7 +193,7 @@ if (selected) {
   back.textContent = '← Full Length Practice Test';
   const list = document.querySelector('#years');
   // Subjects with two sets get wider boxes, two per row.
-  list.classList.toggle('with-sets', id in twoSets);
+  list.classList.toggle('with-sets', id in twoSets || id in formB);
   for (const year of [...years, ...(hostedYears[id] || [])]) list.append(yearBox(id, name, year));
   document.querySelector('#intro').hidden = false;
   list.hidden = false;
