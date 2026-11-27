@@ -115,6 +115,13 @@
       .cat-portrait .grogy-cat .cat-head { transition: none; }
       .cat-heart { animation-name: cat-heart-fade; animation-duration: 700ms; translate: var(--heart-drift) -12px; }
     }
+    .cat-care { padding: clamp(16px, 3vw, 30px); }
+    .cat-care-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .cat-care-tabs button { width: 100%; overflow-wrap: anywhere; }
+    :root[data-cat-page] #cat-care .cat-care-tabs [aria-selected="true"] { background: var(--cat-cyan) !important; color: #000 !important; }
+    .cat-care [role="tabpanel"] { margin-top: 16px; color: var(--cat-muted); }
+    .cat-care [role="tabpanel"] p { margin: 0; }
+    @media (max-width: 480px) { .cat-care-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 </head>
 <body>
@@ -141,7 +148,7 @@
         <div class="cat-box-layer cat-box-back" aria-hidden="true">
           <span class="box-back-flap"></span><span class="box-right-flap"></span><span class="box-inside"></span>
         </div>
-        <div class="grogy-cat" id="cat-portrait" data-state="idle" aria-hidden="true" hidden></div>
+        <div class="grogy-cat" id="cat-portrait" data-state="idle" hidden></div>
         <div class="cat-box-layer cat-box-front" aria-hidden="true">
           <span class="box-side"></span><span class="box-face"></span><span class="box-left-flap"></span><span class="box-front-flap"></span>
         </div>
@@ -159,10 +166,44 @@
         <p id="cat-feed-status" role="status"></p>
       </div>
     </section>
+    <section class="cat-name-card cat-care" id="cat-care" aria-label="Cat care">
+      <div class="cat-care-tabs" role="tablist" aria-label="Cat care">
+        <button type="button" role="tab" id="care-seat-tab" aria-controls="care-seat" aria-selected="true">Cozy Seat</button>
+        <button type="button" role="tab" id="care-food-tab" aria-controls="care-food" aria-selected="false" tabindex="-1">Food</button>
+        <button type="button" role="tab" id="care-toys-tab" aria-controls="care-toys" aria-selected="false" tabindex="-1">Toys</button>
+        <button type="button" role="tab" id="care-accessories-tab" aria-controls="care-accessories" aria-selected="false" tabindex="-1">Accessories</button>
+      </div>
+      <div role="tabpanel" id="care-seat" aria-labelledby="care-seat-tab" tabindex="0"><p>Your cat’s cozy seat is its cardboard box.</p></div>
+      <div role="tabpanel" id="care-food" aria-labelledby="care-food-tab" tabindex="0" hidden><p>A meal restores up to 25 percentage points. The hunger bar drops by 1 point every 3 minutes.</p></div>
+      <div role="tabpanel" id="care-toys" aria-labelledby="care-toys-tab" tabindex="0" hidden><p>Your cat has no toys yet.</p></div>
+      <div role="tabpanel" id="care-accessories" aria-labelledby="care-accessories-tab" tabindex="0" hidden><p>Your cat has no accessories yet.</p></div>
+    </section>
   </main>
   <script type="module">
     import { authenticatedClient } from './auth-gate.js?v=cat-name1';
-    import { catMarkup } from './grogy-cat.js';
+    import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, watchCatHunger } from './grogy-cat.js?v=hunger1';
+
+    const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
+    function selectCareTab(selected) {
+      for (const tab of careTabs) {
+        const active = tab === selected;
+        tab.setAttribute('aria-selected', String(active));
+        tab.tabIndex = active ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !active;
+      }
+    }
+    careTabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectCareTab(tab));
+      tab.addEventListener('keydown', event => {
+        const nextIndex = { ArrowRight: (index + 1) % careTabs.length,
+          ArrowLeft: (index + careTabs.length - 1) % careTabs.length,
+          Home: 0, End: careTabs.length - 1 }[event.key];
+        if (nextIndex === undefined) return;
+        event.preventDefault();
+        selectCareTab(careTabs[nextIndex]);
+        careTabs[nextIndex].focus();
+      });
+    });
 
     const tiers = ['Stranger', 'Wary', 'Curious', 'Familiar', 'Comfort', 'Companion',
       'Affectionate', 'Buddy Buddy :)', 'Best Friends :D', 'Inseparable'];
@@ -217,7 +258,7 @@
     let lastPet = -Infinity;
     pet.addEventListener('click', () => {
       const now = performance.now();
-      if (pet.hidden || now - lastPet < petCooldown) return;
+      if (pet.hidden || portrait.dataset.hungerMood === 'hungry' || now - lastPet < petCooldown) return;
       lastPet = now;
       const burst = document.createDocumentFragment();
       for (let i = 0; i < 3; i++) {
@@ -232,11 +273,12 @@
 
     function resetSleepTimer() {
       clearTimeout(sleepTimer);
+      if (portrait.dataset.hungerMood === 'hungry') return;
       if (portrait.dataset.state === 'sleeping') portrait.dataset.state = 'idle';
       sleepTimer = setTimeout(() => {
         clearTimeout(groomTimer);
         portrait.dataset.state = 'sleeping';
-      }, sleepDelay);
+      }, portrait.dataset.hungerMood === 'tired' ? 20_000 : sleepDelay);
     }
 
     function entranceOffset(destination) {
@@ -263,7 +305,7 @@
       portrait.dataset.state = 'idle';
       pet.hidden = false;
       resetSleepTimer();
-      if (reducedMotion.matches) return;
+      if (reducedMotion.matches || portrait.dataset.hungerMood === 'hungry') return;
 
       const { x, y } = entranceOffset(portrait.getBoundingClientRect());
       const pathLength = Math.hypot(x, y);
@@ -282,7 +324,23 @@
     }
 
     portrait.innerHTML = catMarkup;
-    portrait.querySelector('.cat-walker img').decode().catch(() => {}).then(startCatScene);
+    const hunger = watchCatHunger(portrait, (mood, previous) => {
+      if (portrait.hidden) return;
+      if (mood === 'hungry') {
+        clearTimeout(sleepTimer);
+        clearTimeout(groomTimer);
+        hearts.replaceChildren();
+        if (entrance?.playState === 'running') entrance.pause();
+        portrait.dataset.state = 'idle';
+      } else if (previous === 'hungry' && entrance?.playState === 'paused') {
+        portrait.dataset.state = 'walking';
+        entrance.play();
+        resetSleepTimer();
+      } else if (mood === 'tired' || previous === 'hungry' || previous === 'tired') {
+        resetSleepTimer();
+      }
+    });
+    Promise.all([hunger.ready, portrait.querySelector('.cat-walker img').decode().catch(() => {})]).then(startCatScene);
     window.addEventListener('pageshow', event => {
       if (event.persisted) startCatScene();
     });
@@ -290,7 +348,8 @@
       document.addEventListener(event, resetSleepTimer, { capture: true, passive: true });
     }
     setInterval(() => {
-      if (reducedMotion.matches || document.hidden || portrait.hidden || portrait.dataset.state !== 'idle') return;
+      if (reducedMotion.matches || document.hidden || portrait.hidden || portrait.dataset.state !== 'idle' ||
+          ['tired', 'hungry'].includes(portrait.dataset.hungerMood)) return;
       portrait.dataset.state = 'grooming';
       groomTimer = setTimeout(() => { portrait.dataset.state = 'idle'; }, 2600);
     }, 12000);
@@ -321,7 +380,7 @@
       bar.max = target || 1;
       bar.value = target ? xp : 1;
       xpLabel.textContent = target ? format.format(xp) + ' / ' + format.format(target) + ' EXP to ' + tiers[index + 1] : 'Maximum attachment reached';
-      feed.disabled = !auth || saving || !target;
+      feed.disabled = !auth || saving;
       updateNameLabels();
     }
 
@@ -333,29 +392,37 @@
 
     async function feedCat() {
       const user = await currentUser();
-      const previousXP = savedXP(user);
-      const nextXP = Math.min(previousXP + feedXP, maxXP);
-      if (nextXP === previousXP) {
-        totalXP = previousXP;
-        feedStatus.textContent = 'Maximum attachment reached.';
+      hunger.setUser(user);
+      const level = catHungerFor(user);
+      if (level === 100) {
+        hunger.say('I am full :D');
+        feedStatus.textContent = 'I am full :D';
+        totalXP = savedXP(user);
         return;
       }
-      const { data, error } = await auth.updateUser({ data: { [xpKey]: nextXP } });
+      const previousXP = savedXP(user);
+      const nextXP = Math.min(previousXP + feedXP, maxXP);
+      const { data, error } = await auth.updateUser({ data: { [xpKey]: nextXP, ...hungerAfterMeal(level) } });
       if (error || !data?.user) throw error || new Error('Missing updated account');
+      hunger.setUser(data.user);
       totalXP = savedXP(data.user);
       const { index } = progress(totalXP);
-      const earned = '+' + (totalXP - previousXP) + ' EXP.';
-      feedStatus.textContent = index > progress(previousXP).index ? earned + ' Reached ' + tiers[index] + '!' : earned;
+      const restored = Math.min(mealHunger, 100 - level);
+      const earned = totalXP - previousXP;
+      const meal = '+' + restored + ' hunger points' + (earned ? ' and +' + earned + ' EXP.' : '.');
+      feedStatus.textContent = index > progress(previousXP).index ? meal + ' Reached ' + tiers[index] + '!' : meal;
     }
 
     if (auth) {
       try {
-        totalXP = savedXP(await currentUser());
+        const user = await currentUser();
+        hunger.setUser(user);
+        totalXP = savedXP(user);
       } catch {
         feedStatus.textContent = 'Could not load attachment progress. Feeding will try again.';
       }
       feed.addEventListener('click', async () => {
-        if (saving || totalXP === maxXP) return;
+        if (saving) return;
         saving = true;
         feedStatus.textContent = '';
         paint();
