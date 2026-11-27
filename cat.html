@@ -39,7 +39,7 @@
       position: absolute;
       z-index: 1;
       left: var(--box-center);
-      bottom: 55px;
+      bottom: var(--pet-seat-bottom);
       width: 96px;
       aspect-ratio: 260 / 278;
       translate: -50% 0;
@@ -50,7 +50,7 @@
       position: absolute;
       z-index: 3;
       left: var(--box-center);
-      bottom: 55px;
+      bottom: var(--pet-seat-bottom);
       width: 96px;
       aspect-ratio: 260 / 278;
       translate: -50% 0 !important;
@@ -63,7 +63,7 @@
       cursor: pointer;
     }
     #cat-pet[hidden] { display: none; }
-    .cat-hearts { position: absolute; z-index: 4; left: calc(var(--box-center) - 22px); bottom: 132px; pointer-events: none; }
+    .cat-hearts { position: absolute; z-index: 4; left: calc(var(--box-center) - 22px); bottom: calc(var(--pet-seat-bottom) + 77px); pointer-events: none; }
     .cat-heart { position: absolute; color: #ff699f; line-height: 1; text-shadow: 0 1px 7px #ff2e7677; opacity: 0; animation: cat-heart-rise 1.15s ease-out both; }
     .cat-heart:nth-child(1) { --heart-drift: -22px; font-size: 18px; }
     .cat-heart:nth-child(2) { --heart-drift: 4px; font-size: 26px; animation-delay: 90ms; }
@@ -108,7 +108,7 @@
     @media (max-width: 600px) {
       .cat-banner { grid-template-columns: minmax(0, 1fr); }
       .cat-portrait .grogy-cat, :root[data-cat-page] .cat-portrait #cat-pet { width: 76px; }
-      .cat-hearts { bottom: 115px; }
+      .cat-hearts { bottom: calc(var(--pet-seat-bottom) + 60px); }
     }
     @media (prefers-reduced-motion: reduce) {
       .cat-portrait .grogy-cat :is(.cat-lid, .cat-lash) { animation: none !important; }
@@ -122,6 +122,31 @@
     .cat-care [role="tabpanel"] { margin-top: 16px; color: var(--cat-muted); }
     .cat-care [role="tabpanel"] p { margin: 0; }
     @media (max-width: 480px) { .cat-care-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .cat-seat-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:clamp(8px, 2vw, 18px); }
+    .cat-seat-card { display:grid; grid-template-rows:auto 1fr auto auto; justify-items:center; gap:6px; min-width:0; padding:clamp(6px, 2vw, 16px); border:1px solid #458896; border-radius:12px; text-align:center; }
+    .cat-seat-card[data-equipped="true"] { border-color:var(--cat-cyan); }
+    .cat-seat-preview { position:relative; width:100%; aspect-ratio:5 / 4; min-height:70px; background:#081214; border-radius:8px; overflow:hidden; --box-center:50%; }
+    .cat-seat-preview .cat-box-layer { width:85%; height:88%; bottom:4%; }
+    .cat-seat-card h3 { margin:0; overflow-wrap:anywhere; font-size:clamp(13px, 2.2vw, 18px); color:#f4fbff; }
+    .cat-seat-card button { width:100%; padding-inline:3px; font-size:clamp(12px, 2vw, 16px); }
+    .cat-seat-indicator { min-height:1.3em; color:var(--cat-cyan); font-size:13px; }
+    #cat-seat-dialog { max-width:min(420px, calc(100% - 32px)); margin:auto; padding:22px; border:3px solid var(--cat-cyan); border-radius:14px; background:#000; color:#f4fbff; }
+    #cat-seat-dialog::backdrop { background:#000b; }
+    #cat-seat-question { margin:0 0 15px; }
+    #cat-seat-dialog form { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+    .cat-portrait { --pet-seat-bottom:55px; }
+    .cat-portrait[data-equipped-seat="wooden-stool"] { --pet-seat-bottom:112px; min-height:246px; }
+    .cat-portrait[data-equipped-seat="wooden-stool"] .cat-box-layer { display:none; }
+    .cat-portrait .stool-art { display:none; }
+    .cat-portrait[data-equipped-seat="wooden-stool"] .stool-art { display:block; }
+    .stool-art { position:absolute; left:var(--box-center); bottom:12px; width:min(135px, 77%); height:105px; translate:-50% 0; pointer-events:none; }
+    .cat-seat-preview .stool-art { width:72%; height:75%; bottom:9%; }
+    .stool-art span { position:absolute; display:block; }
+    .stool-brace { left:18%; top:55%; width:66%; height:18%; border:1px solid #825435; border-radius:40%; background:linear-gradient(#eab779,#bd7944); }
+    .stool-leg-left { inset:18% 64% 3% 3%; clip-path:polygon(52% 0,100% 0,63% 96%,0 100%); background:linear-gradient(110deg,#905d38 10%,#d2965b 30%,#f2c285 53%,#bb804b 56%); }
+    .stool-leg-right { inset:18% 3% 3% 64%; clip-path:polygon(0 0,48% 0,100% 100%,37% 96%); background:linear-gradient(74deg,#9e6336 11%,#d99b5d 38%,#f3c794 52%,#c3864c 58%); }
+    .stool-leg-middle { inset:15% 39% 0 40%; border:1px solid #875c3b; border-radius:10% 10% 30% 26%; transform:skewX(-4deg); background:linear-gradient(90deg,#ac6d3e,#e9ae73 55%,#f0c18d 65%,#c1844b 70%); }
+    .stool-top { inset:0 0 auto; height:28%; border:1px solid #795034; border-radius:50% 46% 44% 37% / 49% 42% 56% 51%; background:linear-gradient(176deg,#d28f50 40%,#a96f43 43%,#e2a568 49%,#e8b27c 70%,#bb7946 100%); }
   </style>
 </head>
 <body>
@@ -152,6 +177,7 @@
         <div class="cat-box-layer cat-box-front" aria-hidden="true">
           <span class="box-side"></span><span class="box-face"></span><span class="box-left-flap"></span><span class="box-front-flap"></span>
         </div>
+        <div class="stool-art" aria-hidden="true"><span class="stool-leg-left"></span><span class="stool-leg-right"></span><span class="stool-brace"></span><span class="stool-leg-middle"></span><span class="stool-top"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -173,15 +199,26 @@
         <button type="button" role="tab" id="care-toys-tab" aria-controls="care-toys" aria-selected="false" tabindex="-1">Toys</button>
         <button type="button" role="tab" id="care-accessories-tab" aria-controls="care-accessories" aria-selected="false" tabindex="-1">Accessories</button>
       </div>
-      <div role="tabpanel" id="care-seat" aria-labelledby="care-seat-tab" tabindex="0"><p>Your cat’s cozy seat is its cardboard box.</p></div>
+      <div role="tabpanel" id="care-seat" aria-labelledby="care-seat-tab" tabindex="0">
+        <div class="cat-seat-grid" id="cat-seat-grid"></div>
+        <p id="cat-seat-status" role="status"></p>
+      </div>
       <div role="tabpanel" id="care-food" aria-labelledby="care-food-tab" tabindex="0" hidden><p>A meal restores up to 25 percentage points. The hunger bar drops by 1 point every 3 minutes.</p></div>
       <div role="tabpanel" id="care-toys" aria-labelledby="care-toys-tab" tabindex="0" hidden><p>Your cat has no toys yet.</p></div>
       <div role="tabpanel" id="care-accessories" aria-labelledby="care-accessories-tab" tabindex="0" hidden><p>Your cat has no accessories yet.</p></div>
     </section>
+    <dialog id="cat-seat-dialog" aria-labelledby="cat-seat-question">
+      <p id="cat-seat-question"></p>
+      <form method="dialog">
+        <button type="submit" value="cancel" autofocus>Cancel</button>
+        <button type="submit" value="purchase">Purchase</button>
+      </form>
+    </dialog>
   </main>
   <script type="module">
-    import { authenticatedClient } from './auth-gate.js?v=cat-name1';
-    import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, watchCatHunger } from './grogy-cat.js?v=hunger1';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cat-name1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat1';
+    import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, watchCatHunger } from './grogy-cat.js?v=cozy-seat1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
     function selectCareTab(selected) {
@@ -370,6 +407,93 @@
     }
 
     const auth = authenticatedClient?.auth;
+    const shop = document.querySelector('#cat-seat-grid');
+    const seatStatus = document.querySelector('#cat-seat-status');
+    const purchaseDialog = document.querySelector('#cat-seat-dialog');
+    const seatScene = portrait.closest('.cat-portrait');
+    const seatCatalog = [
+      { id: 'cardbox', name: 'Cardbox', art: '.cat-box-layer' },
+      { id: 'wooden-stool', name: 'Wooden Stool', art: '.stool-art' }
+    ];
+    const priceLabel = id => cozySeatPrices[id] + ' Orbies';
+    let seatPending = false;
+    let purchaseItem;
+    const seatCards = seatCatalog.map(item => {
+      const card = document.createElement('article');
+      card.className = 'cat-seat-card';
+      const preview = document.createElement('div');
+      preview.className = 'cat-seat-preview';
+      preview.setAttribute('aria-hidden', 'true');
+      for (const layer of seatScene.querySelectorAll(item.art)) preview.append(layer.cloneNode(true));
+      const name = document.createElement('h3');
+      name.textContent = item.name;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.addEventListener('click', () => chooseSeat(item));
+      const indicator = document.createElement('span');
+      indicator.className = 'cat-seat-indicator';
+      card.append(preview, name, button, indicator);
+      shop.append(card);
+      return { item, card, button, indicator };
+    });
+
+    function paintSeats() {
+      let seats = { owned: [], equipped: 'cardbox' };
+      try { if (analyticsAccount) seats = getCozySeats(analyticsAccount); } catch {}
+      seatScene.dataset.equippedSeat = seats.equipped;
+      for (const { item, card, button, indicator } of seatCards) {
+        const owned = cozySeatPrices[item.id] === 0 || seats.owned.includes(item.id);
+        const equipped = seats.equipped === item.id;
+        card.dataset.equipped = String(equipped);
+        button.textContent = owned ? 'Equip' : priceLabel(item.id);
+        button.setAttribute('aria-label', owned ? 'Equip ' + item.name : 'Purchase ' + item.name + ' for ' + priceLabel(item.id));
+        button.disabled = !auth || seatPending || equipped;
+        indicator.textContent = equipped ? 'Equipped' : '';
+      }
+    }
+
+    async function applySeat(item, confirmed) {
+      if (seatPending) return;
+      seatPending = true;
+      seatStatus.textContent = '';
+      paintSeats();
+      try {
+        const result = await selectCozySeat(analyticsAccount, item.id, confirmed);
+        if (result === 'insufficient') seatStatus.textContent = 'You need ' + priceLabel(item.id) + ' to purchase ' + item.name + '.';
+        else if (result === 'purchased') seatStatus.textContent = item.name + ' purchased and equipped.';
+        else if (result === 'equipped') seatStatus.textContent = item.name + ' equipped.';
+      } catch {
+        seatStatus.textContent = 'Could not save your seat. Please try again.';
+      } finally {
+        seatPending = false;
+        paintSeats();
+      }
+    }
+
+    function chooseSeat(item) {
+      if (!auth || seatPending || purchaseDialog.open) return;
+      if (!cozySeatPrices[item.id] || getCozySeats(analyticsAccount).owned.includes(item.id)) {
+        applySeat(item, false);
+        return;
+      }
+      purchaseItem = item;
+      purchaseDialog.returnValue = '';
+      document.querySelector('#cat-seat-question').textContent = 'Are you sure you would like to purchase ' + item.name + ' for ' + priceLabel(item.id) + '?';
+      purchaseDialog.showModal();
+    }
+
+    purchaseDialog.addEventListener('close', () => {
+      const item = purchaseItem;
+      purchaseItem = undefined;
+      if (item && purchaseDialog.returnValue === 'purchase') applySeat(item, true);
+    });
+    window.addEventListener('fivey:orbies-updated', paintSeats);
+    window.addEventListener('storage', event => {
+      if (event.key === orbiesKey(analyticsAccount)) paintSeats();
+    });
+    paintSeats();
+
+
     function paint() {
       const { index, xp, target } = progress(totalXP);
       tierLabel.textContent = 'Tier ' + (index + 1) + ' · ' + tiers[index];
