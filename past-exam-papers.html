@@ -29,14 +29,13 @@ h1{font-size:clamp(42px,8vw,94px);line-height:1.04;letter-spacing:-.055em}
 main{flex:1}
 #intro{padding-top:34px}
 #intro p{max-width:760px;color:var(--muted)}
-.years{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding-block:22px 72px}
+.years{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding-block:22px 72px}
 .year{min-width:0;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:22px}
 .year h2{font-size:30px;line-height:1.1;letter-spacing:-.03em}
 .sets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
 .sets h3{margin:0;font-size:17px;letter-spacing:-.01em}
 .sets .year-actions{margin-top:10px}
 .year .no-key{flex-basis:100%;margin:0;color:var(--muted);font-size:14px}
-.years.with-sets{grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))}
 main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
 :root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 .year-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
@@ -207,7 +206,6 @@ if (selected) {
   back.textContent = '← Full Length Practice Test';
   const list = document.querySelector('#years');
   // Every subject uses the wide, two-per-row year boxes.
-  list.classList.add('with-sets');
   for (const year of [...years, ...(hostedYears[id] || [])]) list.append(yearBox(id, name, year));
   document.querySelector('#intro').hidden = false;
   list.hidden = false;
