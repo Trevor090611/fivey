@@ -4,6 +4,7 @@ import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localChatMessages } from './grogy-conversation.js?v=2';
 import { articleSummary } from './article-summary.js?v=2';
+import { grogyCat } from './grogy-cat.js?v=1';
 const questionCost = 1;
 // Summarizing a blog article costs 2 Orbies, paid each time a summary is written.
 const summaryCost = 2;
@@ -12,7 +13,7 @@ const widget = document.createElement('aside');
 widget.className = 'fivey-chat';
 widget.setAttribute('aria-label', 'Grogy AP tutor');
 widget.innerHTML = `
-  <button class="chat-open" type="button" aria-expanded="false" aria-controls="fivey-panel">Ask Grogy</button>
+  <button class="chat-open" type="button" aria-expanded="false" aria-controls="fivey-panel" aria-label="Ask Grogy, your AP tutor (you can drag Grogy around)"></button>
   <section class="chat-panel" id="fivey-panel" aria-labelledby="fivey-chat-title" hidden>
     <div class="chat-header"><strong id="fivey-chat-title">Grogy · AP tutor</strong><button class="chat-close" type="button" aria-label="Close Grogy">×</button></div>
     <div class="chat-log" role="log" aria-label="Conversation" tabindex="0">
@@ -63,11 +64,11 @@ function toggle(isOpen) {
     introduced = true;
     addMessage('Grogy', 'Hi, I’m Grogy, your AP tutor on Fivey. I can chat, explain AP topics, and use Fivey’s study material when it helps. Ask for a quiz on a unit to open its practice questions. If you need to find something on Fivey, I can show you which buttons to click or take you there with your permission.');
   }
-  open.hidden = isOpen;
   open.setAttribute('aria-expanded', String(isOpen));
   (isOpen ? (input.disabled ? close : input) : open).focus();
 }
-open.addEventListener('click', () => toggle(true));
+// Grogy the cat opens the chat when clicked (and closes it when clicked again).
+grogyCat(open, { onActivate: () => toggle(panel.hidden) });
 close.addEventListener('click', () => toggle(false));
 panel.addEventListener('keydown', event => {
   if (event.key === 'Escape') toggle(false);

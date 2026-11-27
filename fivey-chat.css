@@ -14,7 +14,7 @@
   outline: 2px solid #467335;
   outline-offset: 2px;
 }
-.fivey-chat .chat-open, .fivey-chat .chat-send {
+.fivey-chat .chat-send {
   color: #19271f;
   background: #d9f783;
   border: 1px solid #52673b;
@@ -22,7 +22,6 @@
   padding: 9px 14px;
   font-weight: 750;
 }
-.fivey-chat .chat-open { box-shadow: 0 4px 18px #19271f30; }
 .fivey-chat .chat-panel {
   width: min(600px, calc(100vw - max(16px, env(safe-area-inset-right)) - max(16px, env(safe-area-inset-left))));
   height: min(650px, calc(100dvh - max(16px, env(safe-area-inset-bottom)) - max(16px, env(safe-area-inset-top))));
@@ -113,3 +112,162 @@
 .fivey-chat .chat-sources p { margin: 6px 0 0; }
 
 .fivey-chat .chat-speaker { display: block; margin-bottom: 3px; font-size: 12px; }
+
+/* Grogy the cat: the draggable button that opens the chat. */
+.fivey-chat .chat-panel { position: relative; z-index: 2; }
+.fivey-chat .grogy-cat {
+  --cat-width: 96px;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1;
+  width: var(--cat-width);
+  aspect-ratio: 260 / 278;
+  padding: 0;
+  border: 0;
+  border-radius: 40%;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* The shared button paint (auth.css) uses !important; the cat is a picture, not a painted button. */
+:root:root .fivey-chat button.grogy-cat.chat-open {
+  border: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+:root:root .fivey-chat button.grogy-cat.chat-open:hover { translate: 0 0; }
+.fivey-chat .grogy-cat:active, .fivey-chat .grogy-cat[data-state="running"], .fivey-chat .grogy-cat[data-state="held"] { cursor: grabbing; }
+@media (max-width: 600px) { .fivey-chat .grogy-cat { --cat-width: 76px; } }
+.grogy-cat .cat-rig, .grogy-cat .cat-rig img, .grogy-cat .cat-head, .grogy-cat .cat-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.grogy-cat .cat-rig {
+  scale: var(--facing, 1) 1;
+  transition: scale 160ms ease;
+  filter: drop-shadow(0 3px 6px #19271f33);
+}
+.grogy-cat img { pointer-events: none; -webkit-user-drag: none; }
+.grogy-cat .cat-head { transform-origin: 33.3% 56.9%; }
+.grogy-cat .cat-tail { transform-origin: 76.7% 92%; animation: grogy-tail-sway 3.2s ease-in-out infinite alternate; }
+.grogy-cat .cat-shadow {
+  position: absolute;
+  left: 14%;
+  right: 14%;
+  bottom: -3px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #0000002e, #0000);
+}
+/* Eyes: blink every 2 seconds; closed while grooming. */
+.grogy-cat .cat-lid { fill: #6f6a66; transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); }
+.grogy-cat .cat-lash { fill: none; stroke: #2f2b2a; stroke-width: 6; stroke-linecap: round; opacity: 0; }
+.grogy-cat:is([data-state="idle"], [data-state="walking"]) .cat-lid { animation: grogy-blink 2s infinite; }
+.grogy-cat:is([data-state="idle"], [data-state="walking"]) .cat-lash { animation: grogy-lash 2s infinite; }
+.grogy-cat[data-state="grooming"] .cat-lid { transform: scaleY(1); transition: transform 150ms; }
+.grogy-cat[data-state="grooming"] .cat-lash { opacity: 1; }
+.grogy-cat .cat-tongue { fill: #e9898c; stroke: #7d4446; stroke-width: 3; transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); }
+@keyframes grogy-blink { 0%, 86%, 100% { transform: scaleY(0); } 91% { transform: scaleY(1); } }
+@keyframes grogy-lash { 0%, 88%, 95%, 100% { opacity: 0; } 90%, 92% { opacity: 1; } }
+@keyframes grogy-tail-sway { from { rotate: -4deg; } to { rotate: 7deg; } }
+
+/* Dust puffs behind the cat while it runs. */
+.grogy-cat .cat-dust {
+  position: absolute;
+  bottom: 2%;
+  width: 16%;
+  aspect-ratio: 1;
+  margin-left: -8%;
+  border-radius: 50%;
+  background: #b8ab9b8c;
+  pointer-events: none;
+  animation: grogy-dust 520ms ease-out forwards;
+}
+@keyframes grogy-dust {
+  from { opacity: .9; translate: 0 0; scale: .6; }
+  to { opacity: 0; translate: var(--drift, 12px) -10px; scale: 1.9; }
+}
+
+/* Grooming after 10 idle seconds: head dips to lick its chest fur. */
+.grogy-cat[data-state="grooming"] .cat-head { animation: grogy-groom 3.6s ease-in-out; }
+.grogy-cat[data-state="grooming"] .cat-tongue { animation: grogy-lick 360ms ease-in-out 450ms 7; }
+@keyframes grogy-groom {
+  0%, 100% { rotate: 0deg; translate: 0 0; }
+  12%, 24%, 36%, 48%, 60%, 72%, 84% { rotate: -13deg; translate: 2% 7%; }
+  18%, 30%, 42%, 54%, 66%, 78% { rotate: -9deg; translate: 1% 4%; }
+}
+@keyframes grogy-lick { 0%, 100% { transform: scaleY(0); } 45% { transform: scaleY(1.15); } }
+
+/* Walking and running: the walk cycle from Grogy's walking video (14 poses in one strip, facing
+   right). The strip slides one pose at a time behind a window the size of one pose. */
+.grogy-cat .cat-walker {
+  position: absolute;
+  /* Sized so the walking cat is exactly as tall as the sitting cat. */
+  left: -35%;
+  bottom: -1%;
+  width: 170%;
+  aspect-ratio: 385 / 253;
+  overflow: hidden;
+  scale: calc(var(--facing, 1) * -1) 1;
+  filter: drop-shadow(0 3px 6px #19271f33);
+  visibility: hidden;
+  opacity: 0;
+}
+.grogy-cat .cat-walker img { position: absolute; top: 0; left: 0; width: 1400%; max-width: none; height: 100%; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-walker { visibility: visible; opacity: 1; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-rig { visibility: hidden; opacity: 0; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-shadow { left: -24%; right: -24%; }
+/* Walking: one stride every 1.17 seconds, the video's own pace. */
+.grogy-cat[data-state="walking"] .cat-walker img { animation: grogy-stride 1167ms steps(14) infinite; }
+/* Running (dragged): the same stride at a fast trot, bouncing and leaning forward. */
+.grogy-cat[data-state="running"] .cat-walker img { animation: grogy-stride 480ms steps(14) infinite; }
+.grogy-cat[data-state="running"] .cat-walker { animation: grogy-trot 240ms ease-in-out infinite alternate; }
+/* Held still mid-drag: paws dangle as the cat swings gently. */
+.grogy-cat[data-state="held"] .cat-walker { animation: grogy-dangle 900ms ease-in-out infinite alternate; }
+@keyframes grogy-stride { to { translate: -100% 0; } }
+@keyframes grogy-trot {
+  from { translate: 0 0; rotate: calc(-3deg * var(--facing, 1)); }
+  to { translate: 0 -7%; rotate: calc(-6deg * var(--facing, 1)); }
+}
+@keyframes grogy-dangle { from { rotate: -4deg; } to { rotate: 4deg; } }
+
+/* Clicked: a little hop and a "Meow!" bubble. */
+.fivey-chat .grogy-cat.is-meowing { animation: grogy-cat-hop 380ms ease-out; }
+.fivey-chat .grogy-cat::after {
+  content: "Meow!";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  padding: 3px 9px;
+  border: 1px solid #52673b;
+  border-radius: 12px;
+  background: #fffef8;
+  color: #19271f;
+  font: 700 13px/1.3 system-ui, sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  translate: -50% 4px;
+  pointer-events: none;
+}
+.fivey-chat .grogy-cat.is-meowing::after { animation: grogy-meow-bubble 900ms ease-out; }
+@keyframes grogy-cat-hop { 0%, 100% { translate: 0 0; } 40% { translate: 0 -12px; } }
+@keyframes grogy-meow-bubble {
+  0% { opacity: 0; translate: -50% 4px; }
+  15%, 70% { opacity: 1; translate: -50% -4px; }
+  100% { opacity: 0; translate: -50% -12px; }
+}
+:root[data-fivey-dark] .fivey-chat .grogy-cat::after { background: #1d2a22; color: #f4f7ef; border-color: #8fb07a; }
+.fivey-chat .grogy-cat:focus-visible { outline: 2px solid #467335; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grogy-cat .cat-rig, .grogy-cat .cat-head, .grogy-cat .cat-tail, .grogy-cat .cat-tongue, .grogy-cat .cat-walker, .grogy-cat .cat-walker img,
+  .fivey-chat .grogy-cat.is-meowing { animation: none !important; }
+  .grogy-cat .cat-dust { display: none; }
+}
