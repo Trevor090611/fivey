@@ -1,3 +1,5 @@
+import { cozySeatPrices, readCozySeats } from './orbies-wallet.js?v=cozy-seat1';
+
 // Keeps each user's Fivey data on their account (Supabase table fivey_user_data)
 // so it is the same on every browser and device they sign in from.
 // Pages keep reading and writing localStorage as before: this module fills
@@ -41,7 +43,15 @@ function mergeValue(key, saved, local) {
     for (const [id, chest] of Object.entries(b.chests)) {
       if (!chests[id] || (Number(chest?.clicks) || 0) > (Number(chests[id]?.clicks) || 0)) chests[id] = chest;
     }
-    return JSON.stringify({ ...a, ...b, balance: Math.max(a.balance, b.balance), chests });
+    const remoteSeats = readCozySeats(a);
+    const localSeats = readCozySeats(b);
+    const owned = [...new Set([...remoteSeats.owned, ...localSeats.owned])];
+    const selected = remoteSeats.updatedAt > localSeats.updatedAt ? remoteSeats : localSeats;
+    // Each copy's balance already includes its own purchases. Deduct only purchases it has not seen.
+    const remaining = (wallet, seats) => owned.reduce((balance, id) =>
+      balance - (seats.owned.includes(id) ? 0 : cozySeatPrices[id]), wallet.balance);
+    const balance = Math.max(0, remaining(a, remoteSeats), remaining(b, localSeats));
+    return JSON.stringify({ ...a, ...b, balance, chests, cozySeats: { ...selected, owned } });
   }
   if (key.startsWith('fivey-practice-analytics-v1:')) {
     const attempts = value => Number(parse(value, null)?.attempted) || 0;
@@ -145,7 +155,11 @@ export async function syncAccountData(client, userId) {
       const server = saved.has(key) ? saved.get(key) : null;
       let value = server;
       if (server === null) value = local;
-      else if (local !== null && (migrating || dirty.has(key))) value = mergeValue(key, server, local);
+      else if (local !== null) {
+        const lostSeat = key.startsWith('fivey-orbies-v1:') && readCozySeats(readWallet(local)).owned.some(id =>
+          !readCozySeats(readWallet(server)).owned.includes(id));
+        if (migrating || dirty.has(key) || lostSeat) value = mergeValue(key, server, local);
+      }
       if (value !== local && value !== null) setItem.call(localStorage, key, value);
       if (value !== server) toSave.push(key);
       else dirty.delete(key);
