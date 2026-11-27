@@ -556,7 +556,7 @@ function summarizeButton(post) {
       const [full] = await rpc('posts', { p_id: post.id });
       const text = full?.body ? articleText(full.body) : '';
       if (!text) throw new Error('Empty article');
-      document.dispatchEvent(new CustomEvent('fivey:summarize-article', { detail: { title: post.title, text } }));
+      document.dispatchEvent(new CustomEvent('fivey:summarize-article', { detail: { title: post.title, text, summary: post.summary } }));
     } catch {
       pageStatus.textContent = 'This article could not be loaded for Grogy. Try again.';
     } finally {

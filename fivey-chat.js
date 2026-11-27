@@ -3,6 +3,7 @@ import { briefExcerpt, courseNames, findPracticeSources, findSources, resolveSit
 import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localChatMessages } from './grogy-conversation.js?v=2';
+import { articleSummary } from './article-summary.js?v=2';
 const questionCost = 1;
 // Summarizing a blog article costs 2 Orbies, paid each time a summary is written.
 const summaryCost = 2;
@@ -396,6 +397,19 @@ async function ask(review) {
   }
 }
 
+// Keeps only the bullet points of a reply, written as "• " lines. A reply with fewer than two
+// (a refusal or a paragraph) doesn't count as a summary, so nothing is charged for it.
+function bulletPoints(answer) {
+  const marker = /^(?:[•\-*]|\d+[.)])\s+/;
+  const markers = /^(?:(?:[•\-*]|\d+[.)])\s+)+/;
+  const points = (answer ?? '').split('\n').map(line => line.trim()).filter(line => marker.test(line))
+    .map(line => line.replace(markers, '').replace(/^\*\*(.+)\*\*$/, '$1').trim())
+    // A bullet that is only a question (often the article's own heading) isn't a main point.
+    .filter(point => point && !point.endsWith('?'))
+    .map(point => '• ' + point);
+  return points.length >= 2 ? points.join('\n') : '';
+}
+
 // Sends the article in chunks under the 8,000-character message limit, then asks for the summary.
 function articleMessages(title, text) {
   const chunks = text.match(/[\s\S]{1,7000}/g) ?? [];
@@ -407,7 +421,7 @@ function articleMessages(title, text) {
 
 // Writes a point-form summary of a Developer's Blog article. The 2 Orbies are taken only
 // after Grogy has written the summary, so a failed attempt costs nothing.
-async function summarizeArticle({ title, text }) {
+async function summarizeArticle({ title, text, summary: overview = '' }) {
   pending = { draft: input.value };
   setBusy(true);
   setStatus('');
@@ -437,15 +451,20 @@ async function summarizeArticle({ title, text }) {
     } catch {
       summary = '';
     }
+    summary = bulletPoints(summary);
+    // Without the hosted model, use the article's own key sentences and bullet points, so the
+    // summary always matches what the article says.
+    const fromArticle = !summary;
+    if (fromArticle) summary = articleSummary(title, text, overview);
     if (!summary) {
-      finish('Grogy couldn’t summarize the article right now, so no Orbies were used. Try again in a moment.');
+      finish('Grogy couldn’t find enough text in this article to summarize, so no Orbies were used.');
       return;
     }
     if (!await spendOrbies(account, summaryCost)) {
       finish('Summarizing an article costs ' + summaryCost + ' Orbies. You don’t have enough Orbies now.');
       return;
     }
-    addMessage('Grogy', 'Here are the main points of “' + title + '”:\n\n' + summary);
+    addMessage('Grogy', 'Here is a summary of “' + title + '”' + (fromArticle ? ', section by section, in the article’s own words' : '') + ':\n\n' + summary);
     finish('');
   } catch (error) {
     finish(error?.message === 'Sign in again to ask Grogy.' ? error.message :
