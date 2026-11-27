@@ -83,13 +83,17 @@ const years = [2026, 2025, 2024, 2023];
 // Years where a course's exam had two free-response sets (Set 1 and Set 2).
 const twoSets = {
   'environmental-science': [2021, 2022, 2023, 2024, 2025],
-  psychology: [2023, 2024, 2025],
+  psychology: [2019, 2021, 2023, 2024, 2025],
   macroeconomics: [2019, 2021, 2022, 2023, 2024, 2025]
 };
 // Years with a main exam and an alternate exam (Form A and Form B).
 const formB = {
   chemistry: [2011],
   macroeconomics: [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011]
+};
+// Sets that are not on the site because their question paper and answer key don't both exist.
+const missingSets = {
+  psychology: { 2021: ['-set-2'] }
 };
 // Hosted years whose answer key is not available anywhere.
 const noAnswerKey = {
@@ -107,12 +111,16 @@ const hostedYears = {
   'calculus-ab': [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013],
   'physics-1': [2022, 2021, 2019, 2018, 2017, 2016, 2015],
   macroeconomics: [2022, 2021, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008,
-    2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999]
+    2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999],
+  psychology: [2021, 2019, 2018, 2016, 2015, 2014, 2011, 2009, 2008, 2007, 2006, 2005, 2004, 2003]
 };
 
 // The exams given in a year, as [file suffix, label]: one exam, Set 1 and Set 2, or Form A and Form B.
 function exams(course, year) {
-  if (twoSets[course]?.includes(year)) return [['-set-1', 'Set 1'], ['-set-2', 'Set 2']];
+  if (twoSets[course]?.includes(year)) {
+    const missing = missingSets[course]?.[year] || [];
+    return [['-set-1', 'Set 1'], ['-set-2', 'Set 2']].filter(([suffix]) => !missing.includes(suffix));
+  }
   if (formB[course]?.includes(year)) return [['', 'Form A'], ['-form-b', 'Form B']];
   return [['', '']];
 }
@@ -156,7 +164,7 @@ function yearBox(course, name, year) {
   title.textContent = year;
   box.append(title);
   const list = exams(course, year);
-  if (list.length > 1) {
+  if (list.length > 1 || list[0][1]) {
     const sets = document.createElement('div');
     sets.className = 'sets';
     for (const [suffix, text] of list) {
@@ -167,6 +175,9 @@ function yearBox(course, name, year) {
       sets.append(group);
     }
     box.append(sets);
+    for (const suffix of missingSets[course]?.[year] || []) {
+      box.append(Object.assign(document.createElement('p'), { className: 'no-key', textContent: suffix.replace('-set-', 'Set ') + ' is not available for this year.' }));
+    }
   } else {
     box.append(actions(course, year, '', name + ' ' + year));
   }
