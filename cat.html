@@ -22,16 +22,42 @@
     :root[data-cat-page] header nav .fivey-subjects li a { background: #000; color: #f4fbff; }
     :root[data-cat-page] header nav .fivey-subjects li a:is(:hover, :focus-visible) { background: var(--cat-cyan); color: #000; }
     .cat-name-page { width: min(1000px, calc(100% - 32px)); margin: clamp(24px, 5vw, 60px) auto; display: grid; gap: 20px; }
-    .cat-banner, .cat-name-card, .cat-tiers { border: 3px solid var(--cat-cyan); border-radius: 18px; background: #000; }
+    .cat-banner, .cat-name-card { border: 3px solid var(--cat-cyan); border-radius: 18px; background: #000; }
     .cat-banner { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(18px, 4vw, 44px); align-items: center; }
     .cat-banner, .cat-name-card { padding: clamp(18px, 4vw, 36px); }
-    .cat-portrait { min-width: 0; min-height: 200px; display: grid; place-items: center; overflow: hidden; border: 2px solid var(--cat-cyan); border-radius: 16px; background: radial-gradient(ellipse at 50% 76%, #103138, #000 72%); }
-    .cat-portrait .grogy-cat { position: relative; width: min(58%, 184px); aspect-ratio: 600 / 641; pointer-events: none; }
+    .cat-portrait {
+      --box-center: 63%;
+      position: relative;
+      min-width: 0;
+      min-height: 214px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: radial-gradient(ellipse at 60% 88%, #09272e, #000 70%);
+      isolation: isolate;
+    }
+    .cat-portrait .grogy-cat {
+      position: absolute;
+      z-index: 1;
+      left: var(--box-center);
+      bottom: 55px;
+      width: 96px;
+      aspect-ratio: 260 / 278;
+      translate: -50% 0;
+      pointer-events: none;
+    }
+    .cat-portrait .grogy-cat[data-state="walking"] { --facing: -1; }
     .cat-portrait .grogy-cat .cat-tail { animation: none; }
-    .cat-portrait .grogy-cat .cat-walker, .cat-portrait .grogy-cat .cat-zzz { display: none; }
-    .cat-portrait .grogy-cat[data-state="idle"] :is(.cat-body, .cat-tail) { visibility: hidden; }
-    .cat-portrait .grogy-cat[data-state="idle"] .cat-loaf { visibility: visible; }
-    .cat-portrait .grogy-cat[data-state="idle"] .cat-head { translate: 0 23.4%; rotate: -4deg; }
+    .cat-box-layer { position: absolute; left: var(--box-center); bottom: 8px; width: min(190px, 74%); height: 132px; translate: -50% 0; pointer-events: none; }
+    .cat-box-layer span { position: absolute; inset: 0; }
+    .cat-box-back { z-index: 0; }
+    .cat-box-front { z-index: 2; }
+    .cat-box-back .box-back-flap { background: linear-gradient(168deg, #ead1ac, #b78b57); clip-path: polygon(20% 16%, 64% 5%, 72% 37%, 28% 52%); }
+    .cat-box-back .box-right-flap { background: linear-gradient(143deg, #e6c79b, #b68552); clip-path: polygon(70% 36%, 85% 10%, 100% 31%, 85% 56%); }
+    .cat-box-back .box-inside { background: linear-gradient(174deg, #865c37, #4c311e 65%); clip-path: polygon(28% 50%, 70% 35%, 86% 55%, 32% 72%); }
+    .cat-box-front .box-side { background: linear-gradient(115deg, #be8e5f, #92613d); clip-path: polygon(23% 55%, 37% 66%, 37% 95%, 24% 79%); }
+    .cat-box-front .box-face { background: linear-gradient(154deg, #cb9e6d, #a97749 72%, #96643e); clip-path: polygon(37% 66%, 88% 51%, 85% 81%, 37% 95%); }
+    .cat-box-front .box-left-flap { background: linear-gradient(132deg, #d8b084, #a7784e); clip-path: polygon(6% 36%, 28% 50%, 42% 66%, 19% 61%); }
+    .cat-box-front .box-front-flap { background: linear-gradient(162deg, #ead1a8, #c8a078); clip-path: polygon(34% 63%, 86% 49%, 96% 50%, 43% 70%); }
     .cat-attachment h1 { margin: 0 0 16px; font-size: clamp(29px, 5vw, 46px); line-height: 1.08; overflow-wrap: anywhere; }
     .cat-attachment h2, .cat-name-card h2 { margin: 0 0 8px; color: var(--cat-cyan); font-size: 18px; }
     #cat-tier-label { margin: 0 0 8px; font-size: clamp(18px, 3vw, 25px); font-weight: 800; }
@@ -47,16 +73,9 @@
     .cat-name-page :focus-visible { outline: 3px solid var(--cat-cyan); outline-offset: 3px; }
     .cat-name-page p[role="status"] { margin: 0; }
     .cat-name-page p[role="status"]:not(:empty) { margin-top: 10px; }
-    .cat-tiers { padding: 12px 18px; }
-    .cat-tiers summary { color: var(--cat-cyan); padding: 6px 0; font-weight: 750; cursor: pointer; }
-    .cat-tiers ol { margin: 8px 0 4px; padding-inline-start: 30px; }
-    .cat-tiers li { padding: 5px 0; }
-    .cat-tiers li span { color: var(--cat-muted); }
-    .cat-tiers li[aria-current="step"] { color: var(--cat-cyan); font-weight: 750; }
     @media (max-width: 600px) {
       .cat-banner { grid-template-columns: minmax(0, 1fr); }
-      .cat-portrait { min-height: 160px; }
-      .cat-portrait .grogy-cat { width: min(45%, 144px); }
+      .cat-portrait .grogy-cat { width: 76px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .cat-portrait .grogy-cat :is(.cat-lid, .cat-lash) { animation: none !important; }
@@ -74,8 +93,14 @@
   </header>
   <main class="cat-name-page">
     <section class="cat-banner" aria-labelledby="cat-name-title">
-      <div class="cat-portrait" role="img" aria-label="The cat resting in its card">
-        <div class="grogy-cat" id="cat-portrait" data-state="idle" aria-hidden="true"></div>
+      <div class="cat-portrait" role="img" aria-label="The cat and its open cardboard box">
+        <div class="cat-box-layer cat-box-back" aria-hidden="true">
+          <span class="box-back-flap"></span><span class="box-right-flap"></span><span class="box-inside"></span>
+        </div>
+        <div class="grogy-cat" id="cat-portrait" data-state="idle" aria-hidden="true" hidden></div>
+        <div class="cat-box-layer cat-box-front" aria-hidden="true">
+          <span class="box-side"></span><span class="box-face"></span><span class="box-left-flap"></span><span class="box-front-flap"></span>
+        </div>
       </div>
       <div class="cat-attachment">
         <h1 id="cat-name-title">Grogy the Cat</h1>
@@ -88,10 +113,6 @@
         <p id="cat-feed-status" role="status"></p>
       </div>
     </section>
-    <details class="cat-tiers">
-      <summary>Attachment tiers</summary>
-      <ol id="cat-tier-list"></ol>
-    </details>
     <section class="cat-name-card" aria-labelledby="cat-rename-heading">
       <h2 id="cat-rename-heading">Rename your cat</h2>
       <form id="cat-name-form">
@@ -123,28 +144,58 @@
     const xpLabel = document.querySelector('#cat-xp-label');
     const feed = document.querySelector('#cat-feed');
     const feedStatus = document.querySelector('#cat-feed-status');
-    const list = document.querySelector('#cat-tier-list');
     let totalXP = 0;
     let saving = false;
 
-    portrait.innerHTML = catMarkup;
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-    setInterval(() => {
-      if (reducedMotion.matches || document.hidden) return;
-      portrait.dataset.state = 'grooming';
-      setTimeout(() => { portrait.dataset.state = 'idle'; }, 2600);
-    }, 12000);
+    const walkSpeed = 47; // Match the roaming cat's walking pace in pixels per second.
+    const sleepDelay = 60_000;
+    let entrance;
+    let sleepTimer;
+    let groomTimer;
 
-    const tierRows = tiers.map((name, index) => {
-      const row = document.createElement('li');
-      const cost = document.createElement('span');
-      const target = requirements[index];
-      row.textContent = name;
-      cost.textContent = target ? ' · ' + format.format(target) + ' EXP to advance' : ' · Max tier';
-      row.append(cost);
-      list.append(row);
-      return row;
+    function resetSleepTimer() {
+      clearTimeout(sleepTimer);
+      if (portrait.dataset.state === 'sleeping') portrait.dataset.state = 'idle';
+      sleepTimer = setTimeout(() => {
+        clearTimeout(groomTimer);
+        portrait.dataset.state = 'sleeping';
+      }, sleepDelay);
+    }
+
+    function startCatScene() {
+      entrance?.cancel();
+      clearTimeout(groomTimer);
+      portrait.hidden = false;
+      portrait.dataset.state = 'idle';
+      resetSleepTimer();
+      if (reducedMotion.matches) return;
+
+      const distance = Math.max(0, portrait.offsetLeft - portrait.offsetWidth * .65);
+      const pathLength = Math.hypot(distance, 14);
+      portrait.dataset.state = 'walking';
+      entrance = portrait.animate([
+        { transform: 'translate(' + -distance + 'px, 14px)' },
+        { transform: 'translate(0, 0)' }
+      ], { duration: pathLength / walkSpeed * 1000, easing: 'linear' });
+      entrance.onfinish = () => {
+        if (portrait.dataset.state === 'walking') portrait.dataset.state = 'idle';
+      };
+    }
+
+    portrait.innerHTML = catMarkup;
+    portrait.querySelector('.cat-walker img').decode().catch(() => {}).then(startCatScene);
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) startCatScene();
     });
+    for (const event of ['pointerdown', 'keydown', 'click', 'wheel']) {
+      document.addEventListener(event, resetSleepTimer, { capture: true, passive: true });
+    }
+    setInterval(() => {
+      if (reducedMotion.matches || document.hidden || portrait.hidden || portrait.dataset.state !== 'idle') return;
+      portrait.dataset.state = 'grooming';
+      groomTimer = setTimeout(() => { portrait.dataset.state = 'idle'; }, 2600);
+    }, 12000);
 
     function savedXP(user) {
       const xp = user?.user_metadata?.[xpKey];
@@ -174,10 +225,6 @@
       xpLabel.textContent = target ? format.format(xp) + ' / ' + format.format(target) + ' EXP to ' + tiers[index + 1] : 'Maximum attachment reached';
       feed.disabled = !auth || saving || !target;
       feed.textContent = saving ? 'Feeding…' : target ? 'Feed the cat (+' + Math.min(feedXP, maxXP - totalXP) + ' EXP)' : 'Max attachment';
-      tierRows.forEach((row, rowIndex) => {
-        if (rowIndex === index) row.setAttribute('aria-current', 'step');
-        else row.removeAttribute('aria-current');
-      });
     }
 
     async function currentUser() {
