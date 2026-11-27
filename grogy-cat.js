@@ -115,7 +115,7 @@ export function watchCatHunger(cat, onMood = () => {}) {
     hungerStyles.textContent = HUNGER_STYLES;
     document.head.append(hungerStyles);
   }
-  cat.insertAdjacentHTML('beforeend', '<span class="cat-hunger-ui"><span class="cat-hunger-meter" role="meter" aria-label="Hunger bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="cat-hunger-fill"></span><span class="cat-hunger-number">100%</span></span><span class="cat-hunger-speech" role="status" hidden></span></span><span class="cat-stomach-growl" aria-hidden="true">∿ ∿</span>');
+  cat.insertAdjacentHTML('beforeend', '<span class="cat-hunger-ui"><span class="cat-hunger-meter" role="meter" aria-label="Hunger Bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="cat-hunger-fill"></span><span class="cat-hunger-number">100%</span></span><span class="cat-hunger-tooltip" aria-hidden="true">Hunger Bar</span><span class="cat-hunger-speech" role="status" hidden></span></span><span class="cat-stomach-growl" aria-hidden="true">∿ ∿</span>');
   const meter = cat.querySelector('.cat-hunger-meter');
   const number = cat.querySelector('.cat-hunger-number');
   const speech = cat.querySelector('.cat-hunger-speech');
@@ -177,9 +177,11 @@ export function watchCatHunger(cat, onMood = () => {}) {
 
 const HUNGER_STYLES = `
 .grogy-cat .cat-hunger-ui { position:absolute; z-index:4; left:50%; bottom:98%; width:86px; transform:translateX(-50%); pointer-events:none; color:#f5fbff; font:700 11px/1.25 system-ui,sans-serif; }
-.grogy-cat .cat-hunger-meter { display:block; position:relative; isolation:isolate; overflow:hidden; height:16px; border:1px solid var(--hunger-color); border-radius:9px; background:#171d21; text-align:center; --hunger-color:#6ce899; --hunger-fill:100%; }
+.grogy-cat .cat-hunger-meter { display:block; position:relative; isolation:isolate; overflow:hidden; height:16px; border:1px solid var(--hunger-color); border-radius:9px; background:#171d21; text-align:center; pointer-events:auto; --hunger-color:#6ce899; --hunger-fill:100%; }
 .grogy-cat .cat-hunger-fill { position:absolute; z-index:-1; inset:0 auto 0 0; width:var(--hunger-fill); background:var(--hunger-color); }
 .grogy-cat .cat-hunger-number { padding-inline:4px; background:#10171dd9; border-radius:6px; }
+.grogy-cat .cat-hunger-tooltip { display:none; position:absolute; left:50%; top:calc(100% + 3px); transform:translateX(-50%); width:max-content; padding:3px 7px; border-radius:6px; background:#15232b; border:1px solid #7096a3; }
+.grogy-cat .cat-hunger-meter:hover + .cat-hunger-tooltip { display:block; }
 .grogy-cat .cat-hunger-speech { position:absolute; left:50%; bottom:calc(100% + 4px); transform:translateX(-50%); width:max-content; padding:3px 6px; color:#17242b; background:#fff; border:1px solid #427582; border-radius:8px; }
 .grogy-cat .cat-hunger-speech[hidden] { display:none; }
 .grogy-cat[data-hunger-mood="quiet"] .cat-hunger-meter { --hunger-color:#f9df58; }
