@@ -1,14 +1,15 @@
 // Grogy the cat: the button that opens the Grogy chat. Visitors can click it (it mews and opens the
 // chat) or drag it anywhere on the screen (it runs on all four legs while dragged). On its own it
-// blinks every 2 seconds, sometimes walks around for up to 3 seconds, and grooms itself after 10 idle
-// seconds.
-// Sitting, the cat is the original drawing in three layers (tail, body, head). Walking and running,
-// it plays the walk cycle taken from Grogy's walking video.
+// blinks every 2 seconds, sometimes walks around for up to 3 seconds, grooms itself after 10 still
+// seconds, and falls asleep in a loaf after 30 seconds without anyone touching it.
+// Sitting, the cat is the original drawing in three layers (tail, body, head). Walking, running and
+// grooming play frames taken from Grogy's walking and grooming videos, scaled to the same size.
 
 const image = name => new URL('./grogy/cat-' + name + '.png', import.meta.url).href;
 const positionKey = 'grogy-cat-position-v1';
 const groomAfter = 10000;
-const groomLength = 3600;
+const groomLength = 2600; // 31 poses at the video's 12 poses a second
+const sleepAfter = 30000;
 const walkSpeed = 47; // pixels per second, matched to the stride so the paws don't slide
 const margin = 8;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -29,75 +30,84 @@ const lids = prefix => eyes.map(({ cx, cy, rx, ry, tilt }, index) => `
 // Walking and running: 14 poses of one stride from Grogy's walking video, side by side in one strip
 // (each pose 385 × 253, facing right). CSS steps through them.
 const walkStrip = new URL('./grogy/cat-walk.webp', import.meta.url).href;
+// Grooming: 31 poses from Grogy's grooming video (paw up, licks, paw down), each 211 × 210, facing
+// left like the drawing. The first pose lines up exactly with the sitting drawing.
+const groomStrip = new URL('./grogy/cat-groom.webp', import.meta.url).href;
+
+// Sleeping: the drawing's head lowered onto a loaf-shaped body, tail wrapped around the front.
+// Drawn in the drawing's own coordinates (600 × 641) so everything stays the same size.
+const loaf = `
+  <svg class="cat-loaf" viewBox="0 0 600 641" focusable="false" aria-hidden="true">
+    <defs>
+      <linearGradient id="grogy-loaf-fur" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#f6ebdb"/><stop offset=".7" stop-color="#f0e1cc"/><stop offset="1" stop-color="#e2cdb3"/>
+      </linearGradient>
+      <radialGradient id="grogy-loaf-rump" cx=".97" cy=".5" r=".5">
+        <stop offset="0" stop-color="#8f857c" stop-opacity=".8"/><stop offset="1" stop-color="#8f857c" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <g class="loaf-body">
+      <path class="loaf-fur" d="M130 560 C120 430 250 330 410 330 C560 330 640 420 630 540 C625 610 585 641 520 641 L210 641 C160 641 133 610 130 560 Z"/>
+      <path class="loaf-rump" d="M130 560 C120 430 250 330 410 330 C560 330 640 420 630 540 C625 610 585 641 520 641 L210 641 C160 641 133 610 130 560 Z"/>
+      <path class="loaf-detail" d="M360 352 c22 -6 46 -6 66 2 M470 366 c18 2 34 10 46 20 M560 450 c10 20 12 40 8 62"/>
+      <path class="loaf-tail-outline" d="M585 585 C610 640 450 650 330 640 C255 634 205 618 196 590"/>
+      <path class="loaf-tail" d="M585 585 C610 640 450 650 330 640 C255 634 205 618 196 590"/>
+    </g>
+    <path class="loaf-collar" d="M118 528 C170 553 250 553 302 530"/>
+  </svg>`;
 
 export const catMarkup = `
   <span class="cat-shadow" aria-hidden="true"></span>
   <span class="cat-rig" aria-hidden="true">
     <img class="cat-tail" src="${image('tail')}" alt="" draggable="false">
     <img class="cat-body" src="${image('body')}" alt="" draggable="false">
+    ${loaf}
     <span class="cat-head">
       <img src="${image('head')}" alt="" draggable="false">
       <svg class="cat-face" viewBox="0 0 600 641" focusable="false">
         ${lids('grogy-eye')}
-        <ellipse class="cat-tongue" cx="172" cy="322" rx="15" ry="11"/>
       </svg>
     </span>
   </span>
-  <span class="cat-walker" aria-hidden="true"><img src="${walkStrip}" alt="" draggable="false"></span>`;
+  <span class="cat-walker" aria-hidden="true"><img src="${walkStrip}" alt="" draggable="false"></span>
+  <span class="cat-groomer" aria-hidden="true"><img src="${groomStrip}" alt="" draggable="false"></span>
+  <span class="cat-zzz" aria-hidden="true"><span>z</span><span>z</span><span>Z</span></span>`;
 
 let audio;
-// A short, high kitten "mew": a soft, rounded tone that slides up and gently back down, sometimes
-// twice in a row.
-function mew(start, pitch, length) {
-  const voice = audio.createOscillator();
-  voice.type = 'triangle';
-  const overtone = audio.createOscillator();
-  overtone.type = 'sine';
-  const curve = (oscillator, multiple) => {
-    const f = oscillator.frequency;
-    f.setValueAtTime(820 * pitch * multiple, start);
-    f.exponentialRampToValueAtTime(1180 * pitch * multiple, start + length * 0.25);
-    f.exponentialRampToValueAtTime(1260 * pitch * multiple, start + length * 0.5);
-    f.exponentialRampToValueAtTime(900 * pitch * multiple, start + length);
-  };
-  curve(voice, 1);
-  curve(overtone, 2);
-  const vibrato = audio.createOscillator();
-  const vibratoDepth = audio.createGain();
-  vibrato.frequency.value = 9;
-  vibratoDepth.gain.value = 14 * pitch;
-  vibrato.connect(vibratoDepth).connect(voice.frequency);
-  const overtoneLevel = audio.createGain();
-  overtoneLevel.gain.value = 0.25;
-  const mouth = audio.createBiquadFilter();
-  mouth.type = 'lowpass';
-  mouth.Q.value = 2;
-  mouth.frequency.setValueAtTime(1600, start);
-  mouth.frequency.exponentialRampToValueAtTime(4200, start + length * 0.35);
-  mouth.frequency.exponentialRampToValueAtTime(2000, start + length);
-  const volume = audio.createGain();
-  volume.gain.setValueAtTime(0.0001, start);
-  volume.gain.exponentialRampToValueAtTime(0.24, start + 0.03);
-  volume.gain.setValueAtTime(0.24, start + length * 0.55);
-  volume.gain.exponentialRampToValueAtTime(0.0001, start + length);
-  voice.connect(mouth);
-  overtone.connect(overtoneLevel).connect(mouth);
-  mouth.connect(volume).connect(audio.destination);
-  for (const oscillator of [voice, overtone, vibrato]) {
-    oscillator.start(start);
-    oscillator.stop(start + length + 0.05);
-  }
+// The meow: one of three recorded meows, picked at random (never the same one twice in a row).
+// Each has its own volume so all three sound equally loud.
+const meows = [['meow-1.mp3', 0.56], ['meow-2.mp3', 2.37], ['meow-3.mp3', 0.98]]
+  .map(([file, volume]) => ({ url: new URL('./grogy/' + file, import.meta.url).href, volume }));
+let meowSounds;
+let lastMeow = -1;
+
+// Loads and decodes the recordings once. Called on the first press, so it is ready by the click.
+function loadMeows() {
+  audio ??= new (window.AudioContext || window.webkitAudioContext)();
+  meowSounds ??= Promise.all(meows.map(async ({ url }) => {
+    const response = await fetch(url);
+    return audio.decodeAudioData(await response.arrayBuffer());
+  })).catch(error => {
+    meowSounds = null;
+    throw error;
+  });
+  return meowSounds;
 }
 
-function meow() {
+async function meow() {
   try {
-    audio ??= new (window.AudioContext || window.webkitAudioContext)();
+    const sounds = loadMeows();
     if (audio.state === 'suspended') audio.resume();
-    const now = audio.currentTime;
-    const pitch = 0.95 + Math.random() * 0.2;
-    mew(now, pitch, 0.3 + Math.random() * 0.08);
-    // Now and then a second, higher little mew.
-    if (Math.random() < 0.35) mew(now + 0.38, pitch * 1.08, 0.22);
+    let pick = Math.floor(Math.random() * meows.length);
+    if (pick === lastMeow) pick = (pick + 1 + Math.floor(Math.random() * (meows.length - 1))) % meows.length;
+    lastMeow = pick;
+    const buffer = (await sounds)[pick];
+    const source = audio.createBufferSource();
+    source.buffer = buffer;
+    const volume = audio.createGain();
+    volume.gain.value = meows[pick].volume;
+    source.connect(volume).connect(audio.destination);
+    source.start();
   } catch {
     // No sound support: the cat still opens the chat.
   }
@@ -129,6 +139,7 @@ export function grogyCat(button, { onActivate }) {
   let facing = 1; // 1 = facing left (as drawn), -1 = facing right
   let state = 'idle';
   let idleSince = performance.now();
+  let lastTouch = performance.now();
   let walkTimer;
   let groomTimer;
   let walking;
@@ -175,6 +186,19 @@ export function grogyCat(button, { onActivate }) {
     }, groomAfter);
   }
 
+  // Sleeping: 30 seconds after anyone last touched the cat (a click, key press or drag), it lies down
+  // in a loaf and sleeps until someone touches it again. Walks and grooming wait while it sleeps.
+  function touched() {
+    lastTouch = performance.now();
+    if (state === 'sleeping') {
+      setState('idle');
+      planWalk();
+    }
+  }
+  setInterval(() => {
+    if (state === 'idle' && performance.now() - lastTouch >= sleepAfter) setState('sleeping');
+  }, 1000);
+
   // Walking on its own: at random moments, a slow walk of up to 3 seconds in a random direction.
   function planWalk() {
     clearTimeout(walkTimer);
@@ -209,6 +233,13 @@ export function grogyCat(button, { onActivate }) {
       walking = requestAnimationFrame(step);
     };
     walking = requestAnimationFrame(step);
+    // Animation frames pause in a background tab; this makes sure the walk still ends.
+    setTimeout(() => {
+      if (state !== 'walking' || performance.now() - start < length) return;
+      cancelAnimationFrame(walking);
+      setState('idle');
+      planWalk();
+    }, length + 250);
   }
 
   // Dust puffs behind the cat while it runs.
@@ -231,6 +262,10 @@ export function grogyCat(button, { onActivate }) {
   let stillTimer;
   button.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
+    touched();
+    try {
+      loadMeows().catch(() => {});
+    } catch {}
     const { left, top } = size();
     drag = { id: event.pointerId, x: event.clientX, y: event.clientY, offsetX: event.clientX - left, offsetY: event.clientY - top, moved: false };
     dragged = false;
@@ -281,6 +316,7 @@ export function grogyCat(button, { onActivate }) {
       event.preventDefault();
       return;
     }
+    touched();
     meow();
     button.classList.remove('is-meowing');
     void button.offsetWidth;
@@ -292,7 +328,7 @@ export function grogyCat(button, { onActivate }) {
     onActivate();
   });
   button.addEventListener('animationend', event => {
-    if (event.animationName === 'grogy-cat-hop') button.classList.remove('is-meowing');
+    if (event.animationName === 'grogy-tail-wiggle') button.classList.remove('is-meowing');
   });
 
   addEventListener('resize', () => moveTo(place));
