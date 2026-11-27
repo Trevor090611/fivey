@@ -534,6 +534,38 @@ function articleEditor() {
   };
 }
 
+// The article as plain text for Grogy, keeping paragraph and list breaks.
+function articleText(body) {
+  const holder = node('div');
+  if (body.startsWith(formattedArticle)) holder.append(cleanArticleMarkup(body.slice(formattedArticle.length)));
+  else holder.textContent = body;
+  for (const br of holder.querySelectorAll('br')) br.replaceWith('\n');
+  for (const item of holder.querySelectorAll('li')) item.prepend('- ');
+  for (const block of holder.querySelectorAll('p, li, div, h1, h2, h3, h4, h5, h6, blockquote, tr, pre')) block.append('\n');
+  return holder.textContent.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+// Opens Grogy and asks it to summarize the article (2 Orbies, charged by Grogy once the summary is written).
+function summarizeButton(post) {
+  const button = node('button', 'blog-summarize', 'Summarize this Article');
+  button.type = 'button';
+  button.append(node('span', 'blog-summarize-cost', '2 Orbies'));
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    try {
+      const [full] = await rpc('posts', { p_id: post.id });
+      const text = full?.body ? articleText(full.body) : '';
+      if (!text) throw new Error('Empty article');
+      document.dispatchEvent(new CustomEvent('fivey:summarize-article', { detail: { title: post.title, text } }));
+    } catch {
+      pageStatus.textContent = 'This article could not be loaded for Grogy. Try again.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+  return button;
+}
+
 function postCard(post, full = false) {
   const card = node('article', 'blog-card');
   if (full) {
@@ -545,11 +577,12 @@ function postCard(post, full = false) {
     }
     card.append(body);
   } else {
-    card.append(
-      node('h2', null, post.title),
-      node('p', 'blog-summary', post.summary),
-      link('View Full Article!', './blog-article.html?' + new URLSearchParams({ post: post.id }))
+    const actions = node('div', 'blog-card-actions');
+    actions.append(
+      link('View Full Article!', './blog-article.html?' + new URLSearchParams({ post: post.id })),
+      summarizeButton(post)
     );
+    card.append(node('h2', null, post.title), node('p', 'blog-summary', post.summary), actions);
   }
   card.append(discussion(post.id));
   return card;

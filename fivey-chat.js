@@ -4,6 +4,8 @@ import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localChatMessages } from './grogy-conversation.js?v=2';
 const questionCost = 1;
+// Summarizing a blog article costs 2 Orbies, paid each time a summary is written.
+const summaryCost = 2;
 const costLabel = questionCost + (questionCost === 1 ? ' Orbie' : ' Orbies');
 const widget = document.createElement('aside');
 widget.className = 'fivey-chat';
@@ -394,6 +396,63 @@ async function ask(review) {
   }
 }
 
+// Sends the article in chunks under the 8,000-character message limit, then asks for the summary.
+function articleMessages(title, text) {
+  const chunks = text.match(/[\s\S]{1,7000}/g) ?? [];
+  return [
+    ...chunks.map((chunk, index) => ({ role: 'user', content: (index === 0 ? 'Blog article: ' + title + '\n\n' : '') + chunk })),
+    { role: 'user', content: 'Summarize the main points of the blog article above in point form: 4 to 8 short bullet points, each on its own line starting with "• ". Use only what the article says.' }
+  ];
+}
+
+// Writes a point-form summary of a Developer's Blog article. The 2 Orbies are taken only
+// after Grogy has written the summary, so a failed attempt costs nothing.
+async function summarizeArticle({ title, text }) {
+  pending = { draft: input.value };
+  setBusy(true);
+  setStatus('');
+  try {
+    const { session } = await getChatSession();
+    const account = session.user.id;
+    const balance = getOrbiesBalance(account);
+    if (balance < summaryCost) {
+      finish('Summarizing an article costs ' + summaryCost + ' Orbies. You have ' + balance + '.');
+      return;
+    }
+    addMessage('You', 'Summarize this article: ' + title);
+    let summary = '';
+    try {
+      const response = await fetch(geminiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: authConfig.key,
+          Authorization: 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({ messages: articleMessages(title, text) }),
+        signal: AbortSignal.timeout(34000)
+      });
+      const result = await response.json();
+      if (response.ok && typeof result.answer === 'string') summary = result.answer.trim();
+    } catch {
+      summary = '';
+    }
+    if (!summary) {
+      finish('Grogy couldn’t summarize the article right now, so no Orbies were used. Try again in a moment.');
+      return;
+    }
+    if (!await spendOrbies(account, summaryCost)) {
+      finish('Summarizing an article costs ' + summaryCost + ' Orbies. You don’t have enough Orbies now.');
+      return;
+    }
+    addMessage('Grogy', 'Here are the main points of “' + title + '”:\n\n' + summary);
+    finish('');
+  } catch (error) {
+    finish(error?.message === 'Sign in again to ask Grogy.' ? error.message :
+      'Grogy couldn’t summarize the article. Check your connection and try again.');
+  }
+}
+
 input.addEventListener('keydown', event => {
   if (!enterToSend.checked || event.key !== 'Enter' || event.shiftKey ||
     event.altKey || event.ctrlKey || event.metaKey || event.isComposing ||
@@ -405,6 +464,16 @@ input.addEventListener('keydown', event => {
 form.addEventListener('submit', event => {
   event.preventDefault();
   ask();
+});
+
+document.addEventListener('fivey:summarize-article', ({ detail }) => {
+  if (typeof detail?.title !== 'string' || typeof detail?.text !== 'string' || !detail.text.trim()) return;
+  toggle(true);
+  if (pending) {
+    addMessage('Grogy', 'I’m still working on the current reply. Click Summarize this Article again when it finishes.');
+    return;
+  }
+  summarizeArticle(detail);
 });
 
 document.addEventListener('fivey:explain-answer', ({ detail }) => {
