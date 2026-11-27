@@ -46,6 +46,38 @@
       pointer-events: none;
     }
     .cat-portrait .grogy-cat[data-state="walking"][data-walk-direction="right"] { --facing: -1; }
+    :root[data-cat-page] .cat-portrait #cat-pet {
+      position: absolute;
+      z-index: 3;
+      left: var(--box-center);
+      bottom: 55px;
+      width: 96px;
+      aspect-ratio: 260 / 278;
+      translate: -50% 0 !important;
+      margin: 0;
+      padding: 0;
+      border: 0 !important;
+      background: none !important;
+      box-shadow: none !important;
+      border-radius: 35%;
+      cursor: pointer;
+    }
+    #cat-pet[hidden] { display: none; }
+    .cat-hearts { position: absolute; z-index: 4; left: calc(var(--box-center) - 22px); bottom: 132px; pointer-events: none; }
+    .cat-heart { position: absolute; color: #ff699f; line-height: 1; text-shadow: 0 1px 7px #ff2e7677; opacity: 0; animation: cat-heart-rise 1.15s ease-out both; }
+    .cat-heart:nth-child(1) { --heart-drift: -22px; font-size: 18px; }
+    .cat-heart:nth-child(2) { --heart-drift: 4px; font-size: 26px; animation-delay: 90ms; }
+    .cat-heart:nth-child(3) { --heart-drift: 32px; font-size: 20px; animation-delay: 180ms; }
+    @keyframes cat-heart-rise {
+      0% { opacity: 0; transform: translate(0, 0) scale(.55); }
+      18% { opacity: 1; }
+      72% { opacity: .95; }
+      100% { opacity: 0; transform: translate(var(--heart-drift), -55px) scale(1.12); }
+    }
+    @keyframes cat-heart-fade {
+      0%, 100% { opacity: 0; }
+      25%, 75% { opacity: 1; }
+    }
     .cat-portrait .grogy-cat .cat-tail { animation: none; }
     .cat-box-layer { position: absolute; left: var(--box-center); bottom: 8px; width: min(190px, 74%); height: 132px; translate: -50% 0; pointer-events: none; }
     .cat-box-layer span { position: absolute; inset: 0; }
@@ -75,11 +107,13 @@
     .cat-name-page p[role="status"]:not(:empty) { margin-top: 10px; }
     @media (max-width: 600px) {
       .cat-banner { grid-template-columns: minmax(0, 1fr); }
-      .cat-portrait .grogy-cat { width: 76px; }
+      .cat-portrait .grogy-cat, :root[data-cat-page] .cat-portrait #cat-pet { width: 76px; }
+      .cat-hearts { bottom: 115px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .cat-portrait .grogy-cat :is(.cat-lid, .cat-lash) { animation: none !important; }
       .cat-portrait .grogy-cat .cat-head { transition: none; }
+      .cat-heart { animation-name: cat-heart-fade; animation-duration: 700ms; translate: var(--heart-drift) -12px; }
     }
   </style>
 </head>
@@ -97,13 +131,13 @@
       <form id="cat-name-form">
         <label for="cat-name">Cat’s name</label>
         <input id="cat-name" type="text" value="Grogy" maxlength="10" aria-describedby="cat-name-help" autocomplete="off" required disabled>
-        <span id="cat-name-help">Up to 10 characters.</span>
+        <span id="cat-name-help" aria-live="polite">5/10</span>
         <button class="practice-button" type="submit" disabled>Save name</button>
       </form>
       <p id="cat-name-status" role="status"></p>
     </section>
     <section class="cat-banner" aria-labelledby="cat-name-title">
-      <div class="cat-portrait" role="img" aria-label="The cat and its open cardboard box">
+      <div class="cat-portrait">
         <div class="cat-box-layer cat-box-back" aria-hidden="true">
           <span class="box-back-flap"></span><span class="box-right-flap"></span><span class="box-inside"></span>
         </div>
@@ -111,6 +145,8 @@
         <div class="cat-box-layer cat-box-front" aria-hidden="true">
           <span class="box-side"></span><span class="box-face"></span><span class="box-left-flap"></span><span class="box-front-flap"></span>
         </div>
+        <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
+        <div class="cat-hearts" aria-hidden="true"></div>
       </div>
       <div class="cat-attachment">
         <h1 id="cat-name-title">Grogy the Cat</h1>
@@ -119,7 +155,7 @@
         <img id="cat-tier-art" alt="" hidden>
         <progress id="cat-xp-bar" max="100" value="0" aria-labelledby="cat-attachment-heading" aria-describedby="cat-xp-label"></progress>
         <p id="cat-xp-label">0 / 100 EXP to Wary</p>
-        <button class="practice-button" id="cat-feed" type="button" disabled>Feed the cat (+25 EXP)</button>
+        <button class="practice-button" id="cat-feed" type="button" disabled>Feed Grogy</button>
         <p id="cat-feed-status" role="status"></p>
       </div>
     </section>
@@ -144,6 +180,11 @@
     const xpLabel = document.querySelector('#cat-xp-label');
     const feed = document.querySelector('#cat-feed');
     const feedStatus = document.querySelector('#cat-feed-status');
+    const nameInput = document.querySelector('#cat-name');
+    const nameCount = document.querySelector('#cat-name-help');
+    const nameTitle = document.querySelector('#cat-name-title');
+    const pet = document.querySelector('#cat-pet');
+    const hearts = document.querySelector('.cat-hearts');
     let totalXP = 0;
     let saving = false;
 
@@ -153,6 +194,41 @@
     let entrance;
     let sleepTimer;
     let groomTimer;
+
+    function updateNameCount() {
+      nameCount.textContent = nameInput.value.length + '/' + nameInput.maxLength;
+    }
+
+    function updateNameLabels() {
+      const name = nameTitle.textContent.replace(/ the Cat$/, '');
+      feed.textContent = saving ? 'Feeding…' : 'Feed ' + name;
+      pet.setAttribute('aria-label', 'Pet ' + name);
+    }
+
+    nameInput.addEventListener('input', updateNameCount);
+    new MutationObserver(() => {
+      updateNameCount();
+      updateNameLabels();
+    }).observe(nameTitle, { childList: true, characterData: true, subtree: true });
+    updateNameCount();
+    updateNameLabels();
+
+    const petCooldown = 2000;
+    let lastPet = -Infinity;
+    pet.addEventListener('click', () => {
+      const now = performance.now();
+      if (pet.hidden || now - lastPet < petCooldown) return;
+      lastPet = now;
+      const burst = document.createDocumentFragment();
+      for (let i = 0; i < 3; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'cat-heart';
+        heart.textContent = '♥';
+        heart.addEventListener('animationend', () => heart.remove(), { once: true });
+        burst.append(heart);
+      }
+      hearts.replaceChildren(burst);
+    });
 
     function resetSleepTimer() {
       clearTimeout(sleepTimer);
@@ -185,6 +261,7 @@
       clearTimeout(groomTimer);
       portrait.hidden = false;
       portrait.dataset.state = 'idle';
+      pet.hidden = false;
       resetSleepTimer();
       if (reducedMotion.matches) return;
 
@@ -193,11 +270,13 @@
       if (pathLength < 1) return;
       portrait.dataset.walkDirection = x < 0 ? 'right' : 'left';
       portrait.dataset.state = 'walking';
+      pet.hidden = true;
       entrance = portrait.animate([
         { transform: 'translate(' + x + 'px, ' + y + 'px)' },
         { transform: 'translate(0, 0)' }
       ], { duration: pathLength / walkSpeed * 1000, easing: 'linear' });
       entrance.onfinish = () => {
+        pet.hidden = false;
         if (portrait.dataset.state === 'walking') portrait.dataset.state = 'idle';
       };
     }
@@ -243,7 +322,7 @@
       bar.value = target ? xp : 1;
       xpLabel.textContent = target ? format.format(xp) + ' / ' + format.format(target) + ' EXP to ' + tiers[index + 1] : 'Maximum attachment reached';
       feed.disabled = !auth || saving || !target;
-      feed.textContent = saving ? 'Feeding…' : target ? 'Feed the cat (+' + Math.min(feedXP, maxXP - totalXP) + ' EXP)' : 'Max attachment';
+      updateNameLabels();
     }
 
     async function currentUser() {
