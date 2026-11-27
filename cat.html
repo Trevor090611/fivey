@@ -11,7 +11,7 @@
   <style>
     :root[data-cat-page] { color-scheme: dark; --cat-cyan: #62e7ff; --cat-muted: #b9c7cc; }
     * { box-sizing: border-box; }
-    :root[data-cat-page] body { margin: 0; min-height: 100vh; background: #000 !important; color: #f4fbff; font: 16px/1.55 "DM Sans", system-ui, sans-serif; }
+    :root[data-cat-page] body { margin: 0; min-height: 100vh; overflow-x: clip; background: #000 !important; color: #f4fbff; font: 16px/1.55 "DM Sans", system-ui, sans-serif; }
     .cat-name-bar { width: min(1120px, calc(100% - 32px)); min-height: 70px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     :root[data-cat-page] header nav :is(.fivey-user-dropdown, .fivey-subjects ul) { border: 4px solid var(--cat-cyan) !important; background: #000 !important; }
     :root[data-cat-page] :is(.cat-name-page, .fivey-user-dropdown) :is(button, a.practice-button) {
@@ -23,14 +23,14 @@
     :root[data-cat-page] header nav .fivey-subjects li a:is(:hover, :focus-visible) { background: var(--cat-cyan); color: #000; }
     .cat-name-page { width: min(1000px, calc(100% - 32px)); margin: clamp(24px, 5vw, 60px) auto; display: grid; gap: 20px; }
     .cat-banner, .cat-name-card { border: 3px solid var(--cat-cyan); border-radius: 18px; background: #000; }
-    .cat-banner { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(18px, 4vw, 44px); align-items: center; }
+    .cat-banner { display: grid; grid-template-columns: minmax(175px, 244px) minmax(0, 1fr); gap: clamp(16px, 3vw, 30px); align-items: center; }
     .cat-banner, .cat-name-card { padding: clamp(18px, 4vw, 36px); }
     .cat-portrait {
-      --box-center: 63%;
+      --box-center: 45%;
       position: relative;
       min-width: 0;
       min-height: 214px;
-      overflow: hidden;
+      z-index: 1;
       border-radius: 16px;
       background: radial-gradient(ellipse at 60% 88%, #09272e, #000 70%);
       isolation: isolate;
@@ -45,7 +45,7 @@
       translate: -50% 0;
       pointer-events: none;
     }
-    .cat-portrait .grogy-cat[data-state="walking"] { --facing: -1; }
+    .cat-portrait .grogy-cat[data-state="walking"][data-walk-direction="right"] { --facing: -1; }
     .cat-portrait .grogy-cat .cat-tail { animation: none; }
     .cat-box-layer { position: absolute; left: var(--box-center); bottom: 8px; width: min(190px, 74%); height: 132px; translate: -50% 0; pointer-events: none; }
     .cat-box-layer span { position: absolute; inset: 0; }
@@ -92,6 +92,16 @@
     </div>
   </header>
   <main class="cat-name-page">
+    <section class="cat-name-card" aria-labelledby="cat-rename-heading">
+      <h2 id="cat-rename-heading">Rename your cat</h2>
+      <form id="cat-name-form">
+        <label for="cat-name">Cat’s name</label>
+        <input id="cat-name" type="text" value="Grogy" maxlength="10" aria-describedby="cat-name-help" autocomplete="off" required disabled>
+        <span id="cat-name-help">Up to 10 characters.</span>
+        <button class="practice-button" type="submit" disabled>Save name</button>
+      </form>
+      <p id="cat-name-status" role="status"></p>
+    </section>
     <section class="cat-banner" aria-labelledby="cat-name-title">
       <div class="cat-portrait" role="img" aria-label="The cat and its open cardboard box">
         <div class="cat-box-layer cat-box-back" aria-hidden="true">
@@ -112,16 +122,6 @@
         <button class="practice-button" id="cat-feed" type="button" disabled>Feed the cat (+25 EXP)</button>
         <p id="cat-feed-status" role="status"></p>
       </div>
-    </section>
-    <section class="cat-name-card" aria-labelledby="cat-rename-heading">
-      <h2 id="cat-rename-heading">Rename your cat</h2>
-      <form id="cat-name-form">
-        <label for="cat-name">Cat’s name</label>
-        <input id="cat-name" type="text" value="Grogy" maxlength="10" aria-describedby="cat-name-help" autocomplete="off" required disabled>
-        <span id="cat-name-help">Up to 10 characters.</span>
-        <button class="practice-button" type="submit" disabled>Save name</button>
-      </form>
-      <p id="cat-name-status" role="status"></p>
     </section>
   </main>
   <script type="module">
@@ -163,6 +163,23 @@
       }, sleepDelay);
     }
 
+    function entranceOffset(destination) {
+      let position = { right: 16, bottom: 16 };
+      try {
+        const saved = JSON.parse(localStorage.getItem('grogy-cat-position-v1'));
+        if (Number.isFinite(saved?.right) && Number.isFinite(saved?.bottom)) position = saved;
+      } catch {
+        // Use the roaming cat's default corner when storage is unavailable.
+      }
+      const margin = 8;
+      const right = Math.min(Math.max(position.right, margin), Math.max(margin, innerWidth - destination.width - margin));
+      const bottom = Math.min(Math.max(position.bottom, margin), Math.max(margin, innerHeight - destination.height - margin));
+      return {
+        x: innerWidth - destination.width - right - destination.left,
+        y: innerHeight - destination.height - bottom - destination.top
+      };
+    }
+
     function startCatScene() {
       entrance?.cancel();
       clearTimeout(groomTimer);
@@ -171,11 +188,13 @@
       resetSleepTimer();
       if (reducedMotion.matches) return;
 
-      const distance = Math.max(0, portrait.offsetLeft - portrait.offsetWidth * .65);
-      const pathLength = Math.hypot(distance, 14);
+      const { x, y } = entranceOffset(portrait.getBoundingClientRect());
+      const pathLength = Math.hypot(x, y);
+      if (pathLength < 1) return;
+      portrait.dataset.walkDirection = x < 0 ? 'right' : 'left';
       portrait.dataset.state = 'walking';
       entrance = portrait.animate([
-        { transform: 'translate(' + -distance + 'px, 14px)' },
+        { transform: 'translate(' + x + 'px, ' + y + 'px)' },
         { transform: 'translate(0, 0)' }
       ], { duration: pathLength / walkSpeed * 1000, easing: 'linear' });
       entrance.onfinish = () => {
