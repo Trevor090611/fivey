@@ -507,6 +507,16 @@ function articleEditor() {
       savedRange = undefined;
       linkBox.hidden = true;
     },
+    // Opens a saved article body (formatted or plain) for editing.
+    load(body) {
+      if (body.startsWith(formattedArticle)) {
+        field.replaceChildren(cleanArticleMarkup(body.slice(formattedArticle.length)));
+      } else {
+        field.textContent = body;
+      }
+      savedRange = undefined;
+      linkBox.hidden = true;
+    },
     serialize() {
       const content = node('div');
       content.append(cleanArticleMarkup(field.innerHTML));
@@ -717,6 +727,120 @@ function ownerForm() {
   return card;
 }
 
+// The article being shown on the article page, for the developer's Edit Article form.
+let currentPost = null;
+
+// The developer's form for changing a published article's title, category, text and summary.
+function editForm(post) {
+  const card = node('section', 'blog-card blog-owner blog-edit');
+  card.setAttribute('aria-labelledby', 'blog-edit-title');
+  const heading = node('h2', null, 'Edit Article');
+  heading.id = 'blog-edit-title';
+  heading.tabIndex = -1;
+  const form = node('form', 'blog-publish-form');
+  const title = node('input');
+  title.type = 'text';
+  title.required = true;
+  title.maxLength = 240;
+  title.value = post.title;
+  const category = node('select');
+  category.required = true;
+  for (const [value, text] of Object.entries(categories)) {
+    const option = node('option', null, text);
+    option.value = value;
+    category.append(option);
+  }
+  category.value = categoryOf(post);
+  const editor = articleEditor();
+  editor.load(post.body);
+  const summary = node('textarea');
+  summary.maxLength = 1500;
+  summary.rows = 3;
+  summary.required = true;
+  summary.value = post.summary;
+  const status = node('p', 'blog-status');
+  status.setAttribute('role', 'status');
+  const save = node('button', null, 'Save Changes');
+  save.type = 'submit';
+  const cancel = node('button', null, 'Cancel');
+  cancel.type = 'button';
+
+  for (const [text, field] of [['Article title', title], ['Category', category], ['Summary', summary]]) {
+    const label = node('label', null, text);
+    label.append(field);
+    if (field === summary) form.append(editor.section);
+    form.append(label);
+  }
+  const actions = node('div', 'blog-edit-actions');
+  actions.append(save, cancel);
+  form.append(actions, status);
+  card.append(heading, form);
+
+  function disable(disabled) {
+    for (const control of [title, category, summary, save, cancel]) control.disabled = disabled;
+    editor.disable(disabled);
+  }
+  cancel.addEventListener('click', () => showArticle());
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!title.value.trim() || !editor.text() || !summary.value.trim()) {
+      status.textContent = 'Enter a title, the article text and a summary.';
+      return;
+    }
+    const body = editor.serialize();
+    if (body.length > articleLimit) {
+      status.textContent = 'This article exceeds the 32,000-character limit, including formatting. Shorten the article or simplify the formatting.';
+      return;
+    }
+    disable(true);
+    status.textContent = 'Saving…';
+    try {
+      await rpc('update', {
+        p_id: post.id,
+        p_title: title.value.trim(),
+        p_summary: summary.value.trim(),
+        p_body: body,
+        p_category: category.value
+      });
+      await loadPosts();
+      showArticle('Changes saved.');
+    } catch {
+      status.textContent = 'The changes could not be saved. Try again.';
+      disable(false);
+    }
+  });
+  return { card, heading };
+}
+
+// Shows the article (with the Edit Article button for the developer), or the edit form.
+function showArticle(message = '') {
+  const actions = document.querySelector('.blog-edit-bar');
+  if (actions) {
+    actions.hidden = false;
+    actions.querySelector('.blog-status').textContent = message;
+  }
+  document.querySelector('.blog-edit')?.remove();
+  for (const child of list.children) child.hidden = false;
+}
+
+function addEditButton() {
+  if (!currentPost || document.querySelector('.blog-edit-bar')) return;
+  const bar = node('div', 'blog-edit-bar');
+  const button = node('button', null, 'Edit Article');
+  button.type = 'button';
+  const status = node('p', 'blog-status');
+  status.setAttribute('role', 'status');
+  bar.append(button, status);
+  list.before(bar);
+  button.addEventListener('click', () => {
+    const { card, heading } = editForm(currentPost);
+    bar.hidden = true;
+    for (const child of list.children) child.hidden = true;
+    list.append(card);
+    heading.focus();
+  });
+}
+
 async function loadPosts() {
   const id = new URLSearchParams(location.search).get('post');
   if (articlePage && !/^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(id ?? '')) {
@@ -738,6 +862,7 @@ async function loadPosts() {
     const label = node('a', 'blog-category-label', categories[categoryOf(post)]);
     label.href = './blog.html?' + new URLSearchParams({ category: categoryOf(post) });
     list.replaceChildren(label, postCard(post, true));
+    currentPost = post;
   } else {
     allPosts = posts;
     renderCategory();
@@ -786,7 +911,10 @@ if (client) {
   try {
     await loadPosts();
     // The publish form sits above the category heading, since it can post to either category.
-    if (!articlePage && await rpc('is_owner')) document.querySelector('#blog-section-title').before(ownerForm());
+    if (await rpc('is_owner')) {
+      if (articlePage) addEditButton();
+      else document.querySelector('#blog-section-title').before(ownerForm());
+    }
   } catch {
     pageStatus.textContent = 'The blog could not be loaded. Refresh to try again.';
   }
