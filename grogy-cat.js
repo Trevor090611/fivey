@@ -1,7 +1,10 @@
 // Grogy the cat: the button that opens the Grogy chat. Visitors can click it (it mews and opens the
 // chat) or drag it anywhere on the screen (it runs on all four legs while dragged). On its own it
 // blinks every 2 seconds, sometimes walks around for up to 3 seconds, grooms itself after 10 still
-// seconds, and falls asleep in a loaf after 30 seconds without anyone touching it.
+// seconds, and falls asleep in a loaf after 30 seconds without anyone touching it. Sometimes it goes to
+// a nearby button to pat it with a paw (the button shakes with each pat), lick it or rub its face on
+// it, and sometimes it naps on
+// top of a button; clicking that button wakes it with a meow.
 // Sitting, the cat is the original drawing in three layers (tail, body, head). Walking, running and
 // grooming play frames taken from Grogy's walking and grooming videos, scaled to the same size.
 
@@ -34,6 +37,21 @@ const walkStrip = new URL('./grogy/cat-walk.webp', import.meta.url).href;
 // left like the drawing. The first pose lines up exactly with the sitting drawing.
 const groomStrip = new URL('./grogy/cat-groom.webp', import.meta.url).href;
 
+// Playing with a button: the near front leg (removed from the body layer) reaches out sideways and
+// pats. Drawn in the drawing's own coordinates (600 × 641); the paw reaches 10.3% past the left edge.
+const arm = `
+  <svg class="cat-arm" viewBox="0 0 600 641" focusable="false" aria-hidden="true">
+    <path class="arm-edge" d="M150 456 L186 510 L213 546 L215 641"/>
+    <g class="arm-swing">
+      <path class="arm-fur" d="M200 444 C150 446 80 452 30 460 L30 522 C80 528 150 534 200 534 Z"/>
+      <path class="arm-sock" d="M78 455 C55 457 40 458 22 460 L22 522 C40 524 55 525 78 527 Z"/>
+      <path class="arm-line" d="M150 447 C100 450 60 455 22 460 M150 532 C100 530 60 526 22 522"/>
+      <path class="arm-tuft" d="M150 447 l-14 -10 l-4 13 l-14 -9 l-2 12 M120 531 l-10 10 l-3 -12 l-12 9 l-1 -12"/>
+      <ellipse class="arm-paw" cx="-12" cy="492" rx="50" ry="42"/>
+      <path class="arm-toes" d="M-44 466 q-10 12 0 24 M-46 494 q-10 12 0 24 M-30 520 q6 6 16 4"/>
+    </g>
+  </svg>`;
+
 // Sleeping: the drawing's head lowered onto a loaf-shaped body, tail wrapped around the front.
 // Drawn in the drawing's own coordinates (600 × 641) so everything stays the same size.
 const loaf = `
@@ -61,11 +79,14 @@ export const catMarkup = `
   <span class="cat-rig" aria-hidden="true">
     <img class="cat-tail" src="${image('tail')}" alt="" draggable="false">
     <img class="cat-body" src="${image('body')}" alt="" draggable="false">
+    <img class="cat-body-reach" src="${image('body-reach')}" alt="" draggable="false">
     ${loaf}
+    ${arm}
     <span class="cat-head">
       <img src="${image('head')}" alt="" draggable="false">
       <svg class="cat-face" viewBox="0 0 600 641" focusable="false">
         ${lids('grogy-eye')}
+        <ellipse class="cat-tongue" cx="166" cy="326" rx="17" ry="13"/>
       </svg>
     </span>
   </span>
@@ -163,6 +184,7 @@ export function grogyCat(button, { onActivate }) {
     button.style.setProperty('--facing', facing);
   }
   function setState(next) {
+    if (state === 'playing' && next !== 'playing') stopPatting();
     state = next;
     button.dataset.state = next;
     if (next === 'idle') {
@@ -186,6 +208,176 @@ export function grogyCat(button, { onActivate }) {
     }, groomAfter);
   }
 
+  // Buttons Grogy can play with or nap on: visible, uncovered, ordinary-sized buttons on the page.
+  const buttonSelector = 'button, [role="button"], input[type="submit"], input[type="button"], a.practice-button, a.intro-link, a.card';
+  const pawReach = 62 / 600; // how far the patting paw reaches past the cat's side, as a share of its width
+  let attached = null; // { el, mode: 'side' | 'top', face } while Grogy is at a button
+  let travelId = 0;
+
+  // Where the cat must be to pat a button from the side, or to nap on top of it (null if it won't fit).
+  function spotFor(el, mode, side) {
+    if (!el.isConnected) return null;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    const { width: W, height: H } = size();
+    let left, bottom;
+    if (mode === 'side') {
+      left = side === 1 ? r.right - 6 + pawReach * W : r.left + 6 - pawReach * W - W;
+      bottom = r.top + r.height / 2 - (492 / 641) * H + H;
+    } else {
+      left = r.left + r.width / 2 - (side === 1 ? 0.633 : 0.367) * W;
+      bottom = r.top + 3;
+    }
+    const fits = left >= margin && left + W <= innerWidth - margin && bottom - H >= margin && bottom <= innerHeight - margin;
+    return fits ? { right: innerWidth - left - W, bottom: innerHeight - bottom } : null;
+  }
+  function usableButton(el) {
+    if (el.closest('.fivey-chat, [hidden], [inert]') || el.disabled) return false;
+    const r = el.getBoundingClientRect();
+    if (r.width < 40 || r.width > 520 || r.height < 20 || r.height > 140) return false;
+    if (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) return false;
+    const style = getComputedStyle(el);
+    if (style.visibility === 'hidden' || Number(style.opacity) < 0.5) return false;
+    // Not hidden under something else (Grogy itself passing in front doesn't count).
+    const middle = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return !!middle && (el.contains(middle) || button.contains(middle));
+  }
+  // One of the three closest buttons the cat has room to reach, with the spot and the side to use.
+  function pickButton(mode) {
+    const { left, width } = size();
+    const here = left + width / 2;
+    const options = [];
+    for (const el of document.querySelectorAll(buttonSelector)) {
+      if (!usableButton(el)) continue;
+      const r = el.getBoundingClientRect();
+      const sides = mode === 'side' ? (r.left + r.width / 2 < here ? [1, -1] : [-1, 1]) : [facing];
+      for (const side of sides) {
+        const spot = spotFor(el, mode, side);
+        if (!spot) continue;
+        options.push({ el, side, spot, distance: Math.hypot(spot.right - place.right, spot.bottom - place.bottom) });
+        break;
+      }
+    }
+    // Only buttons within a short stroll (it walks there at its normal pace).
+    const near = options.filter(option => option.distance <= walkSpeed * 8).sort((a, b) => a.distance - b.distance);
+    return near.slice(0, 3)[Math.floor(Math.random() * Math.min(3, near.length))] ?? null;
+  }
+  function detach() {
+    attached = null;
+  }
+  // Keeps the cat at its button when the page scrolls or resizes; lets go if the button leaves.
+  function glue() {
+    if (!attached || !['idle', 'grooming', 'sleeping', 'playing'].includes(state)) return;
+    const spot = usableButton(attached.el) && spotFor(attached.el, attached.mode, attached.side);
+    if (spot) moveTo(spot);
+    else {
+      if (state === 'playing') setState('idle');
+      detach();
+    }
+  }
+  addEventListener('scroll', glue, { capture: true, passive: true });
+
+  // Walks to a button at its normal pace.
+  function goTo(choice, mode, arrive) {
+    cancelAnimationFrame(walking);
+    detach();
+    const id = ++travelId;
+    const first = Math.hypot(choice.spot.right - place.right, choice.spot.bottom - place.bottom);
+    const speed = walkSpeed;
+    setState('walking');
+    let last = performance.now();
+    const finish = spot => {
+      if (id !== travelId || state !== 'walking') return;
+      cancelAnimationFrame(walking);
+      moveTo(spot);
+      attached = { el: choice.el, mode, side: choice.side };
+      arrive();
+    };
+    const giveUp = () => {
+      if (id !== travelId || state !== 'walking') return;
+      cancelAnimationFrame(walking);
+      setState('idle');
+      planWalk();
+    };
+    const step = now => {
+      if (id !== travelId || state !== 'walking') return;
+      const spot = usableButton(choice.el) && spotFor(choice.el, mode, choice.side);
+      if (!spot) return giveUp();
+      const seconds = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      const dx = spot.right - place.right;
+      const dy = spot.bottom - place.bottom;
+      const distance = Math.hypot(dx, dy);
+      if (Math.abs(dx) > 1) face(dx < 0 ? -1 : 1);
+      if (distance <= speed * seconds + 1) return finish(spot);
+      moveTo({ right: place.right + dx / distance * speed * seconds, bottom: place.bottom + dy / distance * speed * seconds });
+      walking = requestAnimationFrame(step);
+    };
+    walking = requestAnimationFrame(step);
+    // Animation frames pause in a background tab; this makes sure the trip still ends.
+    setTimeout(() => {
+      const spot = usableButton(choice.el) && spotFor(choice.el, mode, choice.side);
+      if (spot) finish(spot);
+      else giveUp();
+    }, first / walkSpeed * 1000 + 2500);
+  }
+
+  // Playing with a button, for 4–8 seconds, switching every second or two between patting it with a
+  // paw (the button gives a little shake each time the paw lands), licking it, and rubbing its face on
+  // it.
+  let patTimer;
+  let playTimer;
+  let playEnd;
+  function shake(el) {
+    el.classList.remove('grogy-poked');
+    void el.offsetWidth;
+    el.classList.add('grogy-poked');
+  }
+  function play(action) {
+    clearTimeout(patTimer);
+    button.dataset.play = action;
+    if (action === 'pat') {
+      // The paw lands halfway through each 520 ms pat.
+      patTimer = setTimeout(function pat() {
+        if (state !== 'playing' || !attached || button.dataset.play !== 'pat') return;
+        shake(attached.el);
+        patTimer = setTimeout(pat, 520);
+      }, 260);
+    }
+    playTimer = setTimeout(() => {
+      if (state !== 'playing') return;
+      const others = ['pat', 'lick', 'rub'].filter(next => next !== action);
+      play(others[Math.floor(Math.random() * others.length)]);
+    }, random(1300, 2400));
+  }
+  function startPatting() {
+    if (!attached) return;
+    face(attached.side);
+    setState('playing');
+    play('pat');
+    playEnd = setTimeout(() => {
+      if (state !== 'playing') return;
+      setState('idle');
+      planWalk();
+    }, random(4000, 8000));
+  }
+  function stopPatting() {
+    clearTimeout(patTimer);
+    clearTimeout(playTimer);
+    clearTimeout(playEnd);
+    delete button.dataset.play;
+  }
+  document.addEventListener('animationend', event => {
+    if (event.animationName === 'grogy-poke') event.target.classList.remove('grogy-poked');
+  }, true);
+
+  // Napping on a button: clicking that button wakes Grogy, and it meows once.
+  document.addEventListener('click', event => {
+    if (attached?.mode !== 'top' || state !== 'sleeping' || !attached.el.contains(event.target)) return;
+    touched();
+    greet();
+  }, true);
+
   // Sleeping: 30 seconds after anyone last touched the cat (a click, key press or drag), it lies down
   // in a loaf and sleeps until someone touches it again. Walks and grooming wait while it sleeps.
   function touched() {
@@ -196,7 +388,16 @@ export function grogyCat(button, { onActivate }) {
     }
   }
   setInterval(() => {
-    if (state === 'idle' && performance.now() - lastTouch >= sleepAfter) setState('sleeping');
+    if (state !== 'idle' || performance.now() - lastTouch < sleepAfter) return;
+    // About half the time it first finds a button to nap on.
+    if (attached?.mode !== 'top' && !reducedMotion.matches && !document.hidden && Math.random() < 0.5) {
+      const choice = pickButton('top');
+      if (choice) {
+        goTo(choice, 'top', () => setState('sleeping'));
+        return;
+      }
+    }
+    setState('sleeping');
   }, 1000);
 
   // Walking on its own: at random moments, a slow walk of up to 3 seconds in a random direction.
@@ -210,6 +411,15 @@ export function grogyCat(button, { onActivate }) {
       planWalk();
       return;
     }
+    // Sometimes, instead of a stroll, it goes to pat a nearby button.
+    if (Math.random() < 0.35) {
+      const choice = pickButton('side');
+      if (choice) {
+        goTo(choice, 'side', startPatting);
+        return;
+      }
+    }
+    detach();
     const length = random(1000, 3000);
     const angle = random(-0.45, 0.45) + (Math.random() < 0.5 ? 0 : Math.PI);
     const dx = Math.cos(angle) * walkSpeed;
@@ -279,6 +489,8 @@ export function grogyCat(button, { onActivate }) {
     if (!drag.moved && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) < 6) return;
     if (!drag.moved) {
       drag.moved = true;
+      travelId++;
+      detach();
       cancelAnimationFrame(walking);
       setState('running');
     }
@@ -317,21 +529,29 @@ export function grogyCat(button, { onActivate }) {
       return;
     }
     touched();
-    meow();
-    button.classList.remove('is-meowing');
-    void button.offsetWidth;
-    button.classList.add('is-meowing');
-    if (state === 'walking' || state === 'grooming') {
+    greet();
+    if (['walking', 'dashing', 'grooming', 'playing'].includes(state)) {
+      travelId++;
       cancelAnimationFrame(walking);
       setState('idle');
     }
     onActivate();
   });
+  // A meow with a tail wiggle and a "Meow!" bubble.
+  function greet() {
+    meow();
+    button.classList.remove('is-meowing');
+    void button.offsetWidth;
+    button.classList.add('is-meowing');
+  }
   button.addEventListener('animationend', event => {
     if (event.animationName === 'grogy-tail-wiggle') button.classList.remove('is-meowing');
   });
 
-  addEventListener('resize', () => moveTo(place));
+  addEventListener('resize', () => {
+    moveTo(place);
+    glue();
+  });
   reducedMotion.addEventListener?.('change', () => {
     planWalk();
     planGroom();

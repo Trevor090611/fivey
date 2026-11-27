@@ -154,6 +154,9 @@
   transition: scale 160ms ease;
   filter: drop-shadow(0 3px 6px #19271f33);
 }
+/* Only the cat's own box takes clicks and drags; its picture layers (some move outside the box, like
+   the lowered head when sleeping) never cover the page around it. */
+.grogy-cat > * { pointer-events: none; }
 .grogy-cat img { pointer-events: none; -webkit-user-drag: none; }
 .grogy-cat .cat-head { transform-origin: 33.3% 56.9%; }
 .grogy-cat .cat-tail { transform-origin: 76.7% 92%; animation: grogy-tail-sway 3.2s ease-in-out infinite alternate; }
@@ -169,8 +172,8 @@
 /* Eyes: blink every 2 seconds; closed while grooming. */
 .grogy-cat .cat-lid { fill: #6f6a66; transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); }
 .grogy-cat .cat-lash { fill: none; stroke: #2f2b2a; stroke-width: 6; stroke-linecap: round; opacity: 0; }
-.grogy-cat:is([data-state="idle"], [data-state="walking"]) .cat-lid { animation: grogy-blink 2s infinite; }
-.grogy-cat:is([data-state="idle"], [data-state="walking"]) .cat-lash { animation: grogy-lash 2s infinite; }
+.grogy-cat:is([data-state="idle"], [data-state="walking"], [data-state="playing"]) .cat-lid { animation: grogy-blink 2s infinite; }
+.grogy-cat:is([data-state="idle"], [data-state="walking"], [data-state="playing"]) .cat-lash { animation: grogy-lash 2s infinite; }
 .grogy-cat[data-state="sleeping"] .cat-lid { transform: scaleY(1); }
 .grogy-cat[data-state="sleeping"] .cat-lash { opacity: 1; }
 @keyframes grogy-blink { 0%, 86%, 100% { transform: scaleY(0); } 91% { transform: scaleY(1); } }
@@ -210,14 +213,14 @@
   opacity: 0;
 }
 .grogy-cat .cat-walker img { position: absolute; top: 0; left: 0; width: 1400%; max-width: none; height: 100%; }
-.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-walker { visibility: visible; opacity: 1; }
-.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-rig { visibility: hidden; opacity: 0; }
-.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="held"]) .cat-shadow { left: -24%; right: -24%; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="dashing"], [data-state="held"]) .cat-walker { visibility: visible; opacity: 1; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="dashing"], [data-state="held"]) .cat-rig { visibility: hidden; opacity: 0; }
+.grogy-cat:is([data-state="walking"], [data-state="running"], [data-state="dashing"], [data-state="held"]) .cat-shadow { left: -24%; right: -24%; }
 /* Walking: one stride every 1.17 seconds, the video's own pace. */
 .grogy-cat[data-state="walking"] .cat-walker img { animation: grogy-stride 1167ms steps(14) infinite; }
 /* Running (dragged): the same stride at a fast trot, bouncing and leaning forward. */
-.grogy-cat[data-state="running"] .cat-walker img { animation: grogy-stride 480ms steps(14) infinite; }
-.grogy-cat[data-state="running"] .cat-walker { animation: grogy-trot 240ms ease-in-out infinite alternate; }
+.grogy-cat:is([data-state="running"], [data-state="dashing"]) .cat-walker img { animation: grogy-stride 480ms steps(14) infinite; }
+.grogy-cat:is([data-state="running"], [data-state="dashing"]) .cat-walker { animation: grogy-trot 240ms ease-in-out infinite alternate; }
 /* Held still mid-drag: paws dangle as the cat swings gently. */
 .grogy-cat[data-state="held"] .cat-walker { animation: grogy-dangle 900ms ease-in-out infinite alternate; }
 @keyframes grogy-stride { to { translate: -100% 0; } }
@@ -284,6 +287,53 @@
   100% { opacity: 0; transform: translate(26px, -42px) scale(1.1); }
 }
 
+/* Playing with a button: the near front paw reaches out and pats (the body without that leg shows).
+   The button shakes a little each time the paw lands. */
+.grogy-cat .cat-body-reach, .grogy-cat .cat-arm { visibility: hidden; }
+.grogy-cat .cat-arm { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.grogy-cat[data-state="playing"][data-play="pat"] .cat-body { visibility: hidden; }
+.grogy-cat[data-state="playing"][data-play="pat"] :is(.cat-body-reach, .cat-arm) { visibility: visible; }
+.grogy-cat .arm-swing { transform-box: view-box; transform-origin: 185px 490px; }
+.grogy-cat[data-state="playing"][data-play="pat"] .arm-swing { animation: grogy-pat 520ms ease-in-out infinite; }
+.grogy-cat .arm-fur { fill: #f3e6d4; }
+.grogy-cat .arm-tuft { fill: #f3e6d4; stroke: #4a3d36; stroke-width: 4; stroke-linejoin: round; }
+.grogy-cat .arm-sock, .grogy-cat .arm-paw { fill: #6f6a66; }
+.grogy-cat .arm-paw { stroke: #4a3d36; stroke-width: 5; }
+.grogy-cat :is(.arm-line, .arm-edge, .arm-toes) { fill: none; stroke: #4a3d36; stroke-width: 5; stroke-linecap: round; }
+@keyframes grogy-pat { 0%, 100% { rotate: 18deg; } 50% { rotate: -3deg; } }
+.grogy-poked { animation: grogy-poke 300ms ease-out; }
+@keyframes grogy-poke {
+  0%, 100% { translate: 0 0; rotate: 0deg; }
+  20% { translate: -2px 1px; rotate: -2deg; }
+  45% { translate: 2px 0; rotate: 1.5deg; }
+  70% { translate: -1px 0; rotate: -.8deg; }
+}
+
+/* Licking the button: head leans in, eyes half closed, tongue flicking. */
+.grogy-cat .cat-tongue { fill: #e9898c; stroke: #7d4446; stroke-width: 3; transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); }
+.grogy-cat[data-state="playing"][data-play="lick"] .cat-head { animation: grogy-lick-head 700ms ease-in-out infinite; }
+.grogy-cat[data-state="playing"][data-play="lick"] .cat-tongue { animation: grogy-tongue 350ms ease-in-out infinite; }
+.grogy-cat[data-state="playing"][data-play="lick"] .cat-lid { animation: none; transform: scaleY(.55); }
+@keyframes grogy-lick-head {
+  0%, 100% { translate: -6% 5%; rotate: -9deg; }
+  50% { translate: -8% 6.5%; rotate: -12deg; }
+}
+@keyframes grogy-tongue { 0%, 100% { transform: scaleY(.2); } 50% { transform: scaleY(1.1); } }
+
+/* Rubbing its face on the button: eyes closed, head pressing in and sweeping up and down. */
+.grogy-cat[data-state="playing"][data-play="rub"] .cat-head { animation: grogy-rub 900ms ease-in-out infinite; }
+.grogy-cat[data-state="playing"][data-play="rub"] .cat-lid { animation: none; transform: scaleY(1); }
+.grogy-cat[data-state="playing"][data-play="rub"] .cat-lash { animation: none; opacity: 1; }
+.grogy-cat[data-state="playing"][data-play="rub"] .cat-rig { animation: grogy-rub-lean 900ms ease-in-out infinite; }
+@keyframes grogy-rub {
+  0%, 100% { translate: -6% 1%; rotate: -14deg; }
+  50% { translate: -8% 6%; rotate: 5deg; }
+}
+@keyframes grogy-rub-lean {
+  0%, 100% { rotate: calc(-2deg * var(--facing, 1)); }
+  50% { rotate: calc(1deg * var(--facing, 1)); }
+}
+
 /* Clicked: a happy tail wiggle and a "Meow!" bubble. */
 .grogy-cat.is-meowing .cat-tail { animation: grogy-tail-wiggle 760ms ease-in-out; }
 @keyframes grogy-tail-wiggle {
@@ -321,7 +371,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .grogy-cat .cat-rig, .grogy-cat .cat-head, .grogy-cat .cat-tail, .grogy-cat .cat-walker, .grogy-cat .cat-walker img,
-  .grogy-cat.is-meowing .cat-tail { animation: none !important; }
+  .grogy-cat.is-meowing .cat-tail, .grogy-cat .arm-swing, .grogy-poked, .grogy-cat .cat-tongue { animation: none !important; }
   .grogy-cat .cat-dust { display: none; }
   .grogy-cat .loaf-body, .grogy-cat .cat-groomer img { animation: none !important; }
   .grogy-cat[data-state="sleeping"] .cat-head { animation: none !important; }

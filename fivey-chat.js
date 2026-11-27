@@ -4,7 +4,7 @@ import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localChatMessages } from './grogy-conversation.js?v=2';
 import { articleSummary } from './article-summary.js?v=2';
-import { grogyCat } from './grogy-cat.js?v=2';
+import { grogyCat } from './grogy-cat.js?v=3';
 const questionCost = 1;
 // Summarizing a blog article costs 2 Orbies, paid each time a summary is written.
 const summaryCost = 2;
