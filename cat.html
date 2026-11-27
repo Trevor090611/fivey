@@ -1,32 +1,67 @@
 <!doctype html>
-<html lang="en" class="fivey-auth-pending">
+<html lang="en" class="fivey-auth-pending" data-cat-page>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Name Your Cat | Fivey</title>
+  <title>Your Cat | Fivey</title>
   <script src="./theme.js?v=4"></script>
   <link rel="stylesheet" href="./brand.css">
   <link rel="stylesheet" href="./auth.css?v=magenta2">
-  <script type="module" src="./auth-gate.js?v=cat-name1"></script>
+  <link rel="stylesheet" href="./fivey-chat.css?v=16">
   <style>
+    :root[data-cat-page] { color-scheme: dark; --cat-cyan: #62e7ff; --cat-muted: #b9c7cc; }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: #f8f7ef; color: #19271f; font: 16px/1.55 "DM Sans", system-ui, sans-serif; }
+    :root[data-cat-page] body { margin: 0; min-height: 100vh; background: #000 !important; color: #f4fbff; font: 16px/1.55 "DM Sans", system-ui, sans-serif; }
     .cat-name-bar { width: min(1120px, calc(100% - 32px)); min-height: 70px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .cat-name-page { width: min(520px, calc(100% - 32px)); margin: clamp(32px, 8vw, 80px) auto; }
-    .cat-name-card { padding: clamp(20px, 5vw, 36px); border: 1px solid #d4d9cd; border-radius: 16px; background: #fffef8; }
-    .cat-name-card h1 { margin: 0 0 24px; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; overflow-wrap: anywhere; }
-    .cat-name-card form { display: grid; gap: 8px; }
-    .cat-name-card label { font-weight: 700; }
-    .cat-name-card input { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid #63775e; border-radius: 6px; background: #fff; color: #19271f; font: inherit; }
-    .cat-name-card button { width: fit-content; margin-top: 12px; padding: 10px 16px; font: inherit; font-weight: 700; }
-    .cat-name-card button:disabled { opacity: .6; cursor: not-allowed; }
-    .cat-name-card :focus-visible { outline: 3px solid #467335; outline-offset: 3px; }
-    #cat-name-help { font-size: 14px; }
-    #cat-name-status { margin: 0; }
-    #cat-name-status:not(:empty) { margin-top: 12px; }
-    [data-theme="dark"] body { background: #121916; color: #f4f8f2; }
-    [data-theme="dark"] .cat-name-card { background: #1d2721; border-color: #54675a; }
-    [data-theme="dark"] .cat-name-card :focus-visible { outline-color: #d9f783; }
+    :root[data-cat-page] header nav :is(.fivey-user-dropdown, .fivey-subjects ul) { border: 4px solid var(--cat-cyan) !important; background: #000 !important; }
+    :root[data-cat-page] :is(.cat-name-page, .fivey-user-dropdown) :is(button, a.practice-button) {
+      border: 3px solid var(--cat-cyan) !important; background-color: #000 !important;
+      background-image: linear-gradient(var(--cat-cyan), var(--cat-cyan)) !important; color: #f4fbff !important;
+    }
+    :root[data-cat-page] :is(.cat-name-page, .fivey-user-dropdown) :is(button, a.practice-button):is(:hover, :focus-visible):not(:disabled) { color: #000 !important; }
+    :root[data-cat-page] header nav .fivey-subjects li a { background: #000; color: #f4fbff; }
+    :root[data-cat-page] header nav .fivey-subjects li a:is(:hover, :focus-visible) { background: var(--cat-cyan); color: #000; }
+    .cat-name-page { width: min(1000px, calc(100% - 32px)); margin: clamp(24px, 5vw, 60px) auto; display: grid; gap: 20px; }
+    .cat-banner, .cat-name-card, .cat-tiers { border: 3px solid var(--cat-cyan); border-radius: 18px; background: #000; }
+    .cat-banner { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(18px, 4vw, 44px); align-items: center; }
+    .cat-banner, .cat-name-card { padding: clamp(18px, 4vw, 36px); }
+    .cat-portrait { min-width: 0; min-height: 200px; display: grid; place-items: center; overflow: hidden; border: 2px solid var(--cat-cyan); border-radius: 16px; background: radial-gradient(ellipse at 50% 76%, #103138, #000 72%); }
+    .cat-portrait .grogy-cat { position: relative; width: min(58%, 184px); aspect-ratio: 600 / 641; pointer-events: none; }
+    .cat-portrait .grogy-cat .cat-tail { animation: none; }
+    .cat-portrait .grogy-cat .cat-walker, .cat-portrait .grogy-cat .cat-zzz { display: none; }
+    .cat-portrait .grogy-cat[data-state="idle"] :is(.cat-body, .cat-tail) { visibility: hidden; }
+    .cat-portrait .grogy-cat[data-state="idle"] .cat-loaf { visibility: visible; }
+    .cat-portrait .grogy-cat[data-state="idle"] .cat-head { translate: 0 23.4%; rotate: -4deg; }
+    .cat-attachment h1 { margin: 0 0 16px; font-size: clamp(29px, 5vw, 46px); line-height: 1.08; overflow-wrap: anywhere; }
+    .cat-attachment h2, .cat-name-card h2 { margin: 0 0 8px; color: var(--cat-cyan); font-size: 18px; }
+    #cat-tier-label { margin: 0 0 8px; font-size: clamp(18px, 3vw, 25px); font-weight: 800; }
+    #cat-tier-art { display: block; width: auto; max-width: 100%; max-height: 120px; object-fit: contain; margin: 0 0 10px; }
+    #cat-tier-art[hidden] { display: none; }
+    #cat-xp-bar { display: block; width: 100%; height: 14px; accent-color: var(--cat-cyan); }
+    #cat-xp-label, #cat-name-help { color: var(--cat-muted); font-size: 14px; }
+    #cat-xp-label { margin: 6px 0 14px; }
+    .cat-name-card form { display: grid; gap: 8px; max-width: 480px; }
+    .cat-name-card input { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--cat-cyan); border-radius: 6px; background: #000; color: #f4fbff; font: inherit; }
+    .cat-name-page button { width: fit-content; min-height: 44px; padding: 8px 14px; border-radius: 8px; font: inherit; font-weight: 750; }
+    .cat-name-page button:disabled { opacity: .65; cursor: not-allowed; }
+    .cat-name-page :focus-visible { outline: 3px solid var(--cat-cyan); outline-offset: 3px; }
+    .cat-name-page p[role="status"] { margin: 0; }
+    .cat-name-page p[role="status"]:not(:empty) { margin-top: 10px; }
+    .cat-tiers { padding: 12px 18px; }
+    .cat-tiers summary { color: var(--cat-cyan); padding: 6px 0; font-weight: 750; cursor: pointer; }
+    .cat-tiers ol { margin: 8px 0 4px; padding-inline-start: 30px; }
+    .cat-tiers li { padding: 5px 0; }
+    .cat-tiers li span { color: var(--cat-muted); }
+    .cat-tiers li[aria-current="step"] { color: var(--cat-cyan); font-weight: 750; }
+    @media (max-width: 600px) {
+      .cat-banner { grid-template-columns: minmax(0, 1fr); }
+      .cat-portrait { min-height: 160px; }
+      .cat-portrait .grogy-cat { width: min(45%, 144px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cat-portrait .grogy-cat :is(.cat-lid, .cat-lash) { animation: none !important; }
+      .cat-portrait .grogy-cat .cat-head { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -38,8 +73,27 @@
     </div>
   </header>
   <main class="cat-name-page">
-    <section class="cat-name-card" aria-labelledby="cat-name-title">
-      <h1 id="cat-name-title">Grogy the Cat</h1>
+    <section class="cat-banner" aria-labelledby="cat-name-title">
+      <div class="cat-portrait" role="img" aria-label="The cat resting in its card">
+        <div class="grogy-cat" id="cat-portrait" data-state="idle" aria-hidden="true"></div>
+      </div>
+      <div class="cat-attachment">
+        <h1 id="cat-name-title">Grogy the Cat</h1>
+        <h2 id="cat-attachment-heading">Level of Attachment</h2>
+        <p id="cat-tier-label">Tier 1 · Stranger</p>
+        <img id="cat-tier-art" alt="" hidden>
+        <progress id="cat-xp-bar" max="100" value="0" aria-labelledby="cat-attachment-heading" aria-describedby="cat-xp-label"></progress>
+        <p id="cat-xp-label">0 / 100 EXP to Wary</p>
+        <button class="practice-button" id="cat-feed" type="button" disabled>Feed the cat (+25 EXP)</button>
+        <p id="cat-feed-status" role="status"></p>
+      </div>
+    </section>
+    <details class="cat-tiers">
+      <summary>Attachment tiers</summary>
+      <ol id="cat-tier-list"></ol>
+    </details>
+    <section class="cat-name-card" aria-labelledby="cat-rename-heading">
+      <h2 id="cat-rename-heading">Rename your cat</h2>
       <form id="cat-name-form">
         <label for="cat-name">Cat’s name</label>
         <input id="cat-name" type="text" value="Grogy" maxlength="10" aria-describedby="cat-name-help" autocomplete="off" required disabled>
@@ -49,5 +103,129 @@
       <p id="cat-name-status" role="status"></p>
     </section>
   </main>
+  <script type="module">
+    import { authenticatedClient } from './auth-gate.js?v=cat-name1';
+    import { catMarkup } from './grogy-cat.js';
+
+    const tiers = ['Stranger', 'Wary', 'Curious', 'Familiar', 'Comfort', 'Companion',
+      'Affectionate', 'Buddy Buddy :)', 'Best Friends :D', 'Inseparable'];
+    const requirements = tiers.slice(0, -1).map((_, index) => Math.ceil(100 * 2.5 ** index));
+    const maxXP = requirements.reduce((total, cost) => total + cost, 0);
+    const feedXP = 25;
+    const xpKey = 'fivey_cat_attachment_xp';
+    // Add image URLs here by tier number as artwork becomes available.
+    const tierArtwork = {};
+    const format = new Intl.NumberFormat();
+    const portrait = document.querySelector('#cat-portrait');
+    const tierLabel = document.querySelector('#cat-tier-label');
+    const artwork = document.querySelector('#cat-tier-art');
+    const bar = document.querySelector('#cat-xp-bar');
+    const xpLabel = document.querySelector('#cat-xp-label');
+    const feed = document.querySelector('#cat-feed');
+    const feedStatus = document.querySelector('#cat-feed-status');
+    const list = document.querySelector('#cat-tier-list');
+    let totalXP = 0;
+    let saving = false;
+
+    portrait.innerHTML = catMarkup;
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    setInterval(() => {
+      if (reducedMotion.matches || document.hidden) return;
+      portrait.dataset.state = 'grooming';
+      setTimeout(() => { portrait.dataset.state = 'idle'; }, 2600);
+    }, 12000);
+
+    const tierRows = tiers.map((name, index) => {
+      const row = document.createElement('li');
+      const cost = document.createElement('span');
+      const target = requirements[index];
+      row.textContent = name;
+      cost.textContent = target ? ' · ' + format.format(target) + ' EXP to advance' : ' · Max tier';
+      row.append(cost);
+      list.append(row);
+      return row;
+    });
+
+    function savedXP(user) {
+      const xp = user?.user_metadata?.[xpKey];
+      return Number.isSafeInteger(xp) ? Math.max(0, Math.min(xp, maxXP)) : 0;
+    }
+
+    function progress(total) {
+      let xp = total;
+      let index = 0;
+      while (index < requirements.length && xp >= requirements[index]) {
+        xp -= requirements[index];
+        index++;
+      }
+      return { index, xp, target: requirements[index] };
+    }
+
+    const auth = authenticatedClient?.auth;
+    function paint() {
+      const { index, xp, target } = progress(totalXP);
+      tierLabel.textContent = 'Tier ' + (index + 1) + ' · ' + tiers[index];
+      const image = tierArtwork[index + 1];
+      if (image) artwork.src = image;
+      else artwork.removeAttribute('src');
+      artwork.hidden = !image;
+      bar.max = target || 1;
+      bar.value = target ? xp : 1;
+      xpLabel.textContent = target ? format.format(xp) + ' / ' + format.format(target) + ' EXP to ' + tiers[index + 1] : 'Maximum attachment reached';
+      feed.disabled = !auth || saving || !target;
+      feed.textContent = saving ? 'Feeding…' : target ? 'Feed the cat (+' + Math.min(feedXP, maxXP - totalXP) + ' EXP)' : 'Max attachment';
+      tierRows.forEach((row, rowIndex) => {
+        if (rowIndex === index) row.setAttribute('aria-current', 'step');
+        else row.removeAttribute('aria-current');
+      });
+    }
+
+    async function currentUser() {
+      const { data, error } = await auth.getUser();
+      if (error || !data?.user) throw error || new Error('Missing account');
+      return data.user;
+    }
+
+    async function feedCat() {
+      const user = await currentUser();
+      const previousXP = savedXP(user);
+      const nextXP = Math.min(previousXP + feedXP, maxXP);
+      if (nextXP === previousXP) {
+        totalXP = previousXP;
+        feedStatus.textContent = 'Maximum attachment reached.';
+        return;
+      }
+      const { data, error } = await auth.updateUser({ data: { [xpKey]: nextXP } });
+      if (error || !data?.user) throw error || new Error('Missing updated account');
+      totalXP = savedXP(data.user);
+      const { index } = progress(totalXP);
+      const earned = '+' + (totalXP - previousXP) + ' EXP.';
+      feedStatus.textContent = index > progress(previousXP).index ? earned + ' Reached ' + tiers[index] + '!' : earned;
+    }
+
+    if (auth) {
+      try {
+        totalXP = savedXP(await currentUser());
+      } catch {
+        feedStatus.textContent = 'Could not load attachment progress. Feeding will try again.';
+      }
+      feed.addEventListener('click', async () => {
+        if (saving || totalXP === maxXP) return;
+        saving = true;
+        feedStatus.textContent = '';
+        paint();
+        try {
+          if (navigator.locks) await navigator.locks.request(xpKey, feedCat);
+          else await feedCat();
+        } catch {
+          feedStatus.textContent = 'Could not save the feeding. Please try again.';
+        } finally {
+          saving = false;
+          paint();
+        }
+      });
+    }
+    paint();
+  </script>
 </body>
 </html>
