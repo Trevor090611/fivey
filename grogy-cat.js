@@ -1,3 +1,5 @@
+import { connectClient } from './auth-client.js';
+
 // Grogy the cat: the button that opens the Grogy chat. Visitors can click it (it mews and opens the
 // chat) or drag it anywhere on the screen (it runs on all four legs while dragged). On its own it
 // blinks every 2 seconds, sometimes walks around for up to 3 seconds, grooms itself after 10 still
@@ -74,6 +76,126 @@ const loaf = `
     <path class="loaf-collar" d="M118 528 C170 553 250 553 302 530"/>
   </svg>`;
 
+const hungerKey = 'fivey_cat_hunger';
+const hungerInterval = 180_000;
+export const mealHunger = 25;
+let hungerStyles;
+
+function validHunger(record) {
+  return Number.isInteger(record?.level) && record.level >= 0 && record.level <= 100 &&
+    Number.isFinite(record.at) && record.at > 0;
+}
+
+export function catHungerFor(user, now = Date.now()) {
+  const key = hungerKey + ':' + user.id;
+  let local;
+  try { local = JSON.parse(localStorage.getItem(key)); } catch {}
+  const saved = user.user_metadata?.[hungerKey];
+  const record = validHunger(saved) && (!validHunger(local) || saved.at > local.at)
+    ? saved : validHunger(local) ? local : { level: 100, at: now };
+  if (record !== local) {
+    try { localStorage.setItem(key, JSON.stringify(record)); } catch {}
+  }
+  return Math.max(0, record.level - Math.floor(Math.max(0, now - record.at) / hungerInterval));
+}
+
+export function hungerAfterMeal(level, now = Date.now()) {
+  return { [hungerKey]: { level: Math.min(100, level + mealHunger), at: now } };
+}
+
+export function hungerMood(level) {
+  if (level <= 25) return 'hungry';
+  if (level <= 50) return 'tired';
+  return level < 75 ? 'quiet' : 'normal';
+}
+
+export function watchCatHunger(cat, onMood = () => {}) {
+  if (!hungerStyles) {
+    hungerStyles = document.createElement('style');
+    hungerStyles.textContent = HUNGER_STYLES;
+    document.head.append(hungerStyles);
+  }
+  cat.insertAdjacentHTML('beforeend', '<span class="cat-hunger-ui"><span class="cat-hunger-meter" role="meter" aria-label="Hunger bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="cat-hunger-fill"></span><span class="cat-hunger-number">100%</span></span><span class="cat-hunger-speech" role="status" hidden></span></span><span class="cat-stomach-growl" aria-hidden="true">∿ ∿</span>');
+  const meter = cat.querySelector('.cat-hunger-meter');
+  const number = cat.querySelector('.cat-hunger-number');
+  const speech = cat.querySelector('.cat-hunger-speech');
+  let user;
+  let level;
+  let spoken = '';
+  let speechTimer;
+
+  function showSpeech() {
+    const line = spoken || (cat.dataset.hungerMood === 'hungry' ? 'I am hungry :(' : '');
+    if (speech.textContent !== line) speech.textContent = line;
+    speech.hidden = !line;
+  }
+
+  function refresh() {
+    if (!user?.id) return;
+    const next = catHungerFor(user);
+    if (next === level) return;
+    level = next;
+    const previous = cat.dataset.hungerMood;
+    const mood = hungerMood(level);
+    cat.dataset.hungerMood = mood;
+    meter.style.setProperty('--hunger-fill', level + '%');
+    meter.setAttribute('aria-valuenow', level);
+    number.textContent = level + '%';
+    showSpeech();
+    if (mood !== previous) onMood(mood, previous);
+  }
+
+  function setUser(account) {
+    if (!account?.id) return;
+    user = account;
+    refresh();
+  }
+
+  const ready = connectClient().then(async client => {
+    if (!client?.auth) return;
+    const { data } = await client.auth.getSession();
+    if (!user) setUser(data?.session?.user);
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === 'USER_UPDATED') setUser(session?.user);
+    });
+  }).catch(() => {});
+  window.addEventListener('storage', event => {
+    if (event.key === hungerKey + ':' + user?.id) refresh();
+  });
+  window.addEventListener('pageshow', refresh);
+  setInterval(refresh, 1000);
+  return {
+    ready, setUser,
+    say(line) {
+      spoken = line;
+      showSpeech();
+      clearTimeout(speechTimer);
+      speechTimer = setTimeout(() => { spoken = ''; showSpeech(); }, 2800);
+    }
+  };
+}
+
+const HUNGER_STYLES = `
+.grogy-cat .cat-hunger-ui { position:absolute; z-index:4; left:50%; bottom:98%; width:86px; transform:translateX(-50%); pointer-events:none; color:#f5fbff; font:700 11px/1.25 system-ui,sans-serif; }
+.grogy-cat .cat-hunger-meter { display:block; position:relative; isolation:isolate; overflow:hidden; height:16px; border:1px solid var(--hunger-color); border-radius:9px; background:#171d21; text-align:center; --hunger-color:#6ce899; --hunger-fill:100%; }
+.grogy-cat .cat-hunger-fill { position:absolute; z-index:-1; inset:0 auto 0 0; width:var(--hunger-fill); background:var(--hunger-color); }
+.grogy-cat .cat-hunger-number { padding-inline:4px; background:#10171dd9; border-radius:6px; }
+.grogy-cat .cat-hunger-speech { position:absolute; left:50%; bottom:calc(100% + 4px); transform:translateX(-50%); width:max-content; padding:3px 6px; color:#17242b; background:#fff; border:1px solid #427582; border-radius:8px; }
+.grogy-cat .cat-hunger-speech[hidden] { display:none; }
+.grogy-cat[data-hunger-mood="quiet"] .cat-hunger-meter { --hunger-color:#f9df58; }
+.grogy-cat[data-hunger-mood="tired"] .cat-hunger-meter { --hunger-color:#ff9e42; }
+.grogy-cat[data-hunger-mood="hungry"] .cat-hunger-meter { --hunger-color:#ff636d; }
+.grogy-cat .cat-hunger-expression, .grogy-cat .cat-stomach-growl { display:none; }
+.grogy-cat:is([data-hunger-mood="tired"],[data-hunger-mood="hungry"])[data-state="idle"] .cat-lid { animation:none !important; transform:scaleY(.58); }
+.grogy-cat[data-hunger-mood="hungry"][data-state="idle"] .cat-lid { transform:scaleY(.75); }
+.grogy-cat[data-hunger-mood="hungry"] .cat-hunger-expression { display:inline !important; }
+.grogy-cat[data-hunger-mood="hungry"] :is(.cat-tail,.cat-head,.cat-lash,.cat-lid) { animation:none !important; transition:none !important; }
+.fivey-chat .grogy-cat[data-hunger-mood="hungry"]::after { animation:none; }
+.grogy-cat[data-hunger-mood="hungry"] .cat-stomach-growl { display:block; position:absolute; top:62%; right:8%; color:#ffd07e; font:900 17px/1 system-ui,sans-serif; text-shadow:0 1px 3px #32170c; animation:cat-belly-growl 2.8s ease-in-out infinite; }
+@keyframes cat-belly-growl { 0%, 55%, 100% { opacity:.35; scale:.8; } 64%, 80% { opacity:1; scale:1.16; } 72% { scale:.9; } }
+@media(prefers-reduced-motion:reduce) { .grogy-cat[data-hunger-mood="hungry"] .cat-stomach-growl { animation:none; } }
+`;
+
 export const catMarkup = `
   <span class="cat-shadow" aria-hidden="true"></span>
   <span class="cat-rig" aria-hidden="true">
@@ -86,6 +208,7 @@ export const catMarkup = `
       <img src="${image('head')}" alt="" draggable="false">
       <svg class="cat-face" viewBox="0 0 600 641" focusable="false">
         ${lids('grogy-eye')}
+        <path class="cat-hunger-expression" style="display:none" d="M83 219 l42 5 M218 200 l41 -12 M145 325 Q164 304 181 322" fill="none" stroke="#352928" stroke-width="8" stroke-linecap="round"/>
         <ellipse class="cat-tongue" cx="166" cy="326" rx="17" ry="13"/>
       </svg>
     </span>
@@ -161,6 +284,7 @@ export function grogyCat(button, { onActivate }) {
   let state = 'idle';
   let idleSince = performance.now();
   let lastTouch = performance.now();
+  let mood = 'normal';
   let walkTimer;
   let groomTimer;
   let walking;
@@ -170,7 +294,7 @@ export function grogyCat(button, { onActivate }) {
     const { width, height } = size();
     return {
       right: Math.min(Math.max(next.right, margin), Math.max(margin, innerWidth - width - margin)),
-      bottom: Math.min(Math.max(next.bottom, margin), Math.max(margin, innerHeight - height - margin))
+      bottom: Math.min(Math.max(next.bottom, margin), Math.max(margin, innerHeight - height - 51))
     };
   }
   function moveTo(next) {
@@ -198,7 +322,7 @@ export function grogyCat(button, { onActivate }) {
   // Grooming: after 10 seconds without moving, then again after every further 10 idle seconds.
   function planGroom() {
     clearTimeout(groomTimer);
-    if (reducedMotion.matches) return;
+    if (reducedMotion.matches || mood === 'hungry' || mood === 'tired') return;
     groomTimer = setTimeout(() => {
       if (state !== 'idle' || performance.now() - idleSince < groomAfter - 50) return;
       setState('grooming');
@@ -388,9 +512,10 @@ export function grogyCat(button, { onActivate }) {
     }
   }
   setInterval(() => {
-    if (state !== 'idle' || performance.now() - lastTouch < sleepAfter) return;
+    const delay = mood === 'tired' ? 12_000 : sleepAfter;
+    if (mood === 'hungry' || state !== 'idle' || performance.now() - lastTouch < delay) return;
     // About half the time it first finds a button to nap on.
-    if (attached?.mode !== 'top' && !reducedMotion.matches && !document.hidden && Math.random() < 0.5) {
+    if (mood !== 'tired' && attached?.mode !== 'top' && !reducedMotion.matches && !document.hidden && Math.random() < 0.5) {
       const choice = pickButton('top');
       if (choice) {
         goTo(choice, 'top', () => setState('sleeping'));
@@ -403,8 +528,9 @@ export function grogyCat(button, { onActivate }) {
   // Walking on its own: at random moments, a slow walk of up to 3 seconds in a random direction.
   function planWalk() {
     clearTimeout(walkTimer);
-    if (reducedMotion.matches) return;
-    walkTimer = setTimeout(startWalk, random(1500, 16000));
+    if (reducedMotion.matches || mood === 'hungry') return;
+    const wait = mood === 'normal' ? random(1500, 16000) : random(12000, 32000);
+    walkTimer = setTimeout(startWalk, wait);
   }
   function startWalk() {
     if (state !== 'idle' || document.hidden) {
@@ -412,7 +538,7 @@ export function grogyCat(button, { onActivate }) {
       return;
     }
     // Sometimes, instead of a stroll, it goes to pat a nearby button.
-    if (Math.random() < 0.35) {
+    if (mood === 'normal' && Math.random() < 0.35) {
       const choice = pickButton('side');
       if (choice) {
         goTo(choice, 'side', startPatting);
@@ -420,7 +546,7 @@ export function grogyCat(button, { onActivate }) {
       }
     }
     detach();
-    const length = random(1000, 3000);
+    const length = random(1000, mood === 'normal' ? 3000 : 1600);
     const angle = random(-0.45, 0.45) + (Math.random() < 0.5 ? 0 : Math.PI);
     const dx = Math.cos(angle) * walkSpeed;
     const dy = Math.sin(angle) * walkSpeed * 0.4;
@@ -471,7 +597,7 @@ export function grogyCat(button, { onActivate }) {
   let dragged = false;
   let stillTimer;
   button.addEventListener('pointerdown', event => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || mood === 'hungry') return;
     touched();
     try {
       loadMeows().catch(() => {});
@@ -539,6 +665,7 @@ export function grogyCat(button, { onActivate }) {
   });
   // A meow with a tail wiggle and a "Meow!" bubble.
   function greet() {
+    if (mood === 'hungry') return;
     meow();
     button.classList.remove('is-meowing');
     void button.offsetWidth;
@@ -555,6 +682,24 @@ export function grogyCat(button, { onActivate }) {
   reducedMotion.addEventListener?.('change', () => {
     planWalk();
     planGroom();
+  });
+  watchCatHunger(button, (next, previous) => {
+    mood = next;
+    if (next === 'hungry') {
+      travelId++;
+      cancelAnimationFrame(walking);
+      clearTimeout(stillTimer);
+      drag = null;
+      dragged = false;
+      detach();
+      button.classList.remove('is-meowing');
+      setState('idle');
+    } else if (previous === 'hungry') {
+      lastTouch = performance.now();
+      setState('idle');
+    }
+    planWalk();
+    if (state === 'idle') planGroom();
   });
   moveTo(place);
   button.style.setProperty('--facing', facing);
