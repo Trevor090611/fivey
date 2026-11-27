@@ -37,6 +37,39 @@ export function spendOrbies(account, amount) {
   });
 }
 
+export const cozySeatPrices = Object.freeze({ cardbox: 0, 'wooden-stool': 5 });
+const defaultSeat = 'cardbox';
+
+export function readCozySeats(wallet) {
+  const saved = wallet.cozySeats;
+  if (!saved || typeof saved !== 'object') return { owned: [], equipped: defaultSeat, updatedAt: 0 };
+  const owned = Array.isArray(saved.owned) ? [...new Set(saved.owned.filter(id =>
+    Object.hasOwn(cozySeatPrices, id) && cozySeatPrices[id] > 0))] : [];
+  const equipped = owned.includes(saved.equipped) ? saved.equipped : defaultSeat;
+  return { owned, equipped, updatedAt: Number.isFinite(saved.updatedAt) ? saved.updatedAt : 0 };
+}
+
+export function getCozySeats(account) {
+  return readCozySeats(readWallet(account));
+}
+
+export function selectCozySeat(account, item, confirmed = false) {
+  if (!account || !Object.hasOwn(cozySeatPrices, item)) throw new Error('Invalid cozy seat');
+  return updateWallet(account, wallet => {
+    const seats = readCozySeats(wallet);
+    const price = cozySeatPrices[item];
+    const buying = price > 0 && !seats.owned.includes(item);
+    if (buying && !confirmed) return 'confirmation-required';
+    if (buying && wallet.balance < price) return 'insufficient';
+    if (buying) {
+      wallet.balance -= price;
+      seats.owned.push(item);
+    }
+    wallet.cozySeats = { ...seats, equipped: item, updatedAt: Date.now() };
+    return buying ? 'purchased' : 'equipped';
+  });
+}
+
 export function qualifiesForChest(mode, correct, total) {
   return (mode === 'unit' || mode === 'allUnits') && total > 0 && correct * 5 >= total * 4;
 }
