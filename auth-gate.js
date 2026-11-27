@@ -165,6 +165,58 @@ function createStreakCounter(user, subjectTrigger, client) {
   return counter;
 }
 
+function catNameFor(user) {
+  const name = user?.user_metadata?.fivey_cat_name;
+  return typeof name === 'string' && name.trim() && name.length <= 10 ? name.trim() : 'Grogy';
+}
+
+function showCatName(user) {
+  const label = catNameFor(user) + ' the Cat';
+  const link = document.querySelector('#fivey-cat-option');
+  const heading = document.querySelector('#cat-name-title');
+  if (link) link.textContent = label;
+  if (heading) heading.textContent = label;
+}
+
+function setupCatNameForm(auth, user) {
+  const form = document.querySelector('#cat-name-form');
+  if (!form) return;
+
+  const input = form.querySelector('#cat-name');
+  const save = form.querySelector('button[type="submit"]');
+  const status = document.querySelector('#cat-name-status');
+  input.value = catNameFor(user);
+  input.disabled = save.disabled = false;
+  input.addEventListener('input', () => {
+    input.setCustomValidity('');
+    status.textContent = '';
+  });
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (save.disabled) return;
+    const name = input.value.trim();
+    if (!name || name.length > input.maxLength) {
+      input.setCustomValidity('Enter a name of 1 to 10 characters.');
+      input.reportValidity();
+      return;
+    }
+
+    input.disabled = save.disabled = true;
+    status.textContent = 'Saving…';
+    try {
+      const { data, error } = await auth.updateUser({ data: { fivey_cat_name: name } });
+      if (error || !data?.user) throw error || new Error('Missing updated account');
+      input.value = catNameFor(data.user);
+      showCatName(data.user);
+      status.textContent = 'Cat name saved.';
+    } catch {
+      status.textContent = 'Could not save the cat name. Please try again.';
+    } finally {
+      input.disabled = save.disabled = false;
+    }
+  });
+}
+
 async function appendAccountNavigation(nav, signOut, user, client) {
   if (nav.dataset.fiveyAccountNavigation === 'initializing' || nav.querySelector(':scope > .fivey-account-actions')) return;
   nav.dataset.fiveyAccountNavigation = 'initializing';
@@ -337,6 +389,14 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
   if (location.pathname === new URL(myAccount.href).pathname) {
     myAccount.setAttribute('aria-current', 'page');
   }
+  const cat = document.createElement('a');
+  cat.id = 'fivey-cat-option';
+  cat.className = 'practice-button fivey-user-option';
+  cat.href = new URL('./cat.html', import.meta.url).href;
+  cat.textContent = catNameFor(user) + ' the Cat';
+  if (location.pathname === new URL(cat.href).pathname) {
+    cat.setAttribute('aria-current', 'page');
+  }
   const settings = document.createElement('a');
   settings.className = 'practice-button fivey-user-option';
   settings.href = new URL('./settings.html', import.meta.url).href;
@@ -345,7 +405,7 @@ header nav .fivey-subjects li a:hover,header nav .fivey-subjects li a:focus-visi
     settings.setAttribute('aria-current', 'page');
   }
   signOut.classList.add('practice-button', 'fivey-user-option');
-  userDropdown.append(myAccount, settings, signOut);
+  userDropdown.append(myAccount, cat, settings, signOut);
   userMenu.append(userLabel, userDropdown);
   window.addEventListener('fivey:profile-updated', event => {
     const updatedUsername = String(event.detail?.username || '');
@@ -570,9 +630,18 @@ try {
       const nav = document.querySelector('header nav');
       if (nav) await appendAccountNavigation(nav, signOut, data.user, client);
       document.documentElement.classList.remove('fivey-auth-pending');
+      showCatName(data.user);
+      setupCatNameForm(auth, data.user);
       showWelcomeDialog(data.user);
-      auth.onAuthStateChange(event => {
+      auth.onAuthStateChange((event, session) => {
         if (event === 'SIGNED_OUT') location.replace(login.href);
+        if (event === 'USER_UPDATED' && session?.user) showCatName(session.user);
+      });
+      window.addEventListener('pageshow', event => {
+        if (!event.persisted) return;
+        auth.getUser().then(({ data }) => {
+          if (data?.user) showCatName(data.user);
+        }).catch(() => {});
       });
     }
   } else if (authConfig.enabled) {
