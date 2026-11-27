@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" class="fivey-auth-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Name Your Cat | Fivey</title>
+  <script src="./theme.js?v=4"></script>
+  <link rel="stylesheet" href="./brand.css">
+  <link rel="stylesheet" href="./auth.css?v=magenta2">
+  <script type="module" src="./auth-gate.js?v=cat-name1"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: #f8f7ef; color: #19271f; font: 16px/1.55 "DM Sans", system-ui, sans-serif; }
+    .cat-name-bar { width: min(1120px, calc(100% - 32px)); min-height: 70px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .cat-name-page { width: min(520px, calc(100% - 32px)); margin: clamp(32px, 8vw, 80px) auto; }
+    .cat-name-card { padding: clamp(20px, 5vw, 36px); border: 1px solid #d4d9cd; border-radius: 16px; background: #fffef8; }
+    .cat-name-card h1 { margin: 0 0 24px; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; overflow-wrap: anywhere; }
+    .cat-name-card form { display: grid; gap: 8px; }
+    .cat-name-card label { font-weight: 700; }
+    .cat-name-card input { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid #63775e; border-radius: 6px; background: #fff; color: #19271f; font: inherit; }
+    .cat-name-card button { width: fit-content; margin-top: 12px; padding: 10px 16px; font: inherit; font-weight: 700; }
+    .cat-name-card button:disabled { opacity: .6; cursor: not-allowed; }
+    .cat-name-card :focus-visible { outline: 3px solid #467335; outline-offset: 3px; }
+    #cat-name-help { font-size: 14px; }
+    #cat-name-status { margin: 0; }
+    #cat-name-status:not(:empty) { margin-top: 12px; }
+    [data-theme="dark"] body { background: #121916; color: #f4f8f2; }
+    [data-theme="dark"] .cat-name-card { background: #1d2721; border-color: #54675a; }
+    [data-theme="dark"] .cat-name-card :focus-visible { outline-color: #d9f783; }
+  </style>
+</head>
+<body>
+  <p id="fivey-access-status" role="status">Checking Fivey sign-in… <a href="./login.html">Go to login</a></p>
+  <header>
+    <div class="cat-name-bar">
+      <a class="brand" href="./" aria-label="Fivey home"><span class="brand-number" aria-hidden="true">5</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span><span class="brand-bill" aria-hidden="true">$</span></a>
+      <nav aria-label="Main navigation"></nav>
+    </div>
+  </header>
+  <main class="cat-name-page">
+    <section class="cat-name-card" aria-labelledby="cat-name-title">
+      <h1 id="cat-name-title">Grogy the Cat</h1>
+      <form id="cat-name-form">
+        <label for="cat-name">Cat’s name</label>
+        <input id="cat-name" type="text" value="Grogy" maxlength="10" aria-describedby="cat-name-help" autocomplete="off" required disabled>
+        <span id="cat-name-help">Up to 10 characters.</span>
+        <button class="practice-button" type="submit" disabled>Save name</button>
+      </form>
+      <p id="cat-name-status" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>
