@@ -1,7 +1,7 @@
 import { getOrbiesBalance, orbiesKey } from './orbies-wallet.js';
 import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
-import { syncAccountData } from './account-data.js?v=12';
+import { syncAccountData } from './account-data.js?v=13';
 
 // Show the wallet artwork on current and dynamically generated spending controls.
 function decorateOrbieButtons() {
