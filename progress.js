@@ -1,4 +1,4 @@
-import { analyticsAccount } from './auth-gate.js?v=orbies-chest1';
+import { analyticsAccount } from './auth-gate.js?v=orbie-controls2';
 import { createChest, qualifiesForChest } from './orbies-wallet.js?v=chest20';
 import { units, unitPool } from './practice-units.js?v=13';
 import { renderPracticePlot } from './practice-plot.js?v=1';
