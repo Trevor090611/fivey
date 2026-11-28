@@ -3,6 +3,52 @@ import { authConfig } from './auth-config.js?v=2';
 import { completed, connectClient, login, rememberDestination } from './auth-client.js';
 import { syncAccountData } from './account-data.js?v=4';
 
+// Show the wallet artwork on current and dynamically generated spending controls.
+function decorateOrbieButtons() {
+  const style = document.createElement('style');
+  style.textContent = '.fivey-button-coin{display:inline-block;width:1em;height:1em;max-width:none;object-fit:contain;flex:none;margin-inline-start:.38em;vertical-align:-.15em;pointer-events:none}' +
+    'body:has(.progress-quiz:not([hidden]):not(:has(.progress-summary:not([hidden])))) .fivey-chat{display:none!important}';
+  document.head.append(style);
+
+  const selector = 'button, a[role="button"], a.practice-button';
+  const priceLabel = /(?:^|\bfor\s+)[1-9][\d,]*\s+Orbies?\b/i;
+  const coinUrl = new URL('./orbies-coin.png?v=1', import.meta.url).href;
+  function update(button) {
+    const spendsOrbies = button.matches('#cat-seat-dialog button[value="purchase"]') ||
+      button.querySelector('.analytics-lock-icon, .chat-cost, .blog-summarize-cost') ||
+      priceLabel.test(button.textContent.trim());
+    const icon = button.querySelector('.fivey-button-coin');
+    if (!spendsOrbies) {
+      icon?.remove();
+    } else if (!icon) {
+      const image = document.createElement('img');
+      image.className = 'fivey-button-coin';
+      image.src = coinUrl;
+      image.alt = '';
+      image.setAttribute('aria-hidden', 'true');
+      button.append(image);
+    }
+  }
+
+  document.querySelectorAll(selector).forEach(update);
+  new MutationObserver(records => {
+    const buttons = new Set();
+    for (const { target, addedNodes } of records) {
+      const parent = target.nodeType === Node.ELEMENT_NODE ? target : target.parentElement;
+      const button = parent?.closest(selector);
+      if (button) buttons.add(button);
+      for (const node of addedNodes) {
+        if (node.nodeType !== Node.ELEMENT_NODE) continue;
+        if (node.matches(selector)) buttons.add(node);
+        node.querySelectorAll(selector).forEach(child => buttons.add(child));
+      }
+    }
+    for (const button of buttons) if (button.isConnected) update(button);
+  }).observe(document.body, { childList: true, characterData: true, subtree: true });
+}
+
+decorateOrbieButtons();
+
 export let analyticsAccount = null;
 export let authenticatedClient = null;
 
