@@ -228,9 +228,9 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=orbie-controls2';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=hungry-meow1';
     import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat2';
-    import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, watchCatHunger } from './grogy-cat.js?v=cozy-seat1';
+    import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
     function selectCareTab(selected) {
@@ -306,8 +306,10 @@
     const petCooldown = 2000;
     let lastPet = -Infinity;
     pet.addEventListener('click', () => {
+      if (pet.hidden) return;
+      void playCatMeow();
       const now = performance.now();
-      if (pet.hidden || portrait.dataset.hungerMood === 'hungry' || now - lastPet < petCooldown) return;
+      if (portrait.dataset.hungerMood === 'hungry' || now - lastPet < petCooldown) return;
       lastPet = now;
       const burst = document.createDocumentFragment();
       for (let i = 0; i < 3; i++) {
