@@ -251,9 +251,9 @@ body:has(.hero[data-course="macroeconomics"]) .macro-credits{display:block;paddi
 }
 </style>
 <link rel="stylesheet" href="./fivey-chat.css?v=16">
-<script type="module" src="./fivey-chat.js?v=25"></script>
+<script type="module" src="./fivey-chat.js?v=26"></script>
 <link rel="stylesheet" href="./auth.css?v=magenta2">
-<script type="module" src="./auth-gate.js?v=orbies2"></script>
+<script type="module" src="./auth-gate.js?v=orbie-controls2"></script>
 <link rel="stylesheet" href="./site-footer.css?v=2">
 <link rel="stylesheet" href="./biology-banners.css?v=2">
 <script type="module" src="./biology-banners.js?v=2"></script>
@@ -589,7 +589,7 @@ if (selected) {
     if (analyticsView) {
       const panel = document.querySelector('#analytics-panel');
       panel.hidden = false;
-      import('./course-analytics.js?v=3')
+      import('./course-analytics.js?v=4')
         .then(({ showAnalytics }) => showAnalytics(panel, id, name))
         .catch(() => { panel.querySelector('#analytics-status').textContent = 'Analytics could not load. Refresh to try again.'; });
     }
@@ -614,7 +614,7 @@ if (selected) {
     analyticsButton.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      import('./course-analytics.js?v=3')
+      import('./course-analytics.js?v=4')
         .then(({ openAnalytics }) => openAnalytics(id, name, analyticsButton.href))
         .catch(() => location.assign(analyticsButton.href));
     });
@@ -624,11 +624,11 @@ if (selected) {
     calculatorButton.addEventListener('click', event => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
-      import('./course-analytics.js?v=3')
+      import('./course-analytics.js?v=4')
         .then(({ openAnalytics }) => openAnalytics(id, name, calculatorButton.href, 'score-calculator'))
         .catch(() => location.assign(calculatorButton.href));
     });
-    import('./course-analytics.js?v=3').then(({ markAnalyticsButton }) => {
+    import('./course-analytics.js?v=4').then(({ markAnalyticsButton }) => {
       markAnalyticsButton(analyticsButton, id);
       markAnalyticsButton(calculatorButton, id, 'score-calculator');
     }).catch(() => {});
