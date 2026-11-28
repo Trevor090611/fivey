@@ -599,7 +599,7 @@ export function grogyCat(button, { onActivate }) {
   let dragged = false;
   let stillTimer;
   button.addEventListener('pointerdown', event => {
-    if (event.button !== 0 || mood === 'hungry') return;
+    if (event.button !== 0) return;
     touched();
     try {
       loadMeows().catch(() => {});
@@ -620,7 +620,7 @@ export function grogyCat(button, { onActivate }) {
       travelId++;
       detach();
       cancelAnimationFrame(walking);
-      setState('running');
+      if (mood !== 'hungry') setState('running');
     }
     const { width, height } = size();
     const dx = event.clientX - drag.x;
@@ -628,6 +628,7 @@ export function grogyCat(button, { onActivate }) {
     drag.x = event.clientX;
     drag.y = event.clientY;
     moveTo({ right: innerWidth - (event.clientX - drag.offsetX) - width, bottom: innerHeight - (event.clientY - drag.offsetY) - height });
+    if (mood === 'hungry') return;
     // Held still mid-drag: stop running until it moves again.
     button.dataset.state = 'running';
     puff(performance.now());
@@ -691,8 +692,6 @@ export function grogyCat(button, { onActivate }) {
       travelId++;
       cancelAnimationFrame(walking);
       clearTimeout(stillTimer);
-      drag = null;
-      dragged = false;
       detach();
       button.classList.remove('is-meowing');
       setState('idle');
