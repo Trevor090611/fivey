@@ -1,4 +1,4 @@
-import { cozySeatPrices, readCozySeats } from './orbies-wallet.js?v=cozy-seat10';
+import { cozySeatPrices, readCozySeats } from './orbies-wallet.js?v=cozy-seat11';
 
 // Keeps each user's Fivey data on their account (Supabase table fivey_user_data)
 // so it is the same on every browser and device they sign in from.
