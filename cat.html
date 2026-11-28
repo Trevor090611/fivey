@@ -224,6 +224,15 @@
     .footstool-rim { inset:31% 2% auto; height:24%; border:2px solid #8e5730; border-radius:8% 8% 48% 48%; background:linear-gradient(#e3a24e 10%,#f8d081 47%,#fff0c6 52% 63%,#ae7037 66%,#efb059 78%); }
     .footstool-cushion { inset:8% 2% auto; height:35%; border:2px solid #8b4b38; border-bottom:4px solid #e8b163; border-radius:50% 50% 44% 44% / 70% 70% 30% 30%; background:radial-gradient(ellipse at 42% 26%,#f7c1bf 0 54%,#e58d94 56%); }
     .cat-seat-preview .low-footstool-art { bottom:8%; width:63%; height:78%; }
+    .cat-portrait[data-equipped-seat="bath-towel"] { --pet-seat-bottom:41px; }
+    .cat-portrait[data-equipped-seat="bath-towel"] .cat-box-layer, .cat-portrait .bath-towel-art { display:none; }
+    .cat-portrait[data-equipped-seat="bath-towel"] .bath-towel-art { display:block; }
+    .bath-towel-art { position:absolute; left:var(--box-center); bottom:12px; width:min(145px, 76%); aspect-ratio:2.7; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 3px 3px #0008); }
+    .bath-towel-art span { position:absolute; display:block; }
+    .bath-towel-fold { inset:38% 4% 1%; border:2px solid #24484d; border-radius:16% 23% 27% 24%; background:linear-gradient(#7dc4c6,#b1dede 56%,#81c5c6 60%); transform:skewY(8deg); }
+    .bath-towel-fold::after { content:''; position:absolute; inset:23% 23% 26% 7%; border-bottom:2px solid #32595c; border-right:2px solid #32595c; border-radius:0 62% 53% 34%; }
+    .bath-towel-top { inset:2% 3% 36% 8%; border:2px solid #24484d; border-radius:26% 27% 18% 18%; transform:skewX(-28deg) rotate(5deg); background:linear-gradient(110deg,#b5dedd 0 59%,#80c7c7 60% 68%,#b4e0e0 69% 74%,#8fcccc 75% 82%,#abd6d7 83%); }
+    .cat-seat-preview .bath-towel-art { bottom:50%; width:72%; translate:-50% 50%; }
   </style>
 </head>
 <body>
@@ -262,6 +271,7 @@
           <span class="windowsill-art" aria-hidden="true"><span class="window-frame"></span><span class="window-door window-door-left"></span><span class="window-door window-door-right"></span><span class="window-ledge"></span></span>
         </button>
         <div class="low-footstool-art" aria-hidden="true"><span class="footstool-leg footstool-leg-back-left"></span><span class="footstool-leg footstool-leg-back-right"></span><span class="footstool-leg footstool-leg-front-left"></span><span class="footstool-leg footstool-leg-front-right"></span><span class="footstool-rim"></span><span class="footstool-cushion"></span></div>
+        <div class="bath-towel-art" aria-hidden="true"><span class="bath-towel-fold"></span><span class="bath-towel-top"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -300,8 +310,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=footstool1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat6';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=bath-towel1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat7';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -511,12 +521,13 @@
       { id: 'folded-newspaper', name: 'Folded Newspaper', art: '.newspaper-art' },
       { id: 'woven-straw-mat', name: 'Woven Straw Mat', art: '.straw-mat-art' },
       { id: 'hardwood-windowsill', name: 'Hardwood Windowsill', art: '.windowsill-art' },
-      { id: 'low-footstool', name: 'Low Footstool', art: '.low-footstool-art' }
+      { id: 'low-footstool', name: 'Low Footstool', art: '.low-footstool-art' },
+      { id: 'bath-towel', name: 'Bath Towel', art: '.bath-towel-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
     let purchaseItem;
-    const seatCards = seatCatalog.map(item => {
+    const seatCards = seatCatalog.sort((a, b) => cozySeatPrices[a.id] - cozySeatPrices[b.id]).map(item => {
       const card = document.createElement('article');
       card.className = 'cat-seat-card';
       const preview = document.createElement('div');
