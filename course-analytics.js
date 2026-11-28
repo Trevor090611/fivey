@@ -1,7 +1,7 @@
 // Course page locked features (Analytics and the AP score Calculator): each button asks for
 // Orbies the first time, and a locked Analytics page shows an unlock box instead of the results.
 // Uses the same auth-gate.js URL as course.html so sign-in runs only once.
-import { analyticsAccount } from './auth-gate.js?v=orbies2';
+import { analyticsAccount } from './auth-gate.js?v=orbie-controls2';
 import { askToUnlock, isAnalyticsUnlocked, lockedNotice, showLockState } from './analytics-unlock.js?v=3';
 
 export async function openAnalytics(course, name, href, feature = 'analytics') {
