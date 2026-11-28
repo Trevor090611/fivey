@@ -269,6 +269,19 @@
     .cat-seat-preview .covered-cat-cave-art { bottom:8%; width:min(84%,150px); height:84%; }
     .cat-seat-preview .cave-opening { inset:35% 23% 12%; }
     .cat-seat-preview .cave-badge { top:25%; width:14%; }
+    .cat-portrait[data-equipped-seat="plush-donut-bed"] { --pet-seat-bottom:51px; }
+    .cat-portrait[data-equipped-seat="plush-donut-bed"] .cat-box-layer, .cat-portrait .plush-donut-bed-art { display:none; }
+    .cat-portrait[data-equipped-seat="plush-donut-bed"] .plush-donut-bed-art { display:block; }
+    .plush-donut-bed-art { position:absolute; left:var(--box-center); bottom:12px; width:min(172px, 87%); height:100px; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 4px 4px #0008); }
+    .plush-donut-bed-art span { position:absolute; display:block; }
+    .donut-ear { top:0; width:26%; height:52%; background:#ffc1ba; border-radius:58% 8% 36% 18%; clip-path:polygon(10% 0,29% 0,100% 89%,2% 100%); transform:rotate(-10deg); }
+    .donut-ear::after { content:''; position:absolute; inset:22% 17% 0 12%; border-radius:56% 9% 26% 18%; background:#ed9189; }
+    .donut-ear-left { left:14%; }
+    .donut-ear-right { right:14%; transform:scaleX(-1) rotate(-10deg); }
+    .donut-bed-base { inset:48% 1% 2%; border-radius:10% 10% 48% 48%; background:linear-gradient(152deg,#ffbcb5,#f7a79f 61%,#ffc4bd 62%); }
+    .donut-bed-rim { inset:35% 0 34%; border-radius:50%; background:#f98678; box-shadow:inset 0 -3px 0 #db6d67; }
+    .donut-bed-cushion { inset:41% 7% 42%; border-radius:50%; background:radial-gradient(ellipse at 50% 53%,#ed887a 0 6%,transparent 7%),repeating-conic-gradient(from 10deg at 50% 53%,#f8b5ae 0 1deg,transparent 4deg 55deg),#ffc5bd; }
+    .cat-seat-preview .plush-donut-bed-art { bottom:9%; width:min(85%,156px); height:78%; }
   </style>
 </head>
 <body>
@@ -311,6 +324,7 @@
         <div class="cushioned-perch-art" aria-hidden="true"><span class="perch-bracket perch-bracket-left"></span><span class="perch-bracket perch-bracket-right"></span><span class="perch-base"></span><span class="perch-bolster"></span><span class="perch-fleece"></span></div>
         <div class="fresh-laundry-art" aria-hidden="true"><span class="laundry-striped"></span><span class="laundry-sheet"></span><span class="laundry-yellow"></span><span class="laundry-green"></span><span class="laundry-peach"></span><span class="laundry-navy"></span></div>
         <div class="covered-cat-cave-art" aria-hidden="true"><span class="cave-shell"></span><span class="cave-opening"><span class="cave-cushion"></span></span><span class="cave-badge"></span></div>
+        <div class="plush-donut-bed-art" aria-hidden="true"><span class="donut-ear donut-ear-left"></span><span class="donut-ear donut-ear-right"></span><span class="donut-bed-base"></span><span class="donut-bed-rim"></span><span class="donut-bed-cushion"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -349,8 +363,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=covered-cat-cave1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat10';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=plush-donut-bed1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat11';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -564,7 +578,8 @@
       { id: 'bath-towel', name: 'Bath Towel', art: '.bath-towel-art' },
       { id: 'cushioned-perch', name: 'Cushioned Perch', art: '.cushioned-perch-art' },
       { id: 'fresh-laundry', name: 'Pile of Fresh Laundry', art: '.fresh-laundry-art' },
-      { id: 'covered-cat-cave', name: 'Covered Cat Cave', art: '.covered-cat-cave-art' }
+      { id: 'covered-cat-cave', name: 'Covered Cat Cave', art: '.covered-cat-cave-art' },
+      { id: 'plush-donut-bed', name: 'Plush Donut Bed', art: '.plush-donut-bed-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
