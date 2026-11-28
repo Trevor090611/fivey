@@ -233,6 +233,18 @@
     .bath-towel-fold::after { content:''; position:absolute; inset:23% 23% 26% 7%; border-bottom:2px solid #32595c; border-right:2px solid #32595c; border-radius:0 62% 53% 34%; }
     .bath-towel-top { inset:2% 3% 36% 8%; border:2px solid #24484d; border-radius:26% 27% 18% 18%; transform:skewX(-28deg) rotate(5deg); background:linear-gradient(110deg,#b5dedd 0 59%,#80c7c7 60% 68%,#b4e0e0 69% 74%,#8fcccc 75% 82%,#abd6d7 83%); }
     .cat-seat-preview .bath-towel-art { bottom:50%; width:72%; translate:-50% 50%; }
+    .cat-portrait[data-equipped-seat="cushioned-perch"] { --pet-seat-bottom:67px; }
+    .cat-portrait[data-equipped-seat="cushioned-perch"] .cat-box-layer, .cat-portrait .cushioned-perch-art { display:none; }
+    .cat-portrait[data-equipped-seat="cushioned-perch"] .cushioned-perch-art { display:block; }
+    .cushioned-perch-art { position:absolute; left:var(--box-center); bottom:16px; width:min(164px, 82%); aspect-ratio:1.95; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 4px 4px #0008); }
+    .cushioned-perch-art span { display:block; position:absolute; }
+    .perch-bracket { top:49%; width:19%; height:46%; background:linear-gradient(115deg,#755641,#402e24 83%); border-radius:2px 3px 21% 41%; clip-path:polygon(0 0,77% 1%,77% 59%,100% 52%,100% 85%,50% 100%,28% 91%,17% 50%); }
+    .perch-bracket-left { left:17%; top:39%; }
+    .perch-bracket-right { right:17%; }
+    .perch-base { inset:43% 4% 30%; background:linear-gradient(#86634a,#4b362a 85%); border-radius:13% 15% 19% 21%; transform:skewY(-4deg); }
+    .perch-bolster { inset:7% 2% 38%; border-radius:22% 25% 25% 22%; background:linear-gradient(160deg,#c8a788 10%,#e2c2a3 29%,#c39b7a 61%,#aa8064 95%); border:1px solid #a17f60; transform:skewX(-13deg) rotate(4deg); }
+    .perch-fleece { inset:16% 17% 53% 14%; border-radius:18% 23%; background:radial-gradient(ellipse at 48% 52%,#fff6e8,#f1dfc7 78%,#cfae91); box-shadow:inset 0 2px 4px #6e463438; transform:skewX(-13deg) rotate(4deg); }
+    .cat-seat-preview .cushioned-perch-art { bottom:50%; width:80%; translate:-50% 50%; }
   </style>
 </head>
 <body>
@@ -272,6 +284,7 @@
         </button>
         <div class="low-footstool-art" aria-hidden="true"><span class="footstool-leg footstool-leg-back-left"></span><span class="footstool-leg footstool-leg-back-right"></span><span class="footstool-leg footstool-leg-front-left"></span><span class="footstool-leg footstool-leg-front-right"></span><span class="footstool-rim"></span><span class="footstool-cushion"></span></div>
         <div class="bath-towel-art" aria-hidden="true"><span class="bath-towel-fold"></span><span class="bath-towel-top"></span></div>
+        <div class="cushioned-perch-art" aria-hidden="true"><span class="perch-bracket perch-bracket-left"></span><span class="perch-bracket perch-bracket-right"></span><span class="perch-base"></span><span class="perch-bolster"></span><span class="perch-fleece"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -310,8 +323,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=bath-towel1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat7';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cushioned-perch1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat8';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -522,7 +535,8 @@
       { id: 'woven-straw-mat', name: 'Woven Straw Mat', art: '.straw-mat-art' },
       { id: 'hardwood-windowsill', name: 'Hardwood Windowsill', art: '.windowsill-art' },
       { id: 'low-footstool', name: 'Low Footstool', art: '.low-footstool-art' },
-      { id: 'bath-towel', name: 'Bath Towel', art: '.bath-towel-art' }
+      { id: 'bath-towel', name: 'Bath Towel', art: '.bath-towel-art' },
+      { id: 'cushioned-perch', name: 'Cushioned Perch', art: '.cushioned-perch-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
