@@ -184,11 +184,11 @@
     .straw-mat-rail-left { left:3%; transform:skewX(-25deg); }
     .straw-mat-rail-right { right:3%; transform:skewX(25deg); }
     .cat-seat-preview .straw-mat-art { bottom:50%; width:88%; translate:-50% 50%; }
-    .cat-portrait[data-equipped-seat="hardwood-windowsill"] { --pet-seat-bottom:35px; }
+    .cat-portrait[data-equipped-seat="hardwood-windowsill"] { --pet-seat-bottom:31px; }
     .cat-portrait[data-equipped-seat="hardwood-windowsill"] .cat-box-layer { display:none; }
     :root[data-cat-page] .cat-portrait #cat-window-toggle {
       display:none; position:absolute; z-index:0; left:var(--box-center); bottom:10px; translate:-50% 0 !important;
-      width:min(210px, 90%); aspect-ratio:1.65; margin:0; padding:0; cursor:pointer;
+      width:min(210px, 90%); height:118px; margin:0; padding:0; cursor:pointer;
       background:none !important; border:0 !important; box-shadow:none !important;
     }
     :root[data-cat-page] .cat-portrait[data-equipped-seat="hardwood-windowsill"] #cat-window-toggle { display:block; }
@@ -198,18 +198,32 @@
       --glass:linear-gradient(130deg,#e9f8ff 12%,#b7dfed 48%,#f6fdff 50%,#c4eaf6 53%,#e5f9fe 73%);
     }
     .windowsill-art span { display:block; position:absolute; }
-    .window-frame { inset:5% 24% 19%; background:#102d37; border:5px solid #cf9454; border-top-color:#efbd7c; box-shadow:inset 0 0 10px #0009; }
-    .window-door { inset:10% auto 24%; width:23%; border:3px solid #dc9f5e; border-radius:2px; background:var(--glass); transition:transform .22s ease; box-shadow:inset 0 0 0 1px #f1cb9b; }
+    .window-frame { inset:5% 24% 19%; background:#102d37; box-shadow:inset 0 0 10px #0009; }
+    .windowsill-art::after { content:''; position:absolute; z-index:2; inset:5% 24% 19%; border:5px solid #cf9454; border-top-color:#efbd7c; border-bottom-color:#b87f43; }
+    .window-door { z-index:1; inset:10% auto 24%; width:23%; border:3px solid #dc9f5e; border-radius:2px; background:var(--glass); transition:transform .22s ease; box-shadow:inset 0 0 0 1px #f1cb9b; }
     .window-door::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent 46%,#bc8149 47% 54%,transparent 55%),repeating-linear-gradient(0deg,transparent 0 29%,#ca8c4d 29% 34%); }
     .window-door::after { content:''; position:absolute; width:5px; height:9px; top:52%; background:#713e21; border-radius:50%; }
-    .window-door-left { left:27%; transform-origin:left center; transform:rotateY(-132deg); }
+    .window-door-left { left:27%; transform-origin:left center; transform:rotateY(136deg); }
     .window-door-left::after { right:3px; }
-    .window-door-right { right:27%; transform-origin:right center; transform:rotateY(132deg); }
+    .window-door-right { right:27%; transform-origin:right center; transform:rotateY(-136deg); }
     .window-door-right::after { left:3px; }
     #cat-window-toggle[data-window-closed] .window-door { transform:rotateY(0); }
-    .window-ledge { inset:auto 16% 3%; height:18%; background:var(--wood); clip-path:polygon(10% 0,90% 0,100% 82%,97% 100%,3% 100%,0 82%); box-shadow:inset 0 -4px #a76937; }
+    .window-ledge { z-index:3; inset:auto 16% 3%; height:18%; background:var(--wood); clip-path:polygon(10% 0,90% 0,100% 82%,97% 100%,3% 100%,0 82%); box-shadow:inset 0 -4px #a76937; }
     .cat-seat-preview .windowsill-art { inset:9% 3%; }
     @media(prefers-reduced-motion:reduce) { .window-door { transition:none; } }
+    .cat-portrait[data-equipped-seat="low-footstool"] { --pet-seat-bottom:101px; min-height:238px; }
+    .cat-portrait[data-equipped-seat="low-footstool"] .cat-box-layer, .cat-portrait .low-footstool-art { display:none; }
+    .cat-portrait[data-equipped-seat="low-footstool"] .low-footstool-art { display:block; }
+    .low-footstool-art { position:absolute; left:var(--box-center); bottom:13px; width:min(120px, 69%); height:104px; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 3px 4px #0008); }
+    .low-footstool-art span { position:absolute; display:block; }
+    .footstool-leg { top:43%; width:15%; height:52%; background:linear-gradient(90deg,#a56a2c,#ffd686 45%,#d59142 75%,#945b27); border:1px solid #925a2c; clip-path:polygon(8% 0,92% 0,96% 25%,75% 47%,66% 95%,40% 100%,28% 93%,29% 51%,5% 26%); }
+    .footstool-leg-back-left { left:28%; transform:scale(.83); transform-origin:top; filter:brightness(.89); }
+    .footstool-leg-back-right { right:10%; transform:skewX(7deg) scale(.88); transform-origin:top; filter:brightness(.88); }
+    .footstool-leg-front-left { left:13%; transform:skewX(-9deg); }
+    .footstool-leg-front-right { right:25%; height:57%; }
+    .footstool-rim { inset:31% 2% auto; height:24%; border:2px solid #8e5730; border-radius:8% 8% 48% 48%; background:linear-gradient(#e3a24e 10%,#f8d081 47%,#fff0c6 52% 63%,#ae7037 66%,#efb059 78%); }
+    .footstool-cushion { inset:8% 2% auto; height:35%; border:2px solid #8b4b38; border-bottom:4px solid #e8b163; border-radius:50% 50% 44% 44% / 70% 70% 30% 30%; background:radial-gradient(ellipse at 42% 26%,#f7c1bf 0 54%,#e58d94 56%); }
+    .cat-seat-preview .low-footstool-art { bottom:8%; width:63%; height:78%; }
   </style>
 </head>
 <body>
@@ -247,6 +261,7 @@
         <button id="cat-window-toggle" type="button" aria-label="Close window" title="Close window">
           <span class="windowsill-art" aria-hidden="true"><span class="window-frame"></span><span class="window-door window-door-left"></span><span class="window-door window-door-right"></span><span class="window-ledge"></span></span>
         </button>
+        <div class="low-footstool-art" aria-hidden="true"><span class="footstool-leg footstool-leg-back-left"></span><span class="footstool-leg footstool-leg-back-right"></span><span class="footstool-leg footstool-leg-front-left"></span><span class="footstool-leg footstool-leg-front-right"></span><span class="footstool-rim"></span><span class="footstool-cushion"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -285,8 +300,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=windowsill1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat5';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=footstool1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat6';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -495,7 +510,8 @@
       { id: 'doormat', name: 'Doormat', art: '.doormat-art' },
       { id: 'folded-newspaper', name: 'Folded Newspaper', art: '.newspaper-art' },
       { id: 'woven-straw-mat', name: 'Woven Straw Mat', art: '.straw-mat-art' },
-      { id: 'hardwood-windowsill', name: 'Hardwood Windowsill', art: '.windowsill-art' }
+      { id: 'hardwood-windowsill', name: 'Hardwood Windowsill', art: '.windowsill-art' },
+      { id: 'low-footstool', name: 'Low Footstool', art: '.low-footstool-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
