@@ -7,7 +7,7 @@ import { syncAccountData } from './account-data.js?v=4';
 function decorateOrbieButtons() {
   const style = document.createElement('style');
   style.textContent = '.fivey-button-coin{display:inline-block;width:1em;height:1em;max-width:none;object-fit:contain;flex:none;margin-inline-start:.38em;vertical-align:-.15em;pointer-events:none}' +
-    'body:has(.progress-quiz:not([hidden]):not(:has(.progress-summary:not([hidden])))) .fivey-chat{display:none!important}';
+    'body:has(.progress-quiz:not([hidden])):not(:has(.progress-quiz .progress-summary:not([hidden]))) .fivey-chat{display:none!important}';
   document.head.append(style);
 
   const selector = 'button, a[role="button"], a.practice-button';
