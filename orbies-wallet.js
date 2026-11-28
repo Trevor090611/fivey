@@ -37,7 +37,7 @@ export function spendOrbies(account, amount) {
   });
 }
 
-export const cozySeatPrices = Object.freeze({ cardbox: 0, 'wooden-stool': 5, doormat: 7, 'folded-newspaper': 10, 'woven-straw-mat': 13, 'bath-towel': 15, 'fresh-laundry': 17, 'hardwood-windowsill': 20, 'low-footstool': 25, 'cushioned-perch': 27, 'covered-cat-cave': 35, 'plush-donut-bed': 43, 'multi-tier-cat-tree-condo': 50 });
+export const cozySeatPrices = Object.freeze({ cardbox: 0, 'wooden-stool': 5, doormat: 7, 'folded-newspaper': 10, 'woven-straw-mat': 13, 'bath-towel': 15, 'fresh-laundry': 17, 'hardwood-windowsill': 20, 'low-footstool': 25, 'cushioned-perch': 27, 'covered-cat-cave': 35, sofa: 37, 'plush-donut-bed': 43, 'multi-tier-cat-tree-condo': 50 });
 const defaultSeat = 'cardbox';
 
 export function readCozySeats(wallet) {
