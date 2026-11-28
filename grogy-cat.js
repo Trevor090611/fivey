@@ -124,6 +124,49 @@ export function watchCatHunger(cat, onMood = () => {}) {
   let spoken = '';
   let speechTimer;
 
+  const hungryReminderDelay = 10 * 60 * 1000;
+  let nextHungryReminder = 0;
+
+  function reminderKey() {
+    return 'fivey-hungry-meow-v1:' + user.id;
+  }
+
+  function setReminderTime(time) {
+    nextHungryReminder = time;
+    try {
+      if (time) sessionStorage.setItem(reminderKey(), String(time));
+      else sessionStorage.removeItem(reminderKey());
+    } catch {}
+  }
+
+  function say(line) {
+    spoken = line;
+    showSpeech();
+    clearTimeout(speechTimer);
+    speechTimer = setTimeout(() => { spoken = ''; showSpeech(); }, 2800);
+  }
+
+  function remindWhenHungry() {
+    if (cat.dataset.hungerMood !== 'hungry' || !nextHungryReminder || Date.now() < nextHungryReminder ||
+        document.hidden || !cat.getClientRects().length) return;
+    setReminderTime(Date.now() + hungryReminderDelay);
+    say('I am hungry :<');
+    // Browsers may require a trusted page interaction before allowing sound.
+    if (audio?.state === 'running') void meow();
+  }
+
+  function primeMeow(event) {
+    if (!event.isTrusted) return;
+    document.removeEventListener('click', primeMeow, true);
+    document.removeEventListener('keydown', primeMeow, true);
+    try {
+      loadMeows().catch(() => {});
+      if (audio.state === 'suspended') audio.resume().catch(() => {});
+    } catch {}
+  }
+  document.addEventListener('click', primeMeow, true);
+  document.addEventListener('keydown', primeMeow, true);
+
   function showSpeech() {
     const line = spoken || (cat.dataset.hungerMood === 'hungry' ? 'I am hungry :(' : '');
     if (speech.textContent !== line) speech.textContent = line;
@@ -142,7 +185,15 @@ export function watchCatHunger(cat, onMood = () => {}) {
     meter.setAttribute('aria-valuenow', level);
     number.textContent = level + '%';
     showSpeech();
-    if (mood !== previous) onMood(mood, previous);
+    if (mood === previous) return;
+    if (mood === 'hungry') {
+      let savedTime;
+      try { savedTime = Number(sessionStorage.getItem(reminderKey())); } catch {}
+      setReminderTime(savedTime > 0 ? savedTime : Date.now() + hungryReminderDelay);
+    } else {
+      setReminderTime(0);
+    }
+    onMood(mood, previous);
   }
 
   function setUser(account) {
@@ -163,16 +214,11 @@ export function watchCatHunger(cat, onMood = () => {}) {
     if (event.key === hungerKey + ':' + user?.id) refresh();
   });
   window.addEventListener('pageshow', refresh);
-  setInterval(refresh, 1000);
-  return {
-    ready, setUser,
-    say(line) {
-      spoken = line;
-      showSpeech();
-      clearTimeout(speechTimer);
-      speechTimer = setTimeout(() => { spoken = ''; showSpeech(); }, 2800);
-    }
-  };
+  setInterval(() => {
+    refresh();
+    remindWhenHungry();
+  }, 1000);
+  return { ready, setUser, say };
 }
 
 const HUNGER_STYLES = `
@@ -243,7 +289,7 @@ function loadMeows() {
 async function meow() {
   try {
     const sounds = loadMeows();
-    if (audio.state === 'suspended') audio.resume();
+    if (audio.state === 'suspended') audio.resume().catch(() => {});
     let pick = Math.floor(Math.random() * meows.length);
     if (pick === lastMeow) pick = (pick + 1 + Math.floor(Math.random() * (meows.length - 1))) % meows.length;
     lastMeow = pick;
@@ -258,6 +304,8 @@ async function meow() {
     // No sound support: the cat still opens the chat.
   }
 }
+
+export { meow as playCatMeow };
 
 function readPosition() {
   try {
