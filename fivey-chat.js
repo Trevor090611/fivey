@@ -4,7 +4,7 @@ import { connectClient } from './auth-client.js';
 import { authConfig } from './auth-config.js';
 import { localChatMessages } from './grogy-conversation.js?v=2';
 import { articleSummary } from './article-summary.js?v=2';
-import { grogyCat } from './grogy-cat.js?v=hunger-drag1';
+import { catHungerFor, grogyCat, hungerMood } from './grogy-cat.js?v=hungry-meow1';
 const questionCost = 1;
 // Summarizing a blog article costs 2 Orbies, paid each time a summary is written.
 const summaryCost = 2;
@@ -317,6 +317,14 @@ function offerAutopilot(destination) {
   log.scrollTop = log.scrollHeight;
 }
 
+function respondWhileHungry(user, prompt) {
+  if (hungerMood(catHungerFor(user)) !== 'hungry') return false;
+  addMessage('You', prompt);
+  addMessage('Grogy', 'I am hungry, feed me please :(');
+  finish('');
+  return true;
+}
+
 async function ask(review) {
   const draft = input.value.trim();
   if (pending || (!draft && !review)) return;
@@ -339,9 +347,14 @@ async function ask(review) {
   setStatus('');
   try {
     const { client, session } = await getChatSession();
+    const prompt = review ? 'Explain the correct answer to this practice question.' : draft;
+    if (respondWhileHungry(session.user, prompt)) {
+      if (!review) input.value = '';
+      return;
+    }
     const account = session.user.id;
     if (!accepted && !declined && getOrbiesBalance(account) < questionCost) return insufficientOrbies();
-    addMessage('You', review ? 'Explain the correct answer to this practice question.' : draft);
+    addMessage('You', prompt);
     if (!review) input.value = '';
 
     if (newTopic || (reference && !reference.question)) activePractice = undefined;
@@ -428,6 +441,7 @@ async function summarizeArticle({ title, text, summary: overview = '' }) {
   setStatus('');
   try {
     const { session } = await getChatSession();
+    if (respondWhileHungry(session.user, 'Summarize this article: ' + title)) return;
     const account = session.user.id;
     const balance = getOrbiesBalance(account);
     if (balance < summaryCost) {
