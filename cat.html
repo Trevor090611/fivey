@@ -184,6 +184,32 @@
     .straw-mat-rail-left { left:3%; transform:skewX(-25deg); }
     .straw-mat-rail-right { right:3%; transform:skewX(25deg); }
     .cat-seat-preview .straw-mat-art { bottom:50%; width:88%; translate:-50% 50%; }
+    .cat-portrait[data-equipped-seat="hardwood-windowsill"] { --pet-seat-bottom:35px; }
+    .cat-portrait[data-equipped-seat="hardwood-windowsill"] .cat-box-layer { display:none; }
+    :root[data-cat-page] .cat-portrait #cat-window-toggle {
+      display:none; position:absolute; z-index:0; left:var(--box-center); bottom:10px; translate:-50% 0 !important;
+      width:min(210px, 90%); aspect-ratio:1.65; margin:0; padding:0; cursor:pointer;
+      background:none !important; border:0 !important; box-shadow:none !important;
+    }
+    :root[data-cat-page] .cat-portrait[data-equipped-seat="hardwood-windowsill"] #cat-window-toggle { display:block; }
+    .windowsill-art {
+      display:block; position:absolute; inset:0; perspective:155px; pointer-events:none;
+      --wood:repeating-linear-gradient(0deg,#dfaa68 0 2px,#f0c48b 2px 4px,#d49855 4px 5px);
+      --glass:linear-gradient(130deg,#e9f8ff 12%,#b7dfed 48%,#f6fdff 50%,#c4eaf6 53%,#e5f9fe 73%);
+    }
+    .windowsill-art span { display:block; position:absolute; }
+    .window-frame { inset:5% 24% 19%; background:#102d37; border:5px solid #cf9454; border-top-color:#efbd7c; box-shadow:inset 0 0 10px #0009; }
+    .window-door { inset:10% auto 24%; width:23%; border:3px solid #dc9f5e; border-radius:2px; background:var(--glass); transition:transform .22s ease; box-shadow:inset 0 0 0 1px #f1cb9b; }
+    .window-door::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent 46%,#bc8149 47% 54%,transparent 55%),repeating-linear-gradient(0deg,transparent 0 29%,#ca8c4d 29% 34%); }
+    .window-door::after { content:''; position:absolute; width:5px; height:9px; top:52%; background:#713e21; border-radius:50%; }
+    .window-door-left { left:27%; transform-origin:left center; transform:rotateY(-132deg); }
+    .window-door-left::after { right:3px; }
+    .window-door-right { right:27%; transform-origin:right center; transform:rotateY(132deg); }
+    .window-door-right::after { left:3px; }
+    #cat-window-toggle[data-window-closed] .window-door { transform:rotateY(0); }
+    .window-ledge { inset:auto 16% 3%; height:18%; background:var(--wood); clip-path:polygon(10% 0,90% 0,100% 82%,97% 100%,3% 100%,0 82%); box-shadow:inset 0 -4px #a76937; }
+    .cat-seat-preview .windowsill-art { inset:9% 3%; }
+    @media(prefers-reduced-motion:reduce) { .window-door { transition:none; } }
   </style>
 </head>
 <body>
@@ -218,6 +244,9 @@
         <div class="doormat-art" aria-hidden="true"></div>
         <div class="newspaper-art" aria-hidden="true"><span class="newspaper-headline">NEWS</span><span class="newspaper-photo"></span><span class="newspaper-columns"></span></div>
         <div class="straw-mat-art" aria-hidden="true"><span class="straw-mat-weave"></span><span class="straw-mat-rail straw-mat-rail-left"></span><span class="straw-mat-rail straw-mat-rail-right"></span></div>
+        <button id="cat-window-toggle" type="button" aria-label="Close window" title="Close window">
+          <span class="windowsill-art" aria-hidden="true"><span class="window-frame"></span><span class="window-door window-door-left"></span><span class="window-door window-door-right"></span><span class="window-ledge"></span></span>
+        </button>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -256,8 +285,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=straw-mat1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat4';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=windowsill1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat5';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -453,12 +482,20 @@
     const seatStatus = document.querySelector('#cat-seat-status');
     const purchaseDialog = document.querySelector('#cat-seat-dialog');
     const seatScene = portrait.closest('.cat-portrait');
+    const windowToggle = document.querySelector('#cat-window-toggle');
+    windowToggle.addEventListener('click', () => {
+      const closed = windowToggle.toggleAttribute('data-window-closed');
+      const label = closed ? 'Open window' : 'Close window';
+      windowToggle.setAttribute('aria-label', label);
+      windowToggle.title = label;
+    });
     const seatCatalog = [
       { id: 'cardbox', name: 'Cardbox', art: '.cat-box-layer' },
       { id: 'wooden-stool', name: 'Wooden Stool', art: '.stool-art' },
       { id: 'doormat', name: 'Doormat', art: '.doormat-art' },
       { id: 'folded-newspaper', name: 'Folded Newspaper', art: '.newspaper-art' },
-      { id: 'woven-straw-mat', name: 'Woven Straw Mat', art: '.straw-mat-art' }
+      { id: 'woven-straw-mat', name: 'Woven Straw Mat', art: '.straw-mat-art' },
+      { id: 'hardwood-windowsill', name: 'Hardwood Windowsill', art: '.windowsill-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
