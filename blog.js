@@ -1,4 +1,4 @@
-import { authenticatedClient as client } from './auth-gate.js?v=blog1';
+import { authenticatedClient as client } from './auth-gate.js?v=orbie-controls2';
 import { authConfig } from './auth-config.js?v=2';
 
 const list = document.querySelector('#blog-posts');
