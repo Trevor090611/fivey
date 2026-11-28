@@ -307,6 +307,24 @@
     @keyframes tree-toy-swing { from { transform:rotate(-10deg); } to { transform:rotate(16deg); } }
     .cat-portrait[data-tree-facing="right"] .grogy-cat { --facing:-1; }
     .cat-seat-preview .cat-tree-art { bottom:4%; width:min(85%,180px); height:92%; }
+    .cat-portrait[data-equipped-seat="sofa"] { --pet-seat-bottom:56px; }
+    .cat-portrait[data-equipped-seat="sofa"] .cat-box-layer, .cat-portrait .sofa-art { display:none; }
+    .cat-portrait[data-equipped-seat="sofa"] .sofa-art { display:block; }
+    .sofa-art { position:absolute; left:var(--box-center); bottom:10px; width:min(192px, 92%); height:106px; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 4px 4px #0008); }
+    .sofa-art span { position:absolute; display:block; }
+    .sofa-leg { bottom:1%; width:5%; height:21%; background:linear-gradient(90deg,#984430,#bf6449); border-radius:2px 2px 50% 50%; }
+    .sofa-leg-left { left:13%; transform:skewX(-12deg); }
+    .sofa-leg-right { right:14%; transform:skewX(12deg); }
+    .sofa-back { inset:4% 4% 31%; border:1px solid #dcb96e; border-radius:49% 49% 16% 16% / 36% 36% 16% 16%; background:repeating-linear-gradient(89deg,transparent 0 13%,#ffecad9c 13.5% 14%,transparent 14.5%),repeating-linear-gradient(2deg,#f1d185 0 29%,#f8df9b 30% 32%); }
+    .sofa-front { inset:49% 6% 17%; border-radius:10% 13% 20% 20%; background:linear-gradient(#f3d68d,#ffeab3 57%,#e5c776 96%); }
+    .sofa-seat { inset:50% 14% 31%; border-radius:48% 47% 24% 24%; background:#ffe9a9; box-shadow:inset 0 -4px 0 #efd080; }
+    .sofa-arm { top:36%; bottom:20%; width:15%; border-radius:60% 45% 51% 42% / 40% 46% 44% 49%; background:linear-gradient(110deg,#ffebaa,#f1ce7d); box-shadow:inset 1px -3px 0 #e9c26e; }
+    .sofa-arm-left { left:3%; transform:rotate(-12deg); }
+    .sofa-arm-right { right:3%; transform:rotate(12deg); }
+    .sofa-pillow { top:30%; width:21%; height:27%; background:linear-gradient(133deg,#c0e1e9 9%,#96c6d4 29% 80%,#77acbe 92%); border:1px solid #84b6c8; border-radius:20% 13% 17% 18%; }
+    .sofa-pillow-left { left:17%; transform:skewX(10deg) rotate(-13deg); }
+    .sofa-pillow-right { right:17%; transform:skewX(-10deg) rotate(13deg); }
+    .cat-seat-preview .sofa-art { bottom:9%; width:min(94%,189px); height:79%; }
   </style>
 </head>
 <body>
@@ -356,6 +374,7 @@
           <span class="tree-platform tree-platform-top"></span><span class="tree-platform tree-platform-left"></span><span class="tree-platform tree-platform-right"></span>
           <span class="tree-toy tree-toy-left"><span class="tree-ball"></span></span><span class="tree-toy tree-toy-right"><span class="tree-ball"></span></span>
         </div>
+        <div class="sofa-art" aria-hidden="true"><span class="sofa-leg sofa-leg-left"></span><span class="sofa-leg sofa-leg-right"></span><span class="sofa-back"></span><span class="sofa-front"></span><span class="sofa-seat"></span><span class="sofa-arm sofa-arm-left"></span><span class="sofa-arm sofa-arm-right"></span><span class="sofa-pillow sofa-pillow-left"></span><span class="sofa-pillow sofa-pillow-right"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -394,8 +413,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cat-tree1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat12';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cozy-sofa1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat13';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -734,7 +753,8 @@
       { id: 'fresh-laundry', name: 'Pile of Fresh Laundry', art: '.fresh-laundry-art' },
       { id: 'covered-cat-cave', name: 'Covered Cat Cave', art: '.covered-cat-cave-art' },
       { id: 'plush-donut-bed', name: 'Plush Donut Bed', art: '.plush-donut-bed-art' },
-      { id: 'multi-tier-cat-tree-condo', name: 'Multi-Tier Cat Tree Condo', art: '.cat-tree-art' }
+      { id: 'multi-tier-cat-tree-condo', name: 'Multi-Tier Cat Tree Condo', art: '.cat-tree-art' },
+      { id: 'sofa', name: 'Sofa', art: '.sofa-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
