@@ -6,7 +6,7 @@ import { syncAccountData } from './account-data.js?v=4';
 // Show the wallet artwork on current and dynamically generated spending controls.
 function decorateOrbieButtons() {
   const style = document.createElement('style');
-  style.textContent = '.fivey-button-coin{display:inline-block;width:1em;height:1em;max-width:none;object-fit:contain;flex:none;margin-inline-start:.38em;vertical-align:-.15em;pointer-events:none}' +
+  style.textContent = '.fivey-button-coin{display:inline-block;width:1.5em;height:1.5em;max-width:none;object-fit:contain;flex:none;margin-inline-start:.38em;vertical-align:-.32em;pointer-events:none}' +
     'body:has(.progress-quiz:not([hidden])):not(:has(.progress-quiz .progress-summary:not([hidden]))) .fivey-chat{display:none!important}';
   document.head.append(style);
 
