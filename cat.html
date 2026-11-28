@@ -158,6 +158,21 @@
       box-shadow:0 3px 0 #d68645, 0 5px 10px #0008, inset 0 -2px 0 #f39547;
     }
     .cat-seat-preview .doormat-art { bottom:50%; width:90%; translate:-50% 50%; }
+    .cat-portrait[data-equipped-seat="folded-newspaper"] { --pet-seat-bottom:34px; }
+    .cat-portrait[data-equipped-seat="folded-newspaper"] .cat-box-layer, .cat-portrait .newspaper-art { display:none; }
+    .cat-portrait[data-equipped-seat="folded-newspaper"] .newspaper-art { display:block; }
+    .newspaper-art {
+      position:absolute; left:var(--box-center); bottom:14px; width:min(158px, 76%); aspect-ratio:2 / 1;
+      transform:translateX(-50%) skewX(-28deg) rotate(8deg); transform-origin:center;
+      border:2px solid #92928b; border-radius:2px 10px 12px 2px; background:linear-gradient(100deg,#f4f1dd 57%,#d6d4c4);
+      box-shadow:0 3px 0 #c9c7b7, 0 5px 0 #777971, 0 8px 10px #0008; pointer-events:none;
+    }
+    .newspaper-art span { position:absolute; }
+    .newspaper-headline { top:7%; left:7%; width:34%; padding:3% 0; color:#181c20; background:#bdc0bf; font:900 clamp(8px,2vw,15px)/1 system-ui,sans-serif; letter-spacing:.08em; text-align:center; }
+    .newspaper-photo { inset:38% 59% 12% 7%; background:linear-gradient(140deg,#a5aaa7 40%,#656d70 41% 76%,#afa28e 77%); }
+    .newspaper-columns { inset:10% 10% 13% 47%; background:repeating-linear-gradient(0deg,#777d7e 0 1px,transparent 1px 4px); }
+    .newspaper-columns::after { content:''; position:absolute; inset:0 43% 0 53%; background:#e4e0cf; }
+    .cat-seat-preview .newspaper-art { bottom:50%; width:69%; transform:translate(-50%,50%) skewX(-28deg) rotate(8deg); }
   </style>
 </head>
 <body>
@@ -190,6 +205,7 @@
         </div>
         <div class="stool-art" aria-hidden="true"><span class="stool-leg-left"></span><span class="stool-leg-right"></span><span class="stool-brace"></span><span class="stool-leg-middle"></span><span class="stool-top"></span></div>
         <div class="doormat-art" aria-hidden="true"></div>
+        <div class="newspaper-art" aria-hidden="true"><span class="newspaper-headline">NEWS</span><span class="newspaper-photo"></span><span class="newspaper-columns"></span></div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -228,8 +244,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=hungry-meow1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat2';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=newspaper1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat3';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -428,7 +444,8 @@
     const seatCatalog = [
       { id: 'cardbox', name: 'Cardbox', art: '.cat-box-layer' },
       { id: 'wooden-stool', name: 'Wooden Stool', art: '.stool-art' },
-      { id: 'doormat', name: 'Doormat', art: '.doormat-art' }
+      { id: 'doormat', name: 'Doormat', art: '.doormat-art' },
+      { id: 'folded-newspaper', name: 'Folded Newspaper', art: '.newspaper-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
