@@ -37,7 +37,7 @@ export function spendOrbies(account, amount) {
   });
 }
 
-export const cozySeatPrices = Object.freeze({ cardbox: 0, 'wooden-stool': 5, doormat: 7, 'folded-newspaper': 10 });
+export const cozySeatPrices = Object.freeze({ cardbox: 0, 'wooden-stool': 5, doormat: 7, 'folded-newspaper': 10, 'woven-straw-mat': 13 });
 const defaultSeat = 'cardbox';
 
 export function readCozySeats(wallet) {
