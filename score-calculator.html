@@ -68,7 +68,7 @@ h1{font-size:clamp(34px,7vw,52px);line-height:1.08;letter-spacing:-.045em;margin
 main[data-category="humanities"],body:has(main[data-category="humanities"]) .fivey-chat{--button-fill:#fff1b8}
 :root[data-fivey-dark] body:has(main[data-category="humanities"]) .fivey-chat :is(button,a.practice-button){border-color:#ff4fd8!important;background-image:linear-gradient(#ff4fd8,#ff4fd8)!important}
 </style>
-<script type="module" src="./auth-gate.js?v=orbies2"></script>
+<script type="module" src="./auth-gate.js?v=orbie-controls2"></script>
 <link rel="stylesheet" href="./biology-banners.css?v=2">
 <script type="module" src="./biology-banners.js?v=2"></script>
 </head>
@@ -80,7 +80,7 @@ main[data-category="humanities"],body:has(main[data-category="humanities"]) .fiv
 <script type="module">
 // Predicts an AP score for the multiple-choice section from the user's Practice Exams
 // that had every unit selected (saved by progress.js under fivey-practice-exams-v1).
-import { analyticsAccount } from './auth-gate.js?v=orbies2';
+import { analyticsAccount } from './auth-gate.js?v=orbie-controls2';
 import { isAnalyticsUnlocked, lockedNotice } from './analytics-unlock.js?v=3';
 
 const courses = { biology: 'AP Biology', 'environmental-science': 'AP Environmental Science', chemistry: 'AP Chemistry', 'physics-1': 'AP Physics 1', psychology: 'AP Psychology', 'calculus-ab': 'AP Calculus AB', macroeconomics: 'AP Macroeconomics' };
