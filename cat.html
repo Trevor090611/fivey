@@ -282,6 +282,31 @@
     .donut-bed-rim { inset:35% 0 34%; border-radius:50%; background:#f98678; box-shadow:inset 0 -3px 0 #db6d67; }
     .donut-bed-cushion { inset:41% 7% 42%; border-radius:50%; background:radial-gradient(ellipse at 50% 53%,#ed887a 0 6%,transparent 7%),repeating-conic-gradient(from 10deg at 50% 53%,#f8b5ae 0 1deg,transparent 4deg 55deg),#ffc5bd; }
     .cat-seat-preview .plush-donut-bed-art { bottom:9%; width:min(85%,156px); height:78%; }
+    .cat-portrait[data-equipped-seat="multi-tier-cat-tree-condo"] { --pet-seat-bottom:169px; min-height:310px; }
+    .cat-portrait[data-equipped-seat="multi-tier-cat-tree-condo"] .cat-box-layer, .cat-portrait .cat-tree-art { display:none; }
+    .cat-portrait[data-equipped-seat="multi-tier-cat-tree-condo"] .cat-tree-art { display:block; }
+    .cat-tree-art { position:absolute; left:var(--box-center); bottom:10px; width:min(192px, 89%); height:174px; translate:-50% 0; pointer-events:none; filter:drop-shadow(0 4px 4px #0008); }
+    .cat-tree-art span { position:absolute; display:block; }
+    .tree-base { inset:auto 0 0; height:27%; border-radius:50%; background:linear-gradient(170deg,#c9a263,#a77a43); }
+    .tree-condo { inset:57% 23% 11%; border-radius:50% 50% 18% 18% / 17% 17% 27% 27%; background:linear-gradient(90deg,#60391f,#88603a 73%,#694323); box-shadow:inset 0 7px #c39b5c; }
+    .tree-condo::after { content:''; position:absolute; inset:auto 32% 3% 31%; height:53%; border-radius:50% 50% 40% 40%; background:radial-gradient(ellipse at 52% 110%,#b88955 0 35%,#28190f 37%); }
+    .tree-post { width:10%; border-radius:2px 2px 40% 40%; background:repeating-linear-gradient(0deg,#80582f 0 2px,#a87942 3px 5px); }
+    .tree-post-main { inset:8% auto 40% 44%; width:17%; }
+    .tree-post-left { inset:48% auto 39% 26%; }
+    .tree-post-right { inset:34% auto 39% 70%; }
+    .tree-platform { height:11%; border-radius:50%; background:#5a351c; border-bottom:6px solid #c19a5e; }
+    .tree-platform-top { top:0; left:26%; width:48%; }
+    .tree-platform-left { top:36%; left:7%; width:38%; }
+    .tree-platform-right { top:21%; right:5%; width:38%; }
+    .tree-toy { width:12%; height:23%; transform-origin:50% 0; }
+    .tree-toy-left { top:43%; left:9%; }
+    .tree-toy-right { top:28%; right:6%; }
+    .tree-toy::before { content:''; position:absolute; width:1px; inset:0 auto 30% 50%; background:#d7b97a; }
+    .tree-ball { left:16%; right:16%; bottom:0; aspect-ratio:1; border-radius:44% 53% 47% 54%; background:radial-gradient(circle at 35% 30%,#edcf8c,#bb8a48 68%); box-shadow:inset -2px -2px #77502c45; }
+    .cat-portrait[data-tree-toy="left"] .tree-toy-left, .cat-portrait[data-tree-toy="right"] .tree-toy-right { animation:tree-toy-swing 520ms ease-in-out infinite alternate; }
+    @keyframes tree-toy-swing { from { transform:rotate(-10deg); } to { transform:rotate(16deg); } }
+    .cat-portrait[data-tree-facing="right"] .grogy-cat { --facing:-1; }
+    .cat-seat-preview .cat-tree-art { bottom:4%; width:min(85%,180px); height:92%; }
   </style>
 </head>
 <body>
@@ -325,6 +350,12 @@
         <div class="fresh-laundry-art" aria-hidden="true"><span class="laundry-striped"></span><span class="laundry-sheet"></span><span class="laundry-yellow"></span><span class="laundry-green"></span><span class="laundry-peach"></span><span class="laundry-navy"></span></div>
         <div class="covered-cat-cave-art" aria-hidden="true"><span class="cave-shell"></span><span class="cave-opening"><span class="cave-cushion"></span></span><span class="cave-badge"></span></div>
         <div class="plush-donut-bed-art" aria-hidden="true"><span class="donut-ear donut-ear-left"></span><span class="donut-ear donut-ear-right"></span><span class="donut-bed-base"></span><span class="donut-bed-rim"></span><span class="donut-bed-cushion"></span></div>
+        <div class="cat-tree-art" aria-hidden="true">
+          <span class="tree-base"></span><span class="tree-condo"></span>
+          <span class="tree-post tree-post-main"></span><span class="tree-post tree-post-left"></span><span class="tree-post tree-post-right"></span>
+          <span class="tree-platform tree-platform-top"></span><span class="tree-platform tree-platform-left"></span><span class="tree-platform tree-platform-right"></span>
+          <span class="tree-toy tree-toy-left"><span class="tree-ball"></span></span><span class="tree-toy tree-toy-right"><span class="tree-ball"></span></span>
+        </div>
         <button id="cat-pet" type="button" aria-label="Pet Grogy" hidden></button>
         <div class="cat-hearts" aria-hidden="true"></div>
       </div>
@@ -363,8 +394,8 @@
     </dialog>
   </main>
   <script type="module">
-    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=plush-donut-bed1';
-    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat11';
+    import { analyticsAccount, authenticatedClient } from './auth-gate.js?v=cat-tree1';
+    import { cozySeatPrices, getCozySeats, orbiesKey, selectCozySeat } from './orbies-wallet.js?v=cozy-seat12';
     import { catMarkup, catHungerFor, hungerAfterMeal, mealHunger, playCatMeow, watchCatHunger } from './grogy-cat.js?v=hungry-meow1';
 
     const careTabs = [...document.querySelectorAll('.cat-care-tabs [role="tab"]')];
@@ -420,6 +451,109 @@
     let sleepTimer;
     let groomTimer;
 
+    const treeSeat = 'multi-tier-cat-tree-condo';
+    const scene = portrait.closest('.cat-portrait');
+    let treeTimer;
+    let treeMotion;
+    let treePlaying = false;
+    let treeSequence = 0;
+
+    function treeAvailable() {
+      return scene.dataset.equippedSeat === treeSeat && !portrait.hidden && !document.hidden &&
+        !reducedMotion.matches && !['hungry', 'tired'].includes(portrait.dataset.hungerMood);
+    }
+
+    function resetTreePlay() {
+      clearTimeout(treeTimer);
+      treeSequence++;
+      treeMotion?.cancel();
+      treeMotion = undefined;
+      if (treePlaying) {
+        portrait.dataset.state = 'idle';
+        pet.hidden = portrait.hidden;
+      }
+      treePlaying = false;
+      delete portrait.dataset.play;
+      delete scene.dataset.treeToy;
+      delete scene.dataset.treeFacing;
+    }
+
+    function planTreePlay() {
+      clearTimeout(treeTimer);
+      if (!treeAvailable() || treePlaying) return;
+      treeTimer = setTimeout(() => {
+        if (treeAvailable() && portrait.dataset.state === 'idle') void playWithTree();
+        else planTreePlay();
+      }, 16_000 + Math.random() * 16_000);
+    }
+
+    async function playWithTree() {
+      const original = portrait.getBoundingClientRect();
+      const sequence = ++treeSequence;
+      const valid = () => sequence === treeSequence && treeAvailable();
+      const top = { x: 0, y: 0 };
+      let position = top;
+      treePlaying = true;
+      pet.hidden = true;
+
+      function target(side, mode) {
+        const ball = scene.querySelector('.tree-toy-' + side + ' .tree-ball').getBoundingClientRect();
+        const paw = mode === 'pat';
+        const x = paw ? -.07 : .20;
+        return {
+          x: ball.left + ball.width / 2 - original.left - original.width * (side === 'left' ? x : 1 - x),
+          y: ball.top + ball.height / 2 - original.top - original.height * (paw ? .77 : .45)
+        };
+      }
+
+      async function moveTo(end, duration, arc) {
+        const from = position;
+        const at = (x, y) => 'translate(' + x + 'px, ' + y + 'px)';
+        const frames = [{ transform: at(from.x, from.y) }];
+        if (arc) frames.push({ offset: .46, transform: at((from.x + end.x) / 2, Math.min(from.y, end.y) - arc) + ' scale(1.04, .94)' });
+        frames.push({ transform: at(end.x, end.y) });
+        treeMotion?.cancel();
+        treeMotion = portrait.animate(frames, { duration, easing: 'ease-in-out', fill: 'forwards' });
+        await treeMotion.finished;
+        position = end;
+      }
+
+      try {
+        for (const side of ['left', 'right']) {
+          if (!valid()) break;
+          scene.dataset.treeFacing = side;
+          portrait.dataset.state = 'idle';
+          delete scene.dataset.treeToy;
+          await moveTo(target(side, 'pat'), 650, 18);
+          for (const [mode, duration] of [['pat', 1250], ['rub', 1600]]) {
+            if (!valid()) break;
+            if (mode === 'rub') {
+              portrait.dataset.state = 'idle';
+              await moveTo(target(side, mode), 220, 0);
+            }
+            if (!valid()) break;
+            portrait.dataset.state = 'playing';
+            portrait.dataset.play = mode;
+            scene.dataset.treeToy = side;
+            await new Promise(resolve => setTimeout(resolve, duration));
+          }
+        }
+        if (valid()) {
+          delete scene.dataset.treeToy;
+          portrait.dataset.state = 'idle';
+          await moveTo(top, 710, 20);
+        }
+      } catch (error) {
+        if (error?.name !== 'AbortError') console.warn('Cat tree animation could not finish.', error);
+      } finally {
+        if (sequence === treeSequence) {
+          resetTreePlay();
+          planTreePlay();
+        }
+      }
+    }
+
+
     function updateNameCount() {
       nameCount.textContent = nameInput.value.length + '/' + nameInput.maxLength;
     }
@@ -461,10 +595,15 @@
       clearTimeout(sleepTimer);
       if (portrait.dataset.hungerMood === 'hungry') return;
       if (portrait.dataset.state === 'sleeping') portrait.dataset.state = 'idle';
-      sleepTimer = setTimeout(() => {
+      function sleepWhenStill() {
+        if (treePlaying) {
+          sleepTimer = setTimeout(sleepWhenStill, 500);
+          return;
+        }
         clearTimeout(groomTimer);
         portrait.dataset.state = 'sleeping';
-      }, portrait.dataset.hungerMood === 'tired' ? 20_000 : sleepDelay);
+      }
+      sleepTimer = setTimeout(sleepWhenStill, portrait.dataset.hungerMood === 'tired' ? 20_000 : sleepDelay);
     }
 
     function entranceOffset(destination) {
@@ -485,12 +624,17 @@
     }
 
     function startCatScene() {
+      resetTreePlay();
       entrance?.cancel();
       clearTimeout(groomTimer);
       portrait.hidden = false;
       portrait.dataset.state = 'idle';
       pet.hidden = false;
       resetSleepTimer();
+      if (scene.dataset.equippedSeat === treeSeat) {
+        planTreePlay();
+        return;
+      }
       if (reducedMotion.matches || portrait.dataset.hungerMood === 'hungry') return;
 
       const { x, y } = entranceOffset(portrait.getBoundingClientRect());
@@ -512,6 +656,10 @@
     portrait.innerHTML = catMarkup;
     const hunger = watchCatHunger(portrait, (mood, previous) => {
       if (portrait.hidden) return;
+      if (scene.dataset.equippedSeat === treeSeat) {
+        if (!treeAvailable()) resetTreePlay();
+        else planTreePlay();
+      }
       if (mood === 'hungry') {
         clearTimeout(sleepTimer);
         clearTimeout(groomTimer);
@@ -530,6 +678,12 @@
     window.addEventListener('pageshow', event => {
       if (event.persisted) startCatScene();
     });
+    function refreshTreeMotion() {
+      if (!treeAvailable()) resetTreePlay();
+      else planTreePlay();
+    }
+    document.addEventListener('visibilitychange', refreshTreeMotion);
+    reducedMotion.addEventListener('change', refreshTreeMotion);
     for (const event of ['pointerdown', 'keydown', 'click', 'wheel']) {
       document.addEventListener(event, resetSleepTimer, { capture: true, passive: true });
     }
@@ -579,7 +733,8 @@
       { id: 'cushioned-perch', name: 'Cushioned Perch', art: '.cushioned-perch-art' },
       { id: 'fresh-laundry', name: 'Pile of Fresh Laundry', art: '.fresh-laundry-art' },
       { id: 'covered-cat-cave', name: 'Covered Cat Cave', art: '.covered-cat-cave-art' },
-      { id: 'plush-donut-bed', name: 'Plush Donut Bed', art: '.plush-donut-bed-art' }
+      { id: 'plush-donut-bed', name: 'Plush Donut Bed', art: '.plush-donut-bed-art' },
+      { id: 'multi-tier-cat-tree-condo', name: 'Multi-Tier Cat Tree Condo', art: '.cat-tree-art' }
     ];
     const priceLabel = id => cozySeatPrices[id] + ' Orbies';
     let seatPending = false;
@@ -606,7 +761,12 @@
     function paintSeats() {
       let seats = { owned: [], equipped: 'cardbox' };
       try { if (analyticsAccount) seats = getCozySeats(analyticsAccount); } catch {}
+      const previousSeat = seatScene.dataset.equippedSeat;
       seatScene.dataset.equippedSeat = seats.equipped;
+      if (previousSeat !== seats.equipped && !portrait.hidden) {
+        if (seats.equipped === treeSeat) startCatScene();
+        else if (previousSeat === treeSeat) resetTreePlay();
+      }
       for (const { item, card, button, indicator } of seatCards) {
         const owned = cozySeatPrices[item.id] === 0 || seats.owned.includes(item.id);
         const equipped = seats.equipped === item.id;
